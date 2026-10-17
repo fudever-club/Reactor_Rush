@@ -1,0 +1,786 @@
+{
+  "schemaVersion": "1.0.0",
+  "characterId": "p1-cyan",
+  "playback": "cutout-tween",
+  "coordinateUnits": "rig-authoring-pixels and radians",
+  "animations": {
+    "idle": {
+      "durationMs": 1500,
+      "loop": true,
+      "ease": "Sine.easeInOut",
+      "keyframes": [
+        {
+          "atMs": 0,
+          "root": {
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0
+            },
+            "antenna-stem": {
+              "rotation": -0.025
+            },
+            "antenna-tip": {
+              "rotation": -0.04
+            },
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "spring-leg-left": {
+              "scaleY": 1
+            },
+            "spring-leg-right": {
+              "scaleY": 1
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            }
+          }
+        },
+        {
+          "atMs": 750,
+          "root": {
+            "y": -3,
+            "scaleY": 1.012
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0.018
+            },
+            "antenna-stem": {
+              "rotation": 0.035
+            },
+            "antenna-tip": {
+              "rotation": 0.08
+            },
+            "upper-arm-left": {
+              "rotation": 0.025
+            },
+            "upper-arm-right": {
+              "rotation": -0.025
+            },
+            "spring-leg-left": {
+              "scaleY": 0.97
+            },
+            "spring-leg-right": {
+              "scaleY": 0.97
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            }
+          }
+        },
+        {
+          "atMs": 1500,
+          "root": {
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0
+            },
+            "antenna-stem": {
+              "rotation": -0.025
+            },
+            "antenna-tip": {
+              "rotation": -0.04
+            },
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "spring-leg-left": {
+              "scaleY": 1
+            },
+            "spring-leg-right": {
+              "scaleY": 1
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            }
+          }
+        }
+      ]
+    },
+    "catch": {
+      "durationMs": 820,
+      "loop": false,
+      "ease": "Sine.easeInOut",
+      "keyframes": [
+        {
+          "atMs": 0,
+          "root": {
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "lower-arm-left": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "lower-arm-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-left": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            }
+          }
+        },
+        {
+          "atMs": 160,
+          "root": {
+            "y": 3,
+            "scaleY": 0.975
+          },
+          "parts": {
+            "upper-arm-left": {
+              "rotation": 0.32
+            },
+            "upper-arm-right": {
+              "rotation": -0.32
+            },
+            "lower-arm-left": {
+              "rotation": 0.28,
+              "x": -4,
+              "y": -8
+            },
+            "lower-arm-right": {
+              "rotation": -0.28,
+              "x": 4,
+              "y": -8
+            },
+            "hand-left": {
+              "rotation": 0.4,
+              "x": 1,
+              "y": -16
+            },
+            "hand-right": {
+              "rotation": -0.4,
+              "x": -1,
+              "y": -16
+            },
+            "face-idle": {
+              "alpha": 0.4
+            },
+            "face-catch": {
+              "alpha": 0.6
+            },
+            "energy-orb": {
+              "alpha": 0.25,
+              "x": -48,
+              "y": -12
+            }
+          }
+        },
+        {
+          "atMs": 360,
+          "root": {
+            "y": -7,
+            "scaleY": 1.03
+          },
+          "parts": {
+            "upper-arm-left": {
+              "rotation": 0.82
+            },
+            "upper-arm-right": {
+              "rotation": -0.82
+            },
+            "lower-arm-left": {
+              "rotation": 0.78,
+              "x": -10,
+              "y": -28
+            },
+            "lower-arm-right": {
+              "rotation": -0.78,
+              "x": 10,
+              "y": -28
+            },
+            "hand-left": {
+              "rotation": 1.55,
+              "x": 7,
+              "y": -98
+            },
+            "hand-right": {
+              "rotation": -1.55,
+              "x": -7,
+              "y": -98
+            },
+            "face-idle": {
+              "alpha": 0
+            },
+            "face-catch": {
+              "alpha": 1
+            },
+            "energy-orb": {
+              "alpha": 1,
+              "x": -96,
+              "y": -53
+            }
+          }
+        },
+        {
+          "atMs": 610,
+          "root": {
+            "y": -5,
+            "scaleY": 1.018
+          },
+          "parts": {
+            "upper-arm-left": {
+              "rotation": 0.78
+            },
+            "upper-arm-right": {
+              "rotation": -0.78
+            },
+            "lower-arm-left": {
+              "rotation": 0.74,
+              "x": -9,
+              "y": -26
+            },
+            "lower-arm-right": {
+              "rotation": -0.74,
+              "x": 9,
+              "y": -26
+            },
+            "hand-left": {
+              "rotation": 1.48,
+              "x": 6,
+              "y": -91
+            },
+            "hand-right": {
+              "rotation": -1.48,
+              "x": -6,
+              "y": -91
+            },
+            "face-idle": {
+              "alpha": 0
+            },
+            "face-catch": {
+              "alpha": 1
+            },
+            "energy-orb": {
+              "alpha": 1,
+              "x": -96,
+              "y": -53
+            }
+          }
+        },
+        {
+          "atMs": 820,
+          "root": {
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "lower-arm-left": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "lower-arm-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-left": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0,
+              "x": 0,
+              "y": 0
+            }
+          }
+        }
+      ]
+    },
+    "move": {
+      "durationMs": 520,
+      "loop": true,
+      "ease": "Sine.easeInOut",
+      "keyframes": [
+        {
+          "atMs": 0,
+          "root": {
+            "x": 0,
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0
+            },
+            "antenna-stem": {
+              "rotation": -0.025
+            },
+            "antenna-tip": {
+              "rotation": -0.04
+            },
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "upper-leg-left": {
+              "rotation": 0
+            },
+            "upper-leg-right": {
+              "rotation": 0
+            },
+            "spring-leg-left": {
+              "scaleY": 1
+            },
+            "spring-leg-right": {
+              "scaleY": 1
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            }
+          }
+        },
+        {
+          "atMs": 130,
+          "root": {
+            "x": -6,
+            "y": -8,
+            "scaleY": 1.02
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": -0.035
+            },
+            "antenna-stem": {
+              "rotation": -0.15
+            },
+            "antenna-tip": {
+              "rotation": -0.28
+            },
+            "upper-arm-left": {
+              "rotation": -0.16
+            },
+            "upper-arm-right": {
+              "rotation": 0.16
+            },
+            "upper-leg-left": {
+              "rotation": 0.12
+            },
+            "upper-leg-right": {
+              "rotation": -0.12
+            },
+            "spring-leg-left": {
+              "scaleY": 0.94
+            },
+            "spring-leg-right": {
+              "scaleY": 1.04
+            },
+            "foot-left": {
+              "rotation": -0.07
+            },
+            "foot-right": {
+              "rotation": 0.07
+            }
+          }
+        },
+        {
+          "atMs": 260,
+          "root": {
+            "x": 0,
+            "y": -14,
+            "scaleY": 1.035
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0
+            },
+            "antenna-stem": {
+              "rotation": 0.04
+            },
+            "antenna-tip": {
+              "rotation": 0.1
+            },
+            "upper-arm-left": {
+              "rotation": 0.04
+            },
+            "upper-arm-right": {
+              "rotation": -0.04
+            },
+            "upper-leg-left": {
+              "rotation": -0.12
+            },
+            "upper-leg-right": {
+              "rotation": 0.12
+            },
+            "spring-leg-left": {
+              "scaleY": 1.04
+            },
+            "spring-leg-right": {
+              "scaleY": 0.94
+            },
+            "foot-left": {
+              "rotation": 0.07
+            },
+            "foot-right": {
+              "rotation": -0.07
+            }
+          }
+        },
+        {
+          "atMs": 390,
+          "root": {
+            "x": 6,
+            "y": -8,
+            "scaleY": 1.02
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0.035
+            },
+            "antenna-stem": {
+              "rotation": 0.16
+            },
+            "antenna-tip": {
+              "rotation": 0.28
+            },
+            "upper-arm-left": {
+              "rotation": 0.16
+            },
+            "upper-arm-right": {
+              "rotation": -0.16
+            },
+            "upper-leg-left": {
+              "rotation": 0.12
+            },
+            "upper-leg-right": {
+              "rotation": -0.12
+            },
+            "spring-leg-left": {
+              "scaleY": 0.94
+            },
+            "spring-leg-right": {
+              "scaleY": 1.04
+            },
+            "foot-left": {
+              "rotation": -0.07
+            },
+            "foot-right": {
+              "rotation": 0.07
+            }
+          }
+        },
+        {
+          "atMs": 520,
+          "root": {
+            "x": 0,
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0
+            },
+            "antenna-stem": {
+              "rotation": -0.025
+            },
+            "antenna-tip": {
+              "rotation": -0.04
+            },
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "upper-leg-left": {
+              "rotation": 0
+            },
+            "upper-leg-right": {
+              "rotation": 0
+            },
+            "spring-leg-left": {
+              "scaleY": 1
+            },
+            "spring-leg-right": {
+              "scaleY": 1
+            },
+            "foot-left": {
+              "rotation": 0
+            },
+            "foot-right": {
+              "rotation": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            }
+          }
+        }
+      ]
+    },
+    "activate": {
+      "durationMs": 780,
+      "loop": false,
+      "ease": "Sine.easeInOut",
+      "keyframes": [
+        {
+          "atMs": 0,
+          "root": {
+            "x": 0,
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "lower-arm-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            }
+          }
+        },
+        {
+          "atMs": 180,
+          "root": {
+            "x": 2,
+            "y": 2,
+            "scaleY": 0.985
+          },
+          "parts": {
+            "upper-arm-right": {
+              "rotation": -0.42
+            },
+            "lower-arm-right": {
+              "rotation": -0.35,
+              "x": 8,
+              "y": -8
+            },
+            "hand-right": {
+              "rotation": -0.15,
+              "x": 30,
+              "y": -25
+            },
+            "chest-core": {
+              "scaleX": 1.06,
+              "scaleY": 1.06
+            },
+            "energy-orb": {
+              "alpha": 0.5,
+              "x": -34,
+              "y": -38
+            }
+          }
+        },
+        {
+          "atMs": 430,
+          "root": {
+            "x": 0,
+            "y": -2,
+            "scaleY": 1.015
+          },
+          "parts": {
+            "upper-arm-right": {
+              "rotation": -0.78
+            },
+            "lower-arm-right": {
+              "rotation": -0.62,
+              "x": 17,
+              "y": -15
+            },
+            "hand-right": {
+              "rotation": -0.3,
+              "x": 55,
+              "y": -43
+            },
+            "chest-core": {
+              "scaleX": 1.18,
+              "scaleY": 1.18
+            },
+            "face-idle": {
+              "alpha": 0.35
+            },
+            "face-catch": {
+              "alpha": 0.65
+            },
+            "energy-orb": {
+              "alpha": 1,
+              "x": -12,
+              "y": -46
+            }
+          }
+        },
+        {
+          "atMs": 590,
+          "root": {
+            "x": 0,
+            "y": -1,
+            "scaleY": 1.01
+          },
+          "parts": {
+            "upper-arm-right": {
+              "rotation": -0.75
+            },
+            "lower-arm-right": {
+              "rotation": -0.6,
+              "x": 16,
+              "y": -14
+            },
+            "hand-right": {
+              "rotation": -0.28,
+              "x": 53,
+              "y": -40
+            },
+            "chest-core": {
+              "scaleX": 1.14,
+              "scaleY": 1.14
+            },
+            "face-idle": {
+              "alpha": 0.45
+            },
+            "face-catch": {
+              "alpha": 0.55
+            },
+            "energy-orb": {
+              "alpha": 1,
+              "x": -12,
+              "y": -46
+            }
+          }
+        },
+        {
+          "atMs": 780,
+          "root": {
+            "x": 0,
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "lower-arm-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "chest-core": {
+              "scaleX": 1,
+              "scaleY": 1
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0,
+              "x": 0,
+              "y": 0
+            }
+          }
+        }
+      ]
+    }
+  }
+}

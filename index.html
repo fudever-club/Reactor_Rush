@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10142C" />
+    <meta name="description" content="A keyboard-first two-player cooperative energy-catching arcade game." />
+    <title>Reactor Rush — Energy Catch</title>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="game-frame" aria-label="Energy Catch game">
+        <div id="game-container">
+          <div id="runtime-ui" aria-label="Game interface">
+            <section id="menu-screen" class="ui-screen menu-screen" aria-labelledby="menu-title">
+              <header class="menu-title">
+                <p class="menu-eyebrow"><span class="status-dot" aria-hidden="true"></span> REACTOR RUSH</p>
+                <h1 id="menu-title">Energy Catch</h1>
+                <p class="menu-subtitle">Two-player co-op <span aria-hidden="true">·</span> 60 seconds</p>
+              </header>
+
+              <div class="player-cards">
+                <article class="player-card player-card-p1" aria-label="Player 1 Cyan controls">
+                  <div class="player-card-heading">
+                    <span class="player-index">01</span>
+                    <div>
+                      <p class="player-name">Player 1 <span>Cyan</span></p>
+                      <p class="player-role">PLAYER CONTROLS</p>
+                    </div>
+                  </div>
+                  <div class="control-lines">
+                    <p class="control-line"><span class="key-group"><kbd>A</kbd><b>/</b><kbd>D</kbd></span><span>Move</span></p>
+                    <p class="control-line"><span class="key-group"><span class="hold-label">HOLD</span><kbd>S</kbd></span><span>Catch</span></p>
+                  </div>
+                </article>
+
+                <article class="player-card player-card-p2" aria-label="Player 2 Pink controls">
+                  <div class="player-card-heading">
+                    <span class="player-index">02</span>
+                    <div>
+                      <p class="player-name">Player 2 <span>Pink</span></p>
+                      <p class="player-role">PLAYER CONTROLS</p>
+                    </div>
+                  </div>
+                  <div class="control-lines">
+                    <p class="control-line"><span class="key-group"><kbd>←</kbd><b>/</b><kbd>→</kbd></span><span>Move</span></p>
+                    <p class="control-line"><span class="key-group"><span class="hold-label">HOLD</span><kbd>↓</kbd></span><span>Catch</span></p>
+                  </div>
+                </article>
+              </div>
+
+              <div class="menu-action">
+                <button id="start-round" class="game-action" type="button">PRESS ENTER TO START</button>
+            <button id="choose-camera" class="game-action secondary-action" type="button">SET UP WEBCAM CONTROLS</button>
+                <p>Catch cyan energy <span aria-hidden="true">·</span> Avoid red hazards</p>
+              </div>
+            </section>
+
+        <section id="camera-setup-screen" class="ui-screen camera-setup-screen" aria-labelledby="camera-title" hidden>
+          <div class="camera-setup-card">
+            <div class="camera-setup-copy">
+              <p class="camera-eyebrow">OPTIONAL INPUT</p>
+              <h2 id="camera-title">WEB CAM CONTROLS</h2>
+              <p class="camera-instructions">Stand side by side. P1 stays camera-left, P2 camera-right. Move one hand left or right; pinch thumb and index finger to catch.</p>
+              <p class="camera-instructions camera-calibration-instructions">Hold one visible hand near the center of each half, then calibrate both players.</p>
+              <p id="camera-status" class="camera-status" role="status" aria-live="polite">Camera is off. It starts only after you choose Enable Camera.</p>
+              <p id="camera-hands-status" class="camera-hands-status">P1: waiting <span aria-hidden="true">·</span> P2: waiting</p>
+              <label class="camera-consent">
+                <input id="camera-consent" type="checkbox" />
+                <span>Camera frames are processed on this device and are not uploaded or recorded. MediaPipe’s documentation says its usage/performance metrics may be sent to Google. I understand and want to enable camera controls.</span>
+              </label>
+              <div class="camera-actions">
+                <button id="enable-camera" class="game-action" type="button" disabled>ENABLE CAMERA &amp; LOAD MODEL</button>
+                <button id="calibrate-camera" class="game-action secondary-action" type="button" disabled>CALIBRATE BOTH HANDS</button>
+                <button id="start-camera-round" class="game-action" type="button" disabled>START WITH CAMERA</button>
+                <button id="camera-to-keyboard" class="camera-back-action" type="button">CANCEL / USE KEYBOARD</button>
+              </div>
+            </div>
+            <div class="camera-preview-frame">
+              <video id="camera-preview" muted playsinline aria-label="Mirrored webcam preview"></video>
+              <div class="camera-preview-placeholder" aria-hidden="true">CAMERA PREVIEW</div>
+              <span class="camera-preview-label">P1 LEFT <span aria-hidden="true">·</span> P2 RIGHT</span>
+            </div>
+          </div>
+        </section>
+
+            <section id="ready-screen" class="ui-screen transition-screen" aria-labelledby="ready-title" hidden>
+              <div class="transition-card ready-card">
+                <p class="transition-kicker">NEW ROUND</p>
+                <h2 id="ready-title">GET READY</h2>
+                <p>New round <span aria-hidden="true">·</span> scores and combos reset</p>
+              </div>
+            </section>
+
+            <section id="active-hud" class="active-hud" aria-label="Round status" hidden>
+              <article class="hud-player hud-player-p1">
+                <div class="hud-player-heading"><span class="hud-mark" aria-hidden="true">01</span><span>P1 CYAN</span></div>
+                <strong id="hud-p1-score" class="hud-score">0</strong>
+                <span id="hud-p1-combo" class="hud-combo">COMBO 0 <b>·</b> BEST 0</span>
+              </article>
+
+              <div class="hud-clock" aria-live="off">
+                <span class="hud-clock-label">TIME</span>
+                <strong id="hud-timer" class="hud-timer">60</strong>
+                <span class="hud-clock-unit">SECONDS</span>
+              </div>
+
+              <article class="hud-player hud-player-p2">
+                <div class="hud-player-heading"><span class="hud-mark" aria-hidden="true">02</span><span>P2 PINK</span></div>
+                <strong id="hud-p2-score" class="hud-score">0</strong>
+                <span id="hud-p2-combo" class="hud-combo">COMBO 0 <b>·</b> BEST 0</span>
+              </article>
+
+          <div class="play-hint"><span class="hint-orb" aria-hidden="true"></span> ENERGY <b>+100</b><span class="hint-divider" aria-hidden="true"></span><span class="hint-hazard" aria-hidden="true">!</span> HAZARD <b>−50</b><span class="hint-divider" aria-hidden="true"></span> EVERY 5 ENERGY <b>+0.5×</b> <span>MAX 3×</span><span class="hint-divider" aria-hidden="true"></span><span id="hud-controls-hint">HOLD S / ↓ TO CATCH</span></div>
+          <button id="stop-camera" class="camera-stop-button" type="button" hidden>STOP CAMERA</button>
+            </section>
+
+            <section id="results-screen" class="ui-screen results-screen" aria-labelledby="results-title" aria-live="polite" hidden>
+              <div class="results-card">
+                <p class="results-eyebrow">ENERGY CATCH <span aria-hidden="true">/</span> ROUND SUMMARY</p>
+                <h2 id="results-title">ROUND COMPLETE</h2>
+                <p class="results-subtitle">CO-OP SCORECARD</p>
+
+                <div class="results-players">
+                  <article class="result-player result-player-p1">
+                    <div class="result-player-label"><span class="result-mark">01</span> PLAYER 1 <span class="result-color">CYAN</span></div>
+                    <strong id="result-p1-score" class="result-score">0</strong>
+                    <span id="result-p1-combo" class="result-combo">BEST COMBO 0</span>
+                  </article>
+                  <article class="result-player result-player-p2">
+                    <div class="result-player-label"><span class="result-mark">02</span> PLAYER 2 <span class="result-color">PINK</span></div>
+                    <strong id="result-p2-score" class="result-score">0</strong>
+                    <span id="result-p2-combo" class="result-combo">BEST COMBO 0</span>
+                  </article>
+                </div>
+
+                <p class="team-total-label">TEAM TOTAL <strong id="result-team-total">0</strong></p>
+                <button id="restart-round" class="game-action replay-action" type="button">PLAY AGAIN <span>R / ENTER</span></button>
+                <button id="stop-camera-results" class="camera-back-action result-camera-stop" type="button" hidden>STOP CAMERA &amp; RETURN TO KEYBOARD</button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

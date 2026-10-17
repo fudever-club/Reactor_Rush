@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reactor Rush — Mascot Direction Review</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #10142c;
+      --panel: #191f3b;
+      --line: #39405e;
+      --muted: #aeb7d2;
+      --paper: #f4f3ee;
+      --cyan: #55dfff;
+      --pink: #ff78bd;
+      --yellow: #f6d55c;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse at 50% -20%, #27335f, var(--ink) 70%);
+      color: var(--paper);
+    }
+    main { width: min(1440px, 100%); margin: auto; padding: 48px clamp(20px, 5vw, 72px) 72px; }
+    .eyebrow { color: var(--cyan); font-size: 13px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    h1 { max-width: 820px; margin: 12px 0; font-size: clamp(36px, 6vw, 68px); line-height: .98; letter-spacing: -.04em; }
+    .intro { max-width: 760px; color: var(--muted); font-size: 18px; line-height: 1.6; }
+    .notice { margin: 28px 0 36px; padding: 15px 18px; border: 1px solid #786b35; border-radius: 12px; background: #292743; color: #f8eaa8; line-height: 1.5; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: start; }
+    article { overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(160deg, #202746, var(--panel)); box-shadow: 0 16px 44px #080b1d70; }
+    article.recommended { border-color: var(--cyan); box-shadow: 0 0 0 1px #55dfff55, 0 18px 56px #080b1d80; }
+    .art { display: block; width: 100%; height: auto; background: var(--ink); }
+    .copy { padding: 20px; }
+    .kicker { display: flex; justify-content: space-between; gap: 12px; align-items: center; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .badge { padding: 6px 9px; border-radius: 999px; background: #183647; color: var(--cyan); letter-spacing: .04em; }
+    h2 { margin: 12px 0 8px; font-size: 25px; }
+    p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+    .player { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; line-height: 1.45; }
+    .player strong { display: block; margin-bottom: 2px; color: var(--cyan); }
+    .player.p2 strong { color: var(--pink); }
+    .proscons { margin-top: 17px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; }
+    .proscons b { color: var(--paper); }
+    .foot { margin-top: 34px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; line-height: 1.6; }
+    a { color: var(--cyan); }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } article { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr); } .art { height: 100%; object-fit: cover; } }
+    @media (max-width: 640px) { article { display: block; } .art { height: auto; } main { padding-top: 30px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">FU-DEVER Science Arena · Phase 2 concept review</div>
+    <h1>Meet the reactor’s new crew.</h1>
+    <p class="intro">Three original mascot directions for a playful 2D science arcade game. Each pair keeps P1 cyan and P2 pink while using different body shapes so the players remain recognizable without color.</p>
+    <div class="notice"><strong>Selected: Direction A — Orbital Buddy.</strong> The user selected this direction on 17 October 2026. These generated boards are concept references, not editable master artwork or Phaser sprite atlases. <a href="direction-a-character-handoff.html">Open the refined model and pose references →</a></div>
+    <section class="grid" aria-label="Mascot concept directions">
+      <article class="recommended">
+        <img class="art" src="../../assets/concepts/robots/direction-a-orbital-buddy.png" alt="Orbital Buddy: a tall antenna robot beside a shorter, broad robot with round side sensors; expression studies and turnarounds below." loading="eager">
+        <div class="copy">
+          <div class="kicker"><span>Direction A</span><span class="badge">Selected</span></div>
+          <h2>Orbital Buddy</h2>
+          <p>Ceramic toy forms, soft faces, and springy movement. The silhouette contrast comes from a tall kite head and antenna versus a wide face and side pods.</p>
+          <div class="pair"><div class="player"><strong>P1 · Cyan</strong>Kite head · single antenna · spring legs</div><div class="player p2"><strong>P2 · Pink</strong>Wide face · paired sensors · broad feet</div></div>
+          <p class="proscons"><b>Why it leads:</b> clearest balance of warmth, distance readability, and simple forms for a small first sprite set.</p>
+        </div>
+      </article>
+      <article>
+        <img class="art" src="../../assets/concepts/robots/direction-b-vector-sprinters.png" alt="Vector Sprinters: a forward wedge robot beside an upright robot with a large shoulder ring; turnarounds and expressions below." loading="lazy">
+        <div class="copy">
+          <div class="kicker"><span>Direction B</span><span>Fastest energy</span></div>
+          <h2>Vector Sprinters</h2>
+          <p>Graphic speed cues, asymmetry, and lively roller motion. A forward wedge contrasts with an upright capsule and shoulder halo.</p>
+          <div class="pair"><div class="player"><strong>P1 · Cyan</strong>Wedge head · catcher arm · roller feet</div><div class="player p2"><strong>P2 · Pink</strong>Upright face · shoulder halo · ball feet</div></div>
+          <p class="proscons"><b>Trade-off:</b> strongest arcade motion, with more overlapping parts to simplify for animation.</p>
+        </div>
+      </article>
+      <article>
+        <img class="art" src="../../assets/concepts/robots/direction-c-instrument-critters.png" alt="Instrument Critters: a low shield-shaped tracked robot beside a taller pear-shaped hover robot; expression studies and turnarounds below." loading="lazy">
+        <div class="copy">
+          <div class="kicker"><span>Direction C</span><span>Quirkiest lab feel</span></div>
+          <h2>Instrument Critters</h2>
+          <p>Friendly machines assembled from bold lab-instrument shapes. A low shield body contrasts with a taller pear body and sensor prongs.</p>
+          <div class="pair"><div class="player"><strong>P1 · Cyan</strong>Shield body · articulated arms · tread foot</div><div class="player p2"><strong>P2 · Pink</strong>Pear body · three sensors · hover pads</div></div>
+          <p class="proscons"><b>Trade-off:</b> most distinctive construction language, with tread and hover details to validate in motion.</p>
+        </div>
+      </article>
+    </section>
+    <footer class="foot">Shared baseline: 2D cartoon sci-fi lab, proposed 1280×720 canvas, navy stage, dark face displays, and color-independent player cues. The linked game plan is a draft; Energy Catch is its MVP visual anchor. No gameplay or booth hardware has been benchmarked. See <a href="../../DESIGN.md">DESIGN.md</a> and <a href="../../ART_BIBLE.md">ART_BIBLE.md</a> for source notes and proposals.</footer>
+  </main>
+</body>
+</html>

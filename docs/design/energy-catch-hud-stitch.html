@@ -1,0 +1,361 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Reactor Rush: Energy Catch // Lab-HUD</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-container": "#af0043",
+            "inverse-on-surface": "#2b2f45",
+            "on-tertiary-fixed": "#271900",
+            "primary-fixed-dim": "#00dbe9",
+            "on-surface": "#dee1fd",
+            "on-surface-variant": "#b9cacb",
+            "error": "#ffb4ab",
+            "surface-container-high": "#25293e",
+            "surface-container-highest": "#303349",
+            "outline": "#849495",
+            "tertiary-container": "#ffd386",
+            "tertiary": "#fff4e8",
+            "surface-bright": "#34384e",
+            "on-secondary": "#670024",
+            "secondary-fixed": "#ffd9dd",
+            "on-error": "#690005",
+            "error-container": "#93000a",
+            "primary-fixed": "#7df4ff",
+            "on-primary-container": "#006970",
+            "surface-container-lowest": "#090d21",
+            "on-secondary-container": "#ffbcc5",
+            "on-primary": "#00363a",
+            "on-tertiary": "#412d00",
+            "primary-container": "#00f0ff",
+            "surface-container": "#1a1e33",
+            "on-background": "#dee1fd",
+            "secondary-fixed-dim": "#ffb2bd",
+            "primary": "#dbfcff",
+            "on-primary-fixed-variant": "#004f54",
+            "secondary": "#ffb2bd",
+            "tertiary-fixed": "#ffdea8",
+            "background": "#0e1226",
+            "on-primary-fixed": "#002022",
+            "on-error-container": "#ffdad6",
+            "on-tertiary-fixed-variant": "#5e4200",
+            "on-tertiary-container": "#7d5800",
+            "tertiary-fixed-dim": "#ffba20",
+            "surface-dim": "#0e1226",
+            "inverse-surface": "#dee1fd",
+            "surface": "#0e1226",
+            "surface-variant": "#303349",
+            "surface-tint": "#00dbe9",
+            "on-secondary-fixed": "#400013",
+            "outline-variant": "#3b494b",
+            "surface-container-low": "#161a2f",
+            "inverse-primary": "#006970",
+            "on-secondary-fixed-variant": "#900036"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "gutter-mobile": "0.75rem",
+            "margin-mobile": "1rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2.5rem",
+            "space-xs": "0.25rem",
+            "gutter": "1.5rem",
+            "margin": "2rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Space Grotesk"],
+            "label-numeric-md": ["Space Mono"],
+            "headline-md": ["Space Grotesk"],
+            "label-numeric-lg": ["Space Mono"],
+            "body-lg": ["Space Grotesk"],
+            "body-md": ["Space Grotesk"],
+            "headline-lg": ["Space Grotesk"],
+            "display-lg-mobile": ["Space Grotesk"],
+            "display-xl": ["Space Grotesk"],
+            "label-caps": ["Space Mono"],
+            "display-lg": ["Space Grotesk"],
+            "label-subtext": ["Space Mono"]
+          },
+          "fontSize": {
+            "headline-sm": ["20px", { "lineHeight": "26px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-numeric-md": ["20px", { "lineHeight": "24px", "letterSpacing": "0", "fontWeight": "700" }],
+            "headline-md": ["24px", { "lineHeight": "30px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "label-numeric-lg": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-lg": ["18px", { "lineHeight": "24px", "letterSpacing": "0", "fontWeight": "500" }],
+            "body-md": ["15px", { "lineHeight": "22px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "0", "fontWeight": "700" }],
+            "display-lg-mobile": ["36px", { "lineHeight": "40px", "letterSpacing": "0", "fontWeight": "700" }],
+            "display-xl": ["72px", { "lineHeight": "76px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+            "display-lg": ["56px", { "lineHeight": "60px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "label-subtext": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Technical Blueprint Grid Background */
+    .bg-grid-pattern {
+      background-size: 24px 24px;
+      background-image: 
+        linear-gradient(to right, rgba(59, 73, 75, 0.25) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(59, 73, 75, 0.25) 1px, transparent 1px);
+    }
+    
+    /* Subtle Chamfer Clip Paths for Hardware Aesthetic */
+    .chamfer-card {
+      clip-path: polygon(10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%, 0% 10px);
+    }
+    .chamfer-p1 {
+      clip-path: polygon(0% 0%, calc(100% - 14px) 0%, 100% 14px, 100% 100%, 0% 100%);
+    }
+    .chamfer-p2 {
+      clip-path: polygon(14px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 14px);
+    }
+    
+    /* Neon Glow Accents */
+    .glow-cyan {
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.35), inset 0 0 8px rgba(0, 240, 255, 0.2);
+    }
+    .glow-coral {
+      box-shadow: 0 0 16px rgba(255, 77, 121, 0.35), inset 0 0 8px rgba(255, 77, 121, 0.2);
+    }
+    .glow-amber {
+      box-shadow: 0 0 20px rgba(255, 184, 0, 0.45);
+    }
+    .text-glow-cyan {
+      text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+    }
+    .text-glow-coral {
+      text-shadow: 0 0 12px rgba(255, 178, 189, 0.6);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface w-[1280px] h-[720px] max-w-[1280px] max-h-[720px] overflow-hidden select-none relative font-body-md flex flex-col justify-between mx-auto">
+<!-- ==================== SHARED COMPONENT: TopNavBar ==================== -->
+
+<!-- ==================== MAIN 1280x720 ARCADE CANVAS ==================== -->
+<main class="relative w-[1280px] h-[720px] max-w-[1280px] max-h-[720px] overflow-hidden bg-surface-container-lowest bg-grid-pattern select-none flex flex-col justify-between p-6"><!-- Background Conduits -->
+<div class="absolute inset-0 pointer-events-none flex justify-around opacity-15">
+  <div class="w-1 bg-gradient-to-b from-primary-container via-transparent to-primary-container"></div>
+  <div class="w-1 bg-gradient-to-b from-primary-container via-transparent to-primary-container"></div>
+  <div class="w-1 bg-gradient-to-b from-secondary-fixed-dim via-transparent to-secondary-fixed-dim"></div>
+  <div class="w-1 bg-gradient-to-b from-secondary-fixed-dim via-transparent to-secondary-fixed-dim"></div>
+</div>
+
+<!-- TOP ARCADE HUD: P1 Panel | Center Timer & Mode | P2 Panel -->
+<div class="relative z-20 flex items-start justify-between w-full">
+  <!-- PLAYER 1 CYAN HUD CARD -->
+  <div class="w-72 bg-surface-container-low border border-primary-container/40 chamfer-p1 relative shadow-lg">
+    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary-container glow-cyan"></div>
+    <div class="p-3 pl-5 bg-surface-container-lowest/80 backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-1">
+        <span class="bg-primary-container/20 text-primary-container border border-primary-container/40 px-2 py-0.5 text-label-caps font-label-caps rounded font-bold tracking-wider">PLAYER 1</span>
+        <span class="text-primary-container font-label-subtext border border-primary-container/30 px-1.5 py-0.5 rounded bg-surface-container-lowest/90">MULT 1.0x</span>
+      </div>
+      <div class="flex items-baseline justify-between mt-1">
+        <span class="text-headline-sm font-headline-sm text-on-surface-variant font-bold">SCORE</span>
+        <span class="text-display-lg font-label-numeric-lg text-primary-container text-glow-cyan leading-none tracking-tight">1,840</span>
+      </div>
+      <div class="mt-2 pt-2 border-t border-outline-variant/40 flex items-center justify-between">
+        <div class="flex items-center space-x-1.5">
+          <span class="text-label-caps font-label-caps text-primary-container font-bold">COMBO 4</span>
+          <div class="flex space-x-1">
+            <span class="w-2 h-3 bg-primary-container rounded-xs"></span>
+            <span class="w-2 h-3 bg-primary-container rounded-xs"></span>
+            <span class="w-2 h-3 bg-primary-container rounded-xs"></span>
+            <span class="w-2 h-3 bg-primary-container rounded-xs"></span>
+            <span class="w-2 h-3 bg-surface-container rounded-xs border border-outline-variant/30"></span>
+          </div>
+        </div>
+        <span class="text-label-subtext font-label-subtext text-on-surface-variant">[A] [D] MOVE • [S] CATCH</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER TIMER & ARCADE TITLE -->
+  <div class="flex flex-col items-center justify-center">
+    <div class="px-4 py-1 bg-surface-container-low border border-outline-variant/50 rounded-full mb-2 flex items-center space-x-2 shadow-md">
+      <span class="material-symbols-outlined text-primary-container text-base" data-icon="bolt">bolt</span>
+      <span class="text-label-caps font-label-caps text-primary tracking-widest font-bold">ENERGY CATCH</span>
+    </div>
+    <div class="bg-surface-container-low border border-outline-variant px-6 py-2 rounded-xl shadow-2xl flex flex-col items-center">
+      <span class="text-label-subtext font-label-subtext text-tertiary-container tracking-wider">TIME REMAINING</span>
+      <span class="text-display-lg font-label-numeric-lg text-tertiary font-bold tracking-tight text-shadow leading-none mt-1">00:44 <span class="text-xl text-outline-variant">/ 01:00</span></span>
+    </div>
+  </div>
+
+  <!-- PLAYER 2 CORAL/PINK HUD CARD -->
+  <div class="w-72 bg-surface-container-low border border-secondary-fixed-dim/40 chamfer-p2 relative shadow-lg">
+    <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-secondary-fixed-dim glow-coral"></div>
+    <div class="p-3 pr-5 bg-surface-container-lowest/80 backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-secondary-fixed-dim font-label-subtext border border-secondary/40 px-1.5 py-0.5 rounded bg-surface-container-lowest/90">MULT 1.0x</span>
+        <span class="bg-secondary-container/40 text-secondary-fixed border border-secondary/40 px-2 py-0.5 text-label-caps font-label-caps rounded font-bold tracking-wider">PLAYER 2</span>
+      </div>
+      <div class="flex items-baseline justify-between mt-1">
+        <span class="text-display-lg font-label-numeric-lg text-secondary-fixed-dim text-glow-coral leading-none tracking-tight">1,620</span>
+        <span class="text-headline-sm font-headline-sm text-on-surface-variant font-bold">SCORE</span>
+      </div>
+      <div class="mt-2 pt-2 border-t border-outline-variant/40 flex items-center justify-between">
+        <span class="text-label-subtext font-label-subtext text-on-surface-variant">[←] [→] MOVE • [↓] CATCH</span>
+        <div class="flex items-center space-x-1.5">
+          <div class="flex space-x-1">
+            <span class="w-2 h-3 bg-secondary-fixed-dim rounded-xs"></span>
+            <span class="w-2 h-3 bg-secondary-fixed-dim rounded-xs"></span>
+            <span class="w-2 h-3 bg-secondary-fixed-dim rounded-xs"></span>
+            <span class="w-2 h-3 bg-surface-container rounded-xs border border-outline-variant/30"></span>
+            <span class="w-2 h-3 bg-surface-container rounded-xs border border-outline-variant/30"></span>
+          </div>
+          <span class="text-label-caps font-label-caps text-secondary-fixed-dim font-bold">COMBO 3</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CENTRAL PLAYFIELD (2 EQUAL SPLIT LANES) -->
+<div class="absolute inset-0 top-24 bottom-16 px-8 flex">
+  <!-- SUBTLE CENTER DASHED DIVIDER LINE -->
+  <div class="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 flex flex-col items-center justify-between z-10 pointer-events-none opacity-40">
+    <div class="w-0.5 h-full border-r-2 border-dashed border-outline-variant"></div>
+  </div>
+
+  <!-- ==================== PLAYER 1 LEFT LANE ==================== -->
+  <div class="w-1/2 h-full relative border-r border-outline-variant/20 px-6">
+    <!-- Subtle Vertical Lane Conduits -->
+    <div class="absolute inset-0 flex justify-around pointer-events-none opacity-10">
+      <div class="w-px h-full bg-primary-container"></div>
+      <div class="w-px h-full bg-primary-container"></div>
+      <div class="w-px h-full bg-primary-container"></div>
+    </div>
+
+    <!-- Falling Energy Orb towards P1 -->
+    <div class="absolute top-28 left-1/3 -translate-x-1/2 flex flex-col items-center z-20">
+      <div class="w-1 h-16 bg-gradient-to-t from-tertiary-container/80 to-transparent"></div>
+      <div class="relative w-12 h-12 rounded-full bg-tertiary-container/20 border-2 border-tertiary-container flex items-center justify-center glow-amber shadow-lg">
+        <div class="w-7 h-7 rounded-full bg-tertiary-container flex items-center justify-center shadow-inner">
+          <span class="material-symbols-outlined text-on-tertiary text-base font-bold" data-icon="bolt">bolt</span>
+        </div>
+        <span class="absolute -right-14 bg-surface-container-lowest/90 text-tertiary-container font-label-caps text-xs px-2 py-0.5 border border-tertiary-container/40 rounded font-bold shadow">+100 PTS</span>
+      </div>
+    </div>
+
+    <!-- P1 Baseline Catcher: Approved Direction A Mascot (ORBIT / P1) -->
+    <div class="absolute bottom-2 left-1/3 -translate-x-1/2 flex flex-col items-center z-20">
+      <!-- Top Catcher Tray -->
+      <div class="w-36 h-6 border-t-2 border-primary-container rounded-t-full bg-gradient-to-b from-primary-container/30 to-transparent flex items-center justify-center">
+        <div class="w-24 h-0.5 bg-primary-container glow-cyan"></div>
+      </div>
+      <!-- Direction A Robot Head Assembly -->
+      <div class="relative flex flex-col items-center -mt-1">
+        <!-- Center Antenna + Crossbar Bulb -->
+        <div class="flex flex-col items-center">
+          <div class="w-2.5 h-2.5 rounded-full bg-primary-container glow-cyan"></div>
+          <div class="w-5 h-0.5 bg-primary-container -mt-0.5"></div>
+          <div class="w-1 h-4 bg-outline"></div>
+        </div>
+        <!-- Tall Kite / Boxy Head -->
+        <div class="w-16 h-16 bg-surface-container border-2 border-primary-container chamfer-card flex flex-col items-center justify-center shadow-xl relative">
+          <!-- Cyan Visor Eyes -->
+          <div class="w-10 h-4 bg-surface-container-lowest rounded-full border border-primary-container/60 flex items-center justify-around px-1.5">
+            <div class="w-2 h-2 rounded-full bg-primary-container glow-cyan"></div>
+            <div class="w-2 h-2 rounded-full bg-primary-container glow-cyan"></div>
+          </div>
+          <span class="text-[10px] font-label-caps text-primary-fixed-dim mt-1 font-bold tracking-widest">ORBIT • P1</span>
+        </div>
+        <!-- Thruster Base -->
+        <div class="w-10 h-2 bg-outline-variant rounded-b-md border-t border-primary-container/50"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PLAYER 2 RIGHT LANE ==================== -->
+  <div class="w-1/2 h-full relative px-6">
+    <!-- Subtle Vertical Lane Conduits -->
+    <div class="absolute inset-0 flex justify-around pointer-events-none opacity-10">
+      <div class="w-px h-full bg-secondary-fixed-dim"></div>
+      <div class="w-px h-full bg-secondary-fixed-dim"></div>
+      <div class="w-px h-full bg-secondary-fixed-dim"></div>
+    </div>
+
+    <!-- Falling Hazard Core towards P2 -->
+    <div class="absolute top-20 left-2/3 -translate-x-1/2 flex flex-col items-center z-20">
+      <div class="w-1 h-14 bg-gradient-to-t from-secondary-fixed-dim/80 to-transparent"></div>
+      <div class="relative w-12 h-12 flex items-center justify-center animate-pulse glow-coral">
+        <!-- Diamond / Spiky Hazard Core SVG -->
+        <svg class="absolute inset-0 w-full h-full text-secondary-container fill-current" viewBox="0 0 100 100">
+          <polygon points="50,0 65,35 100,50 65,65 50,100 35,65 0,50 35,35"></polygon>
+        </svg>
+        <div class="w-7 h-7 rounded-full bg-surface-container-lowest border-2 border-error flex items-center justify-center z-10">
+          <span class="material-symbols-outlined text-error text-sm font-bold" data-icon="warning">warning</span>
+        </div>
+        <span class="absolute -right-28 bg-error-container text-error font-label-caps text-[10px] px-2 py-0.5 border border-error/50 rounded font-bold shadow">-50 PTS HAZARD</span>
+      </div>
+    </div>
+
+    <!-- P2 Baseline Catcher: Approved Direction A Mascot (PULSE / P2) -->
+    <div class="absolute bottom-2 left-2/3 -translate-x-1/2 flex flex-col items-center z-20">
+      <!-- Top Catcher Tray -->
+      <div class="w-36 h-6 border-t-2 border-secondary-fixed-dim rounded-t-full bg-gradient-to-b from-secondary-container/30 to-transparent flex items-center justify-center">
+        <div class="w-24 h-0.5 bg-secondary-fixed-dim glow-coral"></div>
+      </div>
+      <!-- Direction A Robot Assembly: Wider Rounded Head + Left/Right Side Sensors -->
+      <div class="relative flex flex-col items-center -mt-1">
+        <div class="relative flex items-center justify-center">
+          <!-- Left Round Side Sensor Ear -->
+          <div class="w-3 h-6 bg-secondary-fixed-dim rounded-l-md border border-secondary-fixed shadow"></div>
+          <!-- Wider Rounded Rectangular Head -->
+          <div class="w-20 h-14 px-2 bg-surface-container border-2 border-secondary-fixed-dim rounded-md flex flex-col items-center justify-center shadow-xl relative">
+            <!-- Coral Visor Eyes -->
+            <div class="w-12 h-4 bg-surface-container-lowest rounded-full border border-secondary/60 flex items-center justify-center space-x-3">
+              <div class="w-2 h-2 rounded-full bg-secondary-fixed-dim glow-coral"></div>
+              <div class="w-2 h-2 rounded-full bg-secondary-fixed-dim glow-coral"></div>
+            </div>
+            <span class="text-[10px] font-label-caps text-secondary-fixed-dim mt-1 font-bold tracking-widest">PULSE • P2</span>
+          </div>
+          <!-- Right Round Side Sensor Ear -->
+          <div class="w-3 h-6 bg-secondary-fixed-dim rounded-r-md border border-secondary-fixed shadow"></div>
+        </div>
+        <!-- Thruster Base -->
+        <div class="w-12 h-2 bg-outline-variant rounded-b-md border-t border-secondary-fixed-dim/50 mt-0.5"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM GAME CANVAS RULES BAR -->
+<div class="relative z-30 w-full px-6 py-2 bg-surface-container-low/95 border border-outline-variant/40 rounded flex items-center justify-center text-center shadow-md">
+  <span class="text-label-caps font-label-caps text-on-surface-variant text-xs tracking-wider">
+    <span class="text-tertiary-container font-bold">ENERGY ORB:</span> +100 PTS &nbsp;|&nbsp; 
+    <span class="text-primary-container font-bold">5 STREAK:</span> +0.5x MULTIPLIER (MAX 3.0x) &nbsp;|&nbsp; 
+    <span class="text-error font-bold">HAZARD:</span> -50 &amp; COMBO RESET &nbsp;|&nbsp; 
+    <span class="text-on-surface font-bold">MISS:</span> NO PENALTY
+  </span>
+</div></main>
+<!-- ==================== SHARED COMPONENT: Footer ==================== -->
+
+
+
+</body></html>

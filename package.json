@@ -1,0 +1,23 @@
+{
+  "name": "reactor-rush-animation-poc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "assets:export": "node scripts/export-sprites.mjs",
+    "build": "tsc --noEmit && vite build",
+    "dev": "vite --host 127.0.0.1 --strictPort",
+    "preview": "vite preview --host 127.0.0.1 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "1.1.1",
+    "phaser": "4.2.1"
+  },
+  "devDependencies": {
+    "sharp": "0.35.5",
+    "typescript": "7.0.2",
+    "vite": "8.3.4"
+  }
+}

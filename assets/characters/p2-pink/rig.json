@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "characterId": "p2-pink",
+  "sourceSvg": "assets/characters/p2-pink/source/rig.svg",
+  "designReferences": [
+    "assets/concepts/robots/direction-a-refined-model-sheet.png#P2 Pink",
+    "assets/concepts/robots/direction-a-action-pose-references.png#P2 Pink"
+  ],
+  "canvas": { "width": 320, "height": 360 },
+  "anchor": { "x": 0.5, "y": 0.975 },
+  "groundBaseline": 351,
+  "artNotes": "Pose and silhouette follow the approved Direction A P2 Pink model sheet and six-pose reference: broad rounded screen head, paired circular sensor pods, compact core torso, short articulated limbs, and wide boots. No antenna is present on P2.",
+  "parts": [
+    { "id": "activation-ring", "groupId": "activation-ring", "png": "assets/characters/p2-pink/parts/activation-ring.png", "bounds": { "x": 230, "y": 88, "width": 90, "height": 104 }, "pivot": { "x": 278, "y": 140 }, "zIndex": 5, "defaultAlpha": 0 },
+    { "id": "energy-orb", "groupId": "energy-orb", "png": "assets/characters/p2-pink/parts/energy-orb.png", "bounds": { "x": 110, "y": 0, "width": 100, "height": 82 }, "pivot": { "x": 160, "y": 35 }, "zIndex": 2, "defaultAlpha": 0 },
+    { "id": "foot-left", "groupId": "foot-left", "png": "assets/characters/p2-pink/parts/foot-left.png", "bounds": { "x": 78, "y": 304, "width": 82, "height": 50 }, "pivot": { "x": 120, "y": 343 }, "zIndex": 6 },
+    { "id": "foot-right", "groupId": "foot-right", "png": "assets/characters/p2-pink/parts/foot-right.png", "bounds": { "x": 162, "y": 304, "width": 84, "height": 50 }, "pivot": { "x": 202, "y": 343 }, "zIndex": 6 },
+    { "id": "lower-leg-left", "groupId": "lower-leg-left", "png": "assets/characters/p2-pink/parts/lower-leg-left.png", "bounds": { "x": 90, "y": 273, "width": 62, "height": 64 }, "pivot": { "x": 121, "y": 286 }, "zIndex": 5 },
+    { "id": "lower-leg-right", "groupId": "lower-leg-right", "png": "assets/characters/p2-pink/parts/lower-leg-right.png", "bounds": { "x": 168, "y": 273, "width": 62, "height": 64 }, "pivot": { "x": 199, "y": 286 }, "zIndex": 5 },
+    { "id": "upper-leg-left", "groupId": "upper-leg-left", "png": "assets/characters/p2-pink/parts/upper-leg-left.png", "bounds": { "x": 98, "y": 240, "width": 56, "height": 58 }, "pivot": { "x": 128, "y": 257 }, "zIndex": 4 },
+    { "id": "upper-leg-right", "groupId": "upper-leg-right", "png": "assets/characters/p2-pink/parts/upper-leg-right.png", "bounds": { "x": 166, "y": 239, "width": 56, "height": 58 }, "pivot": { "x": 192, "y": 257 }, "zIndex": 4 },
+    { "id": "upper-arm-left", "groupId": "upper-arm-left", "png": "assets/characters/p2-pink/parts/upper-arm-left.png", "bounds": { "x": 57, "y": 191, "width": 69, "height": 63 }, "pivot": { "x": 105, "y": 207 }, "zIndex": 7 },
+    { "id": "upper-arm-right", "groupId": "upper-arm-right", "png": "assets/characters/p2-pink/parts/upper-arm-right.png", "bounds": { "x": 194, "y": 191, "width": 69, "height": 63 }, "pivot": { "x": 215, "y": 207 }, "zIndex": 7 },
+    { "id": "lower-arm-left", "groupId": "lower-arm-left", "png": "assets/characters/p2-pink/parts/lower-arm-left.png", "bounds": { "x": 56, "y": 220, "width": 58, "height": 60 }, "pivot": { "x": 77, "y": 237 }, "zIndex": 8 },
+    { "id": "lower-arm-right", "groupId": "lower-arm-right", "png": "assets/characters/p2-pink/parts/lower-arm-right.png", "bounds": { "x": 206, "y": 220, "width": 58, "height": 60 }, "pivot": { "x": 243, "y": 237 }, "zIndex": 8 },
+    { "id": "hand-left", "groupId": "hand-left", "png": "assets/characters/p2-pink/parts/hand-left.png", "bounds": { "x": 48, "y": 255, "width": 50, "height": 50 }, "pivot": { "x": 68, "y": 277 }, "zIndex": 9 },
+    { "id": "hand-right", "groupId": "hand-right", "png": "assets/characters/p2-pink/parts/hand-right.png", "bounds": { "x": 222, "y": 255, "width": 50, "height": 50 }, "pivot": { "x": 252, "y": 277 }, "zIndex": 9 },
+    { "id": "torso", "groupId": "torso", "png": "assets/characters/p2-pink/parts/torso.png", "bounds": { "x": 88, "y": 165, "width": 144, "height": 110 }, "pivot": { "x": 160, "y": 185 }, "zIndex": 12 },
+    { "id": "neck", "groupId": "neck", "png": "assets/characters/p2-pink/parts/neck.png", "bounds": { "x": 127, "y": 152, "width": 66, "height": 46 }, "pivot": { "x": 160, "y": 171 }, "zIndex": 13 },
+    { "id": "chest-core", "groupId": "chest-core", "png": "assets/characters/p2-pink/parts/chest-core.png", "bounds": { "x": 125, "y": 180, "width": 70, "height": 72 }, "pivot": { "x": 160, "y": 216 }, "zIndex": 14 },
+    { "id": "head-shell", "groupId": "head-shell", "png": "assets/characters/p2-pink/parts/head-shell.png", "bounds": { "x": 42, "y": 24, "width": 236, "height": 174 }, "pivot": { "x": 160, "y": 190 }, "zIndex": 20 },
+    { "id": "sensor-left", "groupId": "sensor-left", "png": "assets/characters/p2-pink/parts/sensor-left.png", "bounds": { "x": 12, "y": 82, "width": 84, "height": 84 }, "pivot": { "x": 54, "y": 124 }, "zIndex": 21 },
+    { "id": "sensor-right", "groupId": "sensor-right", "png": "assets/characters/p2-pink/parts/sensor-right.png", "bounds": { "x": 224, "y": 82, "width": 84, "height": 84 }, "pivot": { "x": 266, "y": 124 }, "zIndex": 21 },
+    { "id": "face-idle", "groupId": "face-idle", "png": "assets/characters/p2-pink/parts/face-idle.png", "bounds": { "x": 105, "y": 88, "width": 90, "height": 65 }, "pivot": { "x": 150, "y": 120 }, "zIndex": 22 },
+    { "id": "face-catch", "groupId": "face-catch", "png": "assets/characters/p2-pink/parts/face-catch.png", "bounds": { "x": 103, "y": 88, "width": 94, "height": 65 }, "pivot": { "x": 150, "y": 120 }, "zIndex": 23, "defaultAlpha": 0 },
+    { "id": "face-activate", "groupId": "face-activate", "png": "assets/characters/p2-pink/parts/face-activate.png", "bounds": { "x": 103, "y": 88, "width": 94, "height": 65 }, "pivot": { "x": 150, "y": 120 }, "zIndex": 24, "defaultAlpha": 0 }
+  ]
+}

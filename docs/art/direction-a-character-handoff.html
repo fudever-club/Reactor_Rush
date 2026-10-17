@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reactor Rush — Direction A Character Handoff</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #10142c;
+      --panel: #191f3b;
+      --line: #39405e;
+      --muted: #aeb7d2;
+      --paper: #f4f3ee;
+      --cyan: #55dfff;
+      --pink: #ff78bd;
+      --yellow: #f6d55c;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: radial-gradient(ellipse at 45% -18%, #28345e, var(--ink) 68%); color: var(--paper); }
+    main { width: min(1320px, 100%); margin: auto; padding: 42px clamp(18px, 5vw, 64px) 72px; }
+    a { color: var(--cyan); }
+    .eyebrow { color: var(--cyan); font-size: 12px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    h1 { margin: 12px 0; font-size: clamp(36px, 5vw, 60px); line-height: 1; letter-spacing: -.04em; }
+    h2 { margin: 0 0 12px; font-size: 26px; }
+    h3 { margin: 0 0 6px; font-size: 15px; }
+    p { color: var(--muted); line-height: 1.55; }
+    .lead { max-width: 790px; font-size: 17px; }
+    .status { display: inline-block; margin: 8px 0 20px; padding: 8px 12px; border: 1px solid #756932; border-radius: 999px; background: #2c2a3f; color: #f8eaa8; font-size: 13px; font-weight: 800; }
+    section { margin-top: 28px; padding: clamp(16px, 3vw, 28px); border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(150deg, #202746, var(--panel)); }
+    figure { margin: 0; overflow: hidden; border: 1px solid #485171; border-radius: 12px; background: #d9e1e7; }
+    figure img { display: block; width: 100%; height: auto; }
+    figcaption { padding: 10px 13px; background: #141a34; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .identities { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+    .identity { padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #121831; }
+    .identity.p1 { border-left: 4px solid var(--cyan); }
+    .identity.p2 { border-left: 4px solid var(--pink); }
+    .identity p { margin: 4px 0 0; }
+    .poses { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 16px 0 20px; }
+    .pose { min-height: 124px; padding: 13px 12px; border: 1px solid var(--line); border-radius: 11px; background: #121831; }
+    .pose .num { color: var(--yellow); font-size: 11px; font-weight: 900; letter-spacing: .12em; }
+    .pose p { margin: 6px 0 0; font-size: 13px; }
+    .handoff { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .handoff div { padding: 14px; border-radius: 10px; background: #121831; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .handoff strong { display: block; margin-bottom: 4px; color: var(--paper); }
+    footer { margin-top: 25px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; line-height: 1.6; }
+    @media (max-width: 900px) { .poses { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 620px) { .identities, .handoff { grid-template-columns: 1fr; } .poses { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">Character handoff · mascot direction A</div>
+    <h1>Orbital Buddy</h1>
+    <span class="status">Direction selected · concept references in review</span>
+    <p class="lead">This page records the selected silhouette and gives the team one consistent place to review turnarounds and key-action poses before any runtime drawing begins.</p>
+
+    <section>
+      <h2>Refined model sheet</h2>
+      <figure>
+        <img src="../../assets/concepts/robots/direction-a-refined-model-sheet.png" alt="Direction A model sheet showing the cyan antenna robot and pink side-sensor robot, expressions, and front, side, and back references." loading="eager">
+        <figcaption>Generated raster reference, 1536×1024. Use it to guide a later editable redraw; perspective and small details are not dimensional manufacturing specifications.</figcaption>
+      </figure>
+      <div class="identities">
+        <div class="identity p1"><h3>P1 · Cyan · tall, springy silhouette</h3><p>Kite-shaped head, one flexible antenna, narrow torso, spring-like legs, and split rounded feet.</p></div>
+        <div class="identity p2"><h3>P2 · Pink · broad, grounded silhouette</h3><p>Wide rounded face, paired circular side sensors, compact body, short segmented limbs, and magnetic feet.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Six pose references</h2>
+      <p>The sequence runs left to right in both rows: P1 on top, P2 below. These are static gesture guides, not animation frames.</p>
+      <div class="poses" aria-label="Pose sequence labels">
+        <div class="pose"><span class="num">01</span><h3>Idle</h3><p>Relaxed stance; friendly, ready face.</p></div>
+        <div class="pose"><span class="num">02</span><h3>Move</h3><p>Short quick step with a forward lean.</p></div>
+        <div class="pose"><span class="num">03</span><h3>Catch</h3><p>Reach both hands toward an energy orb.</p></div>
+        <div class="pose"><span class="num">04</span><h3>Activate</h3><p>Extend one hand to a reactor switch.</p></div>
+        <div class="pose"><span class="num">05</span><h3>Win</h3><p>Compact two-hand celebration.</p></div>
+        <div class="pose"><span class="num">06</span><h3>Confused</h3><p>Small head tilt; uncertain eyes.</p></div>
+      </div>
+      <figure>
+        <img src="../../assets/concepts/robots/direction-a-action-pose-references.png" alt="Two-row static pose sheet: cyan P1 above and pink P2 below, each with idle, move, catch, activate, win, and confused poses." loading="lazy">
+        <figcaption>Generated raster pose reference, 1536×1024. It contains six concept poses per character in one image; it is not a sprite sheet.</figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <h2>Runtime handoff rules for the next phase</h2>
+      <div class="handoff">
+        <div><strong>Pivot proposal</strong>Place the character pivot at the midpoint between grounded feet, about 96% down the eventual frame. Adjust for the real gameplay camera and hover shadow.</div>
+        <div><strong>Scale proposal</strong>Set sprite dimensions only after a 1280×720 gameplay framing mockup. Keep antenna, sensors, hands, and feet inside a shared safe margin.</div>
+        <div><strong>Build gate</strong>Before animation production, approve the editable redraw, exact proportions, palette, expression set, anchor, frame layout, and reduced-detail readability.</div>
+      </div>
+    </section>
+
+    <footer>Source of truth: <a href="../../DESIGN.md">DESIGN.md</a>, <a href="../../ART_BIBLE.md">ART_BIBLE.md</a>, and <a href="../../assets_manifest.json">assets_manifest.json</a>. Figma is connected read-only for this account, so this review board is kept as editable local HTML. No Phaser integration or booth performance test has been performed. <a href="visual-reference-board.html">Back to all three directions</a>.</footer>
+  </main>
+</body>
+</html>

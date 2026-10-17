@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10142C" />
+    <title>Reactor Rush — Cutout Rig Test</title>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">REACTOR RUSH! · P0 ANIMATION TEST</p>
+          <h1>Cutout rig validation</h1>
+          <p class="lede">Vector cutout production draft from the approved model and six-pose references. Use I / M / C / A for states; F samples browser rAF for 2 seconds.</p>
+        </div>
+        <a class="manifest-link" href="/assets_manifest.json" target="_blank" rel="noreferrer">Asset manifest</a>
+      </header>
+      <section class="game-frame" aria-label="Phaser animation test scene">
+        <div id="game-container"></div>
+      </section>
+      <section class="control-row" aria-label="Animation controls">
+        <div class="button-groups">
+          <div class="control-group" aria-label="Choose character">
+            <span>Character</span>
+            <div class="controls">
+              <button data-character="p1-cyan" class="selected" aria-pressed="true" type="button">P1 Cyan</button>
+              <button data-character="p2-pink" aria-pressed="false" type="button">P2 Pink</button>
+            </div>
+          </div>
+          <div class="control-group" aria-label="Play animation">
+            <span>Animation</span>
+            <div class="controls">
+              <button data-animation="idle" type="button">Idle</button>
+              <button data-animation="move" type="button">Move</button>
+              <button data-animation="catch" class="primary" type="button">Catch</button>
+              <button data-animation="activate" type="button">Activate</button>
+            </div>
+          </div>
+        </div>
+        <p id="page-status" role="status" aria-live="polite">Loading Phaser scene…</p>
+      </section>
+      <footer>
+        <span>320 × 360 authoring units · anchor 0.50 / 0.975 · P1: 22 parts · P2: 23 parts · Phaser AUTO</span>
+        <span>Reviewed pose board is reference art, not a production sprite sheet · rAF sample is host-browser evidence, not a target-device benchmark</span>
+      </footer>
+    </main>
+    <script type="module" src="/src/animation-test.ts"></script>
+  </body>
+</html>
+

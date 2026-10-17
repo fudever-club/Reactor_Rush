@@ -1,0 +1,797 @@
+{
+  "schemaVersion": "1.0.0",
+  "characterId": "p2-pink",
+  "playback": "cutout-tween",
+  "coordinateUnits": "rig-authoring-pixels and radians",
+  "animations": {
+    "idle": {
+      "durationMs": 1500,
+      "loop": true,
+      "ease": "Sine.easeInOut",
+      "keyframes": [
+        {
+          "atMs": 0,
+          "root": {
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0
+            },
+            "sensor-left": {
+              "rotation": 0
+            },
+            "sensor-right": {
+              "rotation": 0
+            },
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "face-activate": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            },
+            "activation-ring": {
+              "alpha": 0
+            }
+          }
+        },
+        {
+          "atMs": 750,
+          "root": {
+            "y": -2,
+            "scaleY": 1.01
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0.012
+            },
+            "sensor-left": {
+              "rotation": -0.035
+            },
+            "sensor-right": {
+              "rotation": 0.035
+            },
+            "upper-arm-left": {
+              "rotation": 0.025
+            },
+            "upper-arm-right": {
+              "rotation": -0.025
+            }
+          }
+        },
+        {
+          "atMs": 1500,
+          "root": {
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0
+            },
+            "sensor-left": {
+              "rotation": 0
+            },
+            "sensor-right": {
+              "rotation": 0
+            },
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "face-activate": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            },
+            "activation-ring": {
+              "alpha": 0
+            }
+          }
+        }
+      ]
+    },
+    "move": {
+      "durationMs": 560,
+      "loop": true,
+      "ease": "Sine.easeInOut",
+      "keyframes": [
+        {
+          "atMs": 0,
+          "root": {
+            "x": 0,
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0
+            },
+            "sensor-left": {
+              "rotation": 0
+            },
+            "sensor-right": {
+              "rotation": 0
+            },
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "upper-leg-left": {
+              "rotation": 0
+            },
+            "upper-leg-right": {
+              "rotation": 0
+            },
+            "lower-leg-left": {
+              "rotation": 0
+            },
+            "lower-leg-right": {
+              "rotation": 0
+            },
+            "foot-left": {
+              "rotation": 0
+            },
+            "foot-right": {
+              "rotation": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "face-activate": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            },
+            "activation-ring": {
+              "alpha": 0
+            }
+          }
+        },
+        {
+          "atMs": 140,
+          "root": {
+            "x": -5,
+            "y": -7,
+            "scaleY": 1.02
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": -0.025
+            },
+            "sensor-left": {
+              "rotation": -0.06
+            },
+            "sensor-right": {
+              "rotation": 0.06
+            },
+            "upper-arm-left": {
+              "rotation": -0.12
+            },
+            "upper-arm-right": {
+              "rotation": 0.12
+            },
+            "upper-leg-left": {
+              "rotation": 0.14
+            },
+            "upper-leg-right": {
+              "rotation": -0.14
+            },
+            "lower-leg-left": {
+              "rotation": -0.08
+            },
+            "lower-leg-right": {
+              "rotation": 0.08
+            },
+            "foot-left": {
+              "rotation": 0.07
+            },
+            "foot-right": {
+              "rotation": -0.07
+            }
+          }
+        },
+        {
+          "atMs": 280,
+          "root": {
+            "x": 0,
+            "y": -13,
+            "scaleY": 1.035
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0
+            },
+            "sensor-left": {
+              "rotation": 0.035
+            },
+            "sensor-right": {
+              "rotation": -0.035
+            },
+            "upper-arm-left": {
+              "rotation": 0.08
+            },
+            "upper-arm-right": {
+              "rotation": -0.08
+            },
+            "upper-leg-left": {
+              "rotation": -0.12
+            },
+            "upper-leg-right": {
+              "rotation": 0.12
+            },
+            "lower-leg-left": {
+              "rotation": 0.08
+            },
+            "lower-leg-right": {
+              "rotation": -0.08
+            },
+            "foot-left": {
+              "rotation": -0.06
+            },
+            "foot-right": {
+              "rotation": 0.06
+            }
+          }
+        },
+        {
+          "atMs": 420,
+          "root": {
+            "x": 5,
+            "y": -7,
+            "scaleY": 1.02
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0.025
+            },
+            "sensor-left": {
+              "rotation": 0.06
+            },
+            "sensor-right": {
+              "rotation": -0.06
+            },
+            "upper-arm-left": {
+              "rotation": 0.12
+            },
+            "upper-arm-right": {
+              "rotation": -0.12
+            },
+            "upper-leg-left": {
+              "rotation": 0.14
+            },
+            "upper-leg-right": {
+              "rotation": -0.14
+            },
+            "lower-leg-left": {
+              "rotation": -0.08
+            },
+            "lower-leg-right": {
+              "rotation": 0.08
+            },
+            "foot-left": {
+              "rotation": 0.07
+            },
+            "foot-right": {
+              "rotation": -0.07
+            }
+          }
+        },
+        {
+          "atMs": 560,
+          "root": {
+            "x": 0,
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "head-shell": {
+              "rotation": 0
+            },
+            "sensor-left": {
+              "rotation": 0
+            },
+            "sensor-right": {
+              "rotation": 0
+            },
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "upper-leg-left": {
+              "rotation": 0
+            },
+            "upper-leg-right": {
+              "rotation": 0
+            },
+            "lower-leg-left": {
+              "rotation": 0
+            },
+            "lower-leg-right": {
+              "rotation": 0
+            },
+            "foot-left": {
+              "rotation": 0
+            },
+            "foot-right": {
+              "rotation": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "face-activate": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            },
+            "activation-ring": {
+              "alpha": 0
+            }
+          }
+        }
+      ]
+    },
+    "catch": {
+      "durationMs": 900,
+      "loop": false,
+      "ease": "Sine.easeInOut",
+      "keyframes": [
+        {
+          "atMs": 0,
+          "root": {
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "lower-arm-left": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "lower-arm-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-left": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            },
+            "activation-ring": {
+              "alpha": 0
+            }
+          }
+        },
+        {
+          "atMs": 180,
+          "root": {
+            "y": 2,
+            "scaleY": 0.975
+          },
+          "parts": {
+            "upper-arm-left": {
+              "rotation": 0.62
+            },
+            "upper-arm-right": {
+              "rotation": -0.62
+            },
+            "lower-arm-left": {
+              "rotation": -0.7,
+              "x": 10,
+              "y": -31
+            },
+            "lower-arm-right": {
+              "rotation": 0.7,
+              "x": -10,
+              "y": -31
+            },
+            "hand-left": {
+              "rotation": -0.25,
+              "x": 28,
+              "y": -80
+            },
+            "hand-right": {
+              "rotation": 0.25,
+              "x": -28,
+              "y": -80
+            },
+            "face-idle": {
+              "alpha": 0.45
+            },
+            "face-catch": {
+              "alpha": 0.55
+            },
+            "energy-orb": {
+              "alpha": 0.35
+            }
+          }
+        },
+        {
+          "atMs": 420,
+          "root": {
+            "y": -7,
+            "scaleY": 1.025
+          },
+          "parts": {
+            "upper-arm-left": {
+              "rotation": 2.25
+            },
+            "upper-arm-right": {
+              "rotation": -2.25
+            },
+            "lower-arm-left": {
+              "rotation": -2.05,
+              "x": 23,
+              "y": -72
+            },
+            "lower-arm-right": {
+              "rotation": 2.05,
+              "x": -23,
+              "y": -72
+            },
+            "hand-left": {
+              "rotation": -0.25,
+              "x": 62,
+              "y": -178
+            },
+            "hand-right": {
+              "rotation": 0.25,
+              "x": -62,
+              "y": -178
+            },
+            "face-idle": {
+              "alpha": 0
+            },
+            "face-catch": {
+              "alpha": 1
+            },
+            "energy-orb": {
+              "alpha": 1
+            },
+            "activation-ring": {
+              "alpha": 0
+            }
+          }
+        },
+        {
+          "atMs": 660,
+          "root": {
+            "y": -5,
+            "scaleY": 1.015
+          },
+          "parts": {
+            "upper-arm-left": {
+              "rotation": 2.2
+            },
+            "upper-arm-right": {
+              "rotation": -2.2
+            },
+            "lower-arm-left": {
+              "rotation": -2,
+              "x": 22,
+              "y": -69
+            },
+            "lower-arm-right": {
+              "rotation": 2,
+              "x": -22,
+              "y": -69
+            },
+            "hand-left": {
+              "rotation": -0.22,
+              "x": 60,
+              "y": -174
+            },
+            "hand-right": {
+              "rotation": 0.22,
+              "x": -60,
+              "y": -174
+            },
+            "face-idle": {
+              "alpha": 0
+            },
+            "face-catch": {
+              "alpha": 1
+            },
+            "energy-orb": {
+              "alpha": 1
+            }
+          }
+        },
+        {
+          "atMs": 900,
+          "root": {
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "upper-arm-left": {
+              "rotation": 0
+            },
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "lower-arm-left": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "lower-arm-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-left": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-catch": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            },
+            "activation-ring": {
+              "alpha": 0
+            }
+          }
+        }
+      ]
+    },
+    "activate": {
+      "durationMs": 760,
+      "loop": false,
+      "ease": "Sine.easeInOut",
+      "keyframes": [
+        {
+          "atMs": 0,
+          "root": {
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "lower-arm-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-activate": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            },
+            "activation-ring": {
+              "alpha": 0,
+              "x": 34
+            }
+          }
+        },
+        {
+          "atMs": 160,
+          "root": {
+            "x": 2,
+            "y": 1,
+            "scaleY": 0.985
+          },
+          "parts": {
+            "upper-arm-right": {
+              "rotation": -0.65
+            },
+            "lower-arm-right": {
+              "rotation": -0.75,
+              "x": -3,
+              "y": -32
+            },
+            "hand-right": {
+              "rotation": -0.2,
+              "x": 12,
+              "y": -61
+            },
+            "chest-core": {
+              "scaleX": 1.08,
+              "scaleY": 1.08
+            },
+            "face-idle": {
+              "alpha": 0.4
+            },
+            "face-activate": {
+              "alpha": 0.6
+            },
+            "activation-ring": {
+              "alpha": 0.25,
+              "x": 34
+            }
+          }
+        },
+        {
+          "atMs": 390,
+          "root": {
+            "x": 0,
+            "y": -2,
+            "scaleY": 1.02
+          },
+          "parts": {
+            "upper-arm-right": {
+              "rotation": -1.7
+            },
+            "lower-arm-right": {
+              "rotation": -2.3,
+              "x": -7,
+              "y": -73
+            },
+            "hand-right": {
+              "rotation": -0.12,
+              "x": 54,
+              "y": -137
+            },
+            "chest-core": {
+              "scaleX": 1.18,
+              "scaleY": 1.18
+            },
+            "face-idle": {
+              "alpha": 0
+            },
+            "face-activate": {
+              "alpha": 1
+            },
+            "activation-ring": {
+              "alpha": 1,
+              "x": 34
+            }
+          }
+        },
+        {
+          "atMs": 570,
+          "root": {
+            "x": 0,
+            "y": -1,
+            "scaleY": 1.01
+          },
+          "parts": {
+            "upper-arm-right": {
+              "rotation": -1.65
+            },
+            "lower-arm-right": {
+              "rotation": -2.2,
+              "x": -7,
+              "y": -69
+            },
+            "hand-right": {
+              "rotation": -0.1,
+              "x": 54,
+              "y": -133
+            },
+            "chest-core": {
+              "scaleX": 1.14,
+              "scaleY": 1.14
+            },
+            "face-idle": {
+              "alpha": 0
+            },
+            "face-activate": {
+              "alpha": 1
+            },
+            "activation-ring": {
+              "alpha": 1,
+              "x": 34
+            }
+          }
+        },
+        {
+          "atMs": 760,
+          "root": {
+            "y": 0,
+            "scaleY": 1
+          },
+          "parts": {
+            "upper-arm-right": {
+              "rotation": 0
+            },
+            "lower-arm-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "hand-right": {
+              "rotation": 0,
+              "x": 0,
+              "y": 0
+            },
+            "chest-core": {
+              "scaleX": 1,
+              "scaleY": 1
+            },
+            "face-idle": {
+              "alpha": 1
+            },
+            "face-activate": {
+              "alpha": 0
+            },
+            "energy-orb": {
+              "alpha": 0
+            },
+            "activation-ring": {
+              "alpha": 0,
+              "x": 0
+            }
+          }
+        }
+      ]
+    }
+  }
+}

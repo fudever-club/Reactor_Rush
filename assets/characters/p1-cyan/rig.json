@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0.0",
+  "characterId": "p1-cyan",
+  "displayName": "P1 Cyan — Orbital Buddy",
+  "sourceSvg": "assets/characters/p1-cyan/source/rig.svg",
+  "designReferences": [
+    "assets/concepts/robots/direction-a-refined-model-sheet.png#P1 Cyan",
+    "assets/concepts/robots/direction-a-action-pose-references.png#P1 Cyan"
+  ],
+  "canvas": { "width": 320, "height": 360, "units": "authoring-pixels" },
+  "anchor": { "x": 0.5, "y": 0.975 },
+  "groundBaseline": 351,
+  "artNotes": "Editable vector cutout redraw follows the approved Direction A P1 Cyan model and six-pose references. These source boards remain references, not runtime sprite sheets.",
+  "colorPalette": {
+    "ink": "#10142C",
+    "primary": "#55DFFF",
+    "shell": "#F4F3EE",
+    "energy": "#F6D55C",
+    "joint": "#252B47"
+  },
+  "parts": [
+    { "id": "antenna-stem", "groupId": "antenna-stem", "png": "assets/characters/p1-cyan/parts/antenna-stem.png", "bounds": { "x": 140, "y": 4, "width": 84, "height": 78 }, "pivot": { "x": 160, "y": 68 }, "zIndex": 0 },
+    { "id": "antenna-tip", "groupId": "antenna-tip", "png": "assets/characters/p1-cyan/parts/antenna-tip.png", "bounds": { "x": 197, "y": 0, "width": 30, "height": 30 }, "pivot": { "x": 212, "y": 15 }, "zIndex": 1 },
+    { "id": "upper-leg-left", "groupId": "upper-leg-left", "png": "assets/characters/p1-cyan/parts/upper-leg-left.png", "bounds": { "x": 104, "y": 224, "width": 52, "height": 60 }, "pivot": { "x": 138, "y": 235 }, "zIndex": 2 },
+    { "id": "upper-leg-right", "groupId": "upper-leg-right", "png": "assets/characters/p1-cyan/parts/upper-leg-right.png", "bounds": { "x": 162, "y": 224, "width": 54, "height": 60 }, "pivot": { "x": 182, "y": 235 }, "zIndex": 2 },
+    { "id": "spring-leg-left", "groupId": "spring-leg-left", "png": "assets/characters/p1-cyan/parts/spring-leg-left.png", "bounds": { "x": 106, "y": 262, "width": 40, "height": 54 }, "pivot": { "x": 126, "y": 271 }, "zIndex": 3 },
+    { "id": "spring-leg-right", "groupId": "spring-leg-right", "png": "assets/characters/p1-cyan/parts/spring-leg-right.png", "bounds": { "x": 174, "y": 262, "width": 40, "height": 54 }, "pivot": { "x": 194, "y": 271 }, "zIndex": 3 },
+    { "id": "foot-left", "groupId": "foot-left", "png": "assets/characters/p1-cyan/parts/foot-left.png", "bounds": { "x": 80, "y": 301, "width": 70, "height": 52 }, "pivot": { "x": 116, "y": 328 }, "zIndex": 4 },
+    { "id": "foot-right", "groupId": "foot-right", "png": "assets/characters/p1-cyan/parts/foot-right.png", "bounds": { "x": 168, "y": 301, "width": 72, "height": 52 }, "pivot": { "x": 204, "y": 328 }, "zIndex": 4 },
+    { "id": "upper-arm-left", "groupId": "upper-arm-left", "png": "assets/characters/p1-cyan/parts/upper-arm-left.png", "bounds": { "x": 66, "y": 166, "width": 68, "height": 66 }, "pivot": { "x": 119, "y": 184 }, "zIndex": 5 },
+    { "id": "upper-arm-right", "groupId": "upper-arm-right", "png": "assets/characters/p1-cyan/parts/upper-arm-right.png", "bounds": { "x": 186, "y": 166, "width": 68, "height": 66 }, "pivot": { "x": 201, "y": 184 }, "zIndex": 5 },
+    { "id": "lower-arm-left", "groupId": "lower-arm-left", "png": "assets/characters/p1-cyan/parts/lower-arm-left.png", "bounds": { "x": 38, "y": 200, "width": 68, "height": 62 }, "pivot": { "x": 88, "y": 208 }, "zIndex": 6 },
+    { "id": "lower-arm-right", "groupId": "lower-arm-right", "png": "assets/characters/p1-cyan/parts/lower-arm-right.png", "bounds": { "x": 214, "y": 200, "width": 68, "height": 62 }, "pivot": { "x": 232, "y": 208 }, "zIndex": 6 },
+    { "id": "hand-left", "groupId": "hand-left", "png": "assets/characters/p1-cyan/parts/hand-left.png", "bounds": { "x": 32, "y": 212, "width": 54, "height": 54 }, "pivot": { "x": 59, "y": 238 }, "zIndex": 14 },
+    { "id": "hand-right", "groupId": "hand-right", "png": "assets/characters/p1-cyan/parts/hand-right.png", "bounds": { "x": 234, "y": 212, "width": 54, "height": 54 }, "pivot": { "x": 261, "y": 238 }, "zIndex": 14 },
+    { "id": "neck", "groupId": "neck", "png": "assets/characters/p1-cyan/parts/neck.png", "bounds": { "x": 136, "y": 141, "width": 48, "height": 42 }, "pivot": { "x": 160, "y": 164 }, "zIndex": 7 },
+    { "id": "torso", "groupId": "torso", "png": "assets/characters/p1-cyan/parts/torso.png", "bounds": { "x": 100, "y": 150, "width": 120, "height": 121 }, "pivot": { "x": 160, "y": 168 }, "zIndex": 8 },
+    { "id": "chest-core", "groupId": "chest-core", "png": "assets/characters/p1-cyan/parts/chest-core.png", "bounds": { "x": 133, "y": 180, "width": 54, "height": 54 }, "pivot": { "x": 160, "y": 207 }, "zIndex": 9 },
+    { "id": "head-shell", "groupId": "head-shell", "png": "assets/characters/p1-cyan/parts/head-shell.png", "bounds": { "x": 96, "y": 46, "width": 128, "height": 132 }, "pivot": { "x": 160, "y": 164 }, "zIndex": 10 },
+    { "id": "side-sensor", "groupId": "side-sensor", "png": "assets/characters/p1-cyan/parts/side-sensor.png", "bounds": { "x": 86, "y": 90, "width": 44, "height": 44 }, "pivot": { "x": 108, "y": 112 }, "zIndex": 11 },
+    { "id": "face-idle", "groupId": "face-idle", "png": "assets/characters/p1-cyan/parts/face-idle.png", "bounds": { "x": 122, "y": 72, "width": 76, "height": 84 }, "pivot": { "x": 160, "y": 114 }, "zIndex": 12, "defaultAlpha": 1 },
+    { "id": "face-catch", "groupId": "face-catch", "png": "assets/characters/p1-cyan/parts/face-catch.png", "bounds": { "x": 122, "y": 72, "width": 76, "height": 84 }, "pivot": { "x": 160, "y": 114 }, "zIndex": 13, "defaultAlpha": 0 },
+    { "id": "energy-orb", "groupId": "energy-orb", "png": "assets/characters/p1-cyan/parts/energy-orb.png", "bounds": { "x": 242, "y": 102, "width": 52, "height": 52 }, "pivot": { "x": 268, "y": 128 }, "zIndex": 15, "defaultAlpha": 0 }
+  ]
+}
