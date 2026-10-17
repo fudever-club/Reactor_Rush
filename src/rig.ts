@@ -59,6 +59,7 @@ export class CutoutRig {
   currentAnimation = '';
   private activeTween?: Phaser.Tweens.Tween;
   private activeProgress?: { value: number };
+  private reducedMotion = false;
   private readonly partDefaults = new Map<string, Required<Transform>>();
   private readonly restPositions = new Map<string, { x: number; y: number }>();
 
@@ -103,6 +104,11 @@ export class CutoutRig {
     this.currentAnimation = name;
     this.emitState(name, 'started');
     this.applyPose(definition, 0);
+    if (this.reducedMotion && definition.loop) {
+      this.activeProgress = undefined;
+      this.activeTween = undefined;
+      return;
+    }
 
     const progress = { value: 0 };
     this.activeProgress = progress;
@@ -118,6 +124,18 @@ export class CutoutRig {
         if (!definition.loop && name !== 'idle') this.play('idle');
       }
     });
+  }
+
+  setReducedMotion(enabled: boolean): void {
+    if (this.reducedMotion === enabled) return;
+    this.reducedMotion = enabled;
+    const definition = this.animationSet.animations[this.currentAnimation];
+    if (!definition?.loop) return;
+    if (this.activeProgress) this.scene.tweens.killTweensOf(this.activeProgress);
+    this.activeProgress = undefined;
+    this.activeTween = undefined;
+    if (enabled) this.applyPose(definition, 0);
+    else this.play(this.currentAnimation);
   }
 
   destroy(): void {

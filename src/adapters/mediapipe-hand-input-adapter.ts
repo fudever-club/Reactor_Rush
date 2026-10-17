@@ -1,5 +1,5 @@
 import type { InputAdapter, InputFrame, PlayerId } from '../gameplay/core';
-import { HandInputMapper, type DetectedHand } from './hand-input-mapper.ts';
+import { HAND_TRACKING_STALE_MS, HandInputMapper, type DetectedHand } from './hand-input-mapper.ts';
 
 export type CameraInputStatus = 'idle' | 'requesting-camera' | 'loading-model' | 'ready' | 'stopped' | 'error';
 
@@ -27,6 +27,8 @@ const WASM_ROOT = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.1/wa
 const MODEL_PATH = '/mediapipe/hand_landmarker.task';
 const SAMPLE_INTERVAL_MS = 85;
 const MODEL_READY_TIMEOUT_MS = 30_000;
+const INFERENCE_TIMEOUT_MS = 2_000;
+const MAX_FRAME_CAPTURE_FAILURES = 3;
 const NEUTRAL: InputFrame = {
   p1: { moveAxis: 0, catch: false },
   p2: { moveAxis: 0, catch: false }
@@ -49,6 +51,12 @@ function errorMessage(error: unknown): string {
     if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
       return 'No camera was found. You can continue with keyboard controls.';
     }
+    if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+      return 'The camera is already in use or unavailable. Close other camera apps and try again.';
+    }
+    if (error.name === 'OverconstrainedError' || error.name === 'NotSupportedError') {
+      return 'This camera does not support the requested video settings. Try another camera or use keyboard controls.';
+    }
     return error.message;
   }
   return String(error);
@@ -69,9 +77,13 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private frameHandle?: number;
   private readyReject?: (error: Error) => void;
   private latestHands: DetectedHand[] = [];
+  private lastDetectionAt = Number.NEGATIVE_INFINITY;
   private lastVideoTime = -1;
   private lastFrameSentAt = 0;
   private inFlight = false;
+  private inFlightSince = Number.NEGATIVE_INFINITY;
+  private frameCaptureFailures = 0;
+  private detectionWasFresh = false;
   private disposed = false;
   private calibrated = false;
   private status: CameraInputStatus = 'idle';
@@ -125,7 +137,11 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   }
 
   canCalibrate(): boolean {
-    return this.status === 'ready' && this.mapper.canCalibrate(this.latestHands);
+    return this.status === 'ready' && this.isDetectionFresh() && this.mapper.canCalibrate(this.latestHands);
+  }
+
+  canStart(): boolean {
+    return this.status === 'ready' && this.calibrated && this.isDetectionFresh() && this.mapper.canCalibrate(this.latestHands);
   }
 
   calibrate(): boolean {
@@ -144,6 +160,8 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     this.readyReject = undefined;
     this.releaseResources();
     this.latestHands = [];
+    this.lastDetectionAt = Number.NEGATIVE_INFINITY;
+    this.detectionWasFresh = false;
     this.calibrated = false;
     this.mapper.reset();
     this.setStatus('stopped');
@@ -174,6 +192,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       this.video.playsInline = true;
       await this.video.play();
       if (this.disposed) return;
+      this.video.dataset.active = 'true';
 
       this.setStatus('loading-model');
       this.worker = this.createWorker();
@@ -184,7 +203,10 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       this.setStatus('ready');
       this.frameHandle = this.requestFrame(this.captureFrame);
     } catch (error) {
-      if (this.disposed) return;
+      if (this.disposed) {
+        if (this.status === 'error') throw error instanceof Error ? error : new Error(errorMessage(error));
+        return;
+      }
       const message = errorMessage(error);
       this.releaseResources();
       this.setStatus('error', message);
@@ -232,6 +254,11 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private captureFrame: FrameRequestCallback = () => {
     if (this.disposed || this.status !== 'ready') return;
     const now = this.now();
+    this.expireStaleDetection(now);
+    if (this.inFlight && now - this.inFlightSince > INFERENCE_TIMEOUT_MS) {
+      this.fail('The hand model stopped responding. Camera controls were stopped; keyboard controls remain available.');
+      return;
+    }
     if (
       !this.inFlight &&
       this.video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
@@ -242,21 +269,28 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       this.lastVideoTime = this.video.currentTime;
       this.lastFrameSentAt = now;
       this.inFlight = true;
-      this.createBitmap(this.video).then((bitmap) => {
+      this.inFlightSince = now;
+      Promise.resolve().then(() => this.createBitmap(this.video)).then((bitmap) => {
         if (this.disposed || !this.worker) {
           bitmap.close();
           this.inFlight = false;
+          this.inFlightSince = Number.NEGATIVE_INFINITY;
           return;
         }
         try {
           this.worker.postMessage({ type: 'frame', bitmap, timestamp: now }, [bitmap]);
+          this.frameCaptureFailures = 0;
         } catch (error) {
           bitmap.close();
           throw error;
         }
       }).catch((error: unknown) => {
         this.inFlight = false;
-        this.onStatus?.('ready', `Frame capture skipped: ${errorMessage(error)}`);
+        this.inFlightSince = Number.NEGATIVE_INFINITY;
+        this.frameCaptureFailures += 1;
+        const message = `Camera frame capture failed (${this.frameCaptureFailures}/${MAX_FRAME_CAPTURE_FAILURES}): ${errorMessage(error)}`;
+        if (this.frameCaptureFailures >= MAX_FRAME_CAPTURE_FAILURES) this.fail(`${message} Camera controls were stopped.`);
+        else this.onStatus?.('ready', message);
       });
     }
     this.frameHandle = this.requestFrame(this.captureFrame);
@@ -266,8 +300,13 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     if (this.disposed) return;
     if (event.data.type === 'result') {
       this.inFlight = false;
-      this.latestHands = event.data.hands.map((landmarks) => ({ landmarks }));
-      if (this.calibrated) this.mapper.update(this.latestHands, this.now());
+      this.inFlightSince = Number.NEGATIVE_INFINITY;
+      this.lastDetectionAt = event.data.timestamp;
+      this.latestHands = this.now() - this.lastDetectionAt <= HAND_TRACKING_STALE_MS
+        ? event.data.hands.map((landmarks) => ({ landmarks }))
+        : [];
+      this.detectionWasFresh = this.latestHands.length > 0;
+      if (this.calibrated) this.mapper.update(this.latestHands, this.lastDetectionAt);
       this.notifyDetection();
     } else if (event.data.type === 'error') {
       this.fail(event.data.message);
@@ -285,9 +324,13 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private fail(message: string): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.readyReject?.(new Error(message));
+    this.readyReject = undefined;
     this.releaseResources();
     this.mapper.reset();
     this.latestHands = [];
+    this.lastDetectionAt = Number.NEGATIVE_INFINITY;
+    this.detectionWasFresh = false;
     this.calibrated = false;
     this.setStatus('error', message);
     this.notifyDetection();
@@ -306,22 +349,36 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     }
     this.video.pause();
     this.video.srcObject = null;
+    delete this.video.dataset.active;
     this.worker?.removeEventListener('message', this.handleWorkerMessage);
     this.worker?.removeEventListener('error', this.handleWorkerError);
     this.worker?.terminate();
     this.worker = undefined;
     this.inFlight = false;
+    this.inFlightSince = Number.NEGATIVE_INFINITY;
+    this.frameCaptureFailures = 0;
   }
 
   private notifyDetection(): void {
     const visiblePlayers: PlayerId[] = [];
-    if (this.latestHands.length) {
+    if (this.isDetectionFresh()) {
       const left = this.latestHands.some((hand) => hand.landmarks[0] && 1 - hand.landmarks[0].x < 0.465);
       const right = this.latestHands.some((hand) => hand.landmarks[0] && 1 - hand.landmarks[0].x > 0.535);
       if (left) visiblePlayers.push(PLAYER_ID.p1);
       if (right) visiblePlayers.push(PLAYER_ID.p2);
     }
     this.onDetection?.(visiblePlayers, this.canCalibrate(), this.calibrated);
+  }
+
+  private isDetectionFresh(now = this.now()): boolean {
+    return this.latestHands.length > 0 && now - this.lastDetectionAt <= HAND_TRACKING_STALE_MS;
+  }
+
+  private expireStaleDetection(now: number): void {
+    if (!this.detectionWasFresh || now - this.lastDetectionAt <= HAND_TRACKING_STALE_MS) return;
+    this.latestHands = [];
+    this.detectionWasFresh = false;
+    this.notifyDetection();
   }
 
   private setStatus(status: CameraInputStatus, message?: string): void {

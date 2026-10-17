@@ -6,9 +6,12 @@ import p2Animations from '../assets/characters/p2-pink/animations.json';
 import { KeyboardInputAdapter } from './adapters/keyboard-input-adapter';
 import { MediaPipeHandInputAdapter, type CameraInputStatus } from './adapters/mediapipe-hand-input-adapter';
 import {
-  advanceGame,
+  advanceGameFrame,
   applyCatch,
+  canCatchFallingItem,
   createGameState,
+  hasTimeAfterStep,
+  isCurrentInputStep,
   requestRestart,
   startGame,
   type GameState,
@@ -16,6 +19,7 @@ import {
   type InputFrame,
   type PlayerId
 } from './gameplay/core';
+import { getFallingItemCue } from './gameplay/accessibility-cues';
 import { CutoutRig, preloadRig, type AnimationSet, type RigSpec } from './rig';
 import './game-style.css';
 
@@ -26,6 +30,9 @@ const CATCH_MIN_Y = 515;
 const CATCH_MAX_Y = 615;
 const CATCH_DISTANCE = 68;
 const MOVE_SPEED = 390;
+const ITEM_CUE_INTERVAL_MS = 350;
+const ITEM_CUE_LEAD_TIME_MS = 1_200;
+const ITEM_CUE_AFTER_CATCH_MS = 500;
 const PLAYER_HOME: Record<PlayerId, number> = { p1: 340, p2: 940 };
 const PLAYER_LIMITS: Record<PlayerId, { min: number; max: number }> = {
   p1: { min: 95, max: 565 },
@@ -69,6 +76,7 @@ interface RuntimeUi {
   cameraBackButton: HTMLButtonElement;
   cameraVideo: HTMLVideoElement;
   cameraStatus: HTMLElement;
+  cameraTitle: HTMLElement;
   cameraHandsStatus: HTMLElement;
   cameraStopButton: HTMLButtonElement;
   resultCameraStopButton: HTMLButtonElement;
@@ -84,6 +92,9 @@ interface RuntimeUi {
   resultP1Combo: HTMLElement;
   resultP2Combo: HTMLElement;
   resultTeamTotal: HTMLElement;
+  readyTitle: HTMLElement;
+  resultsTitle: HTMLElement;
+  gameAnnouncer: HTMLElement;
 }
 
 class EnergyCatchScene extends Phaser.Scene {
@@ -94,12 +105,16 @@ class EnergyCatchScene extends Phaser.Scene {
   private cameraMode = false;
   private cameraSetupVisible = false;
   private ui?: RuntimeUi;
+  private reducedMotionQuery?: MediaQueryList;
+  private cameraSetupWasVisible = false;
+  private lastItemCueAt = Number.NEGATIVE_INFINITY;
+  private lastCatchAnnouncementAt = Number.NEGATIVE_INFINITY;
+  private announcedItemCues = new WeakSet<FallingItem>();
   private rigs = {} as Record<PlayerId, CutoutRig>;
   private playerX: Record<PlayerId, number> = { ...PLAYER_HOME };
   private items: FallingItem[] = [];
   private spawnAfterMs = 500;
   private spawnPlayer: PlayerId = 'p1';
-  private phaseBeforeUpdate: GameState['phase'] = 'menu';
   private lastHudSignature = '';
   private lastInput: InputFrame = {
     p1: { moveAxis: 0, catch: false },
@@ -116,6 +131,8 @@ class EnergyCatchScene extends Phaser.Scene {
 
   create(): void {
     this.game.canvas.tabIndex = 0;
+    this.game.canvas.setAttribute('role', 'application');
+    this.game.canvas.setAttribute('aria-label', 'Energy Catch playfield. Player 1 uses A and D to move and holds S to catch. Player 2 uses Left and Right to move and holds Down to catch.');
     this.game.canvas.focus({ preventScroll: true });
     this.drawStage();
     this.ui = this.createHud();
@@ -132,8 +149,39 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui.cameraStopButton.addEventListener('click', this.handleCameraStopRequested);
     this.ui.resultCameraStopButton.addEventListener('click', this.handleCameraStopRequested);
     const onWindowKeyDown = (event: KeyboardEvent) => {
+      if (this.cameraSetupVisible) {
+        if (event.code === 'Escape') {
+          event.preventDefault();
+          this.handleCameraBackRequested();
+          return;
+        }
+        if (event.code === 'Tab') {
+          const focusable = [...this.ui!.cameraSetup.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), input:not([disabled])'
+          )].filter((element) => element.getClientRects().length > 0);
+          if (!focusable.length) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          const active = document.activeElement;
+          if (event.shiftKey && (active === first || active === this.ui!.cameraTitle || active === this.ui!.cameraSetup || !this.ui!.cameraSetup.contains(active))) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && (active === last || active === this.ui!.cameraSetup || !this.ui!.cameraSetup.contains(active))) {
+            event.preventDefault();
+            first.focus();
+          }
+          return;
+        }
+        return;
+      }
       if (event.repeat) return;
-      if (!this.cameraSetupVisible && (event.code === 'Enter' || event.code === 'Space')) this.handleStartRequested();
+      const target = event.target;
+      const targetUsesNativeKeyboard = target instanceof Element && Boolean(
+        target.closest('button, input, select, textarea, a[href], [contenteditable="true"]')
+      );
+      if (!targetUsesNativeKeyboard && event.code === 'Enter' && (this.state.phase === 'menu' || this.state.phase === 'results')) {
+        this.handleStartRequested();
+      }
       if (event.code === 'KeyR') this.handleRestartRequested();
     };
     window.addEventListener('keydown', onWindowKeyDown);
@@ -150,6 +198,12 @@ class EnergyCatchScene extends Phaser.Scene {
       );
       this.rigs[player].play('idle');
     }
+    this.reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const applyMotionPreference = (event: MediaQueryList | MediaQueryListEvent) => {
+      for (const rig of Object.values(this.rigs)) rig.setReducedMotion(event.matches);
+    };
+    applyMotionPreference(this.reducedMotionQuery);
+    this.reducedMotionQuery.addEventListener('change', applyMotionPreference);
     this.updateHud();
     this.showPhase('menu');
     const harness = {
@@ -166,6 +220,7 @@ class EnergyCatchScene extends Phaser.Scene {
     (window as typeof window & { __RR_GAME_TEST__?: typeof harness }).__RR_GAME_TEST__ = harness;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       window.removeEventListener('keydown', onWindowKeyDown);
+      this.reducedMotionQuery?.removeEventListener('change', applyMotionPreference);
       this.ui?.startButton.removeEventListener('click', this.handleStartRequested);
       this.ui?.restartButton.removeEventListener('click', this.handleRestartRequested);
       this.ui?.chooseCameraButton.removeEventListener('click', this.handleCameraSetupRequested);
@@ -186,22 +241,29 @@ class EnergyCatchScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
-    const dt = Math.min(Math.max(0, delta), 50);
-    this.lastInput = this.inputAdapter?.read() ?? this.lastInput;
-
-    this.phaseBeforeUpdate = this.state.phase;
-    this.state = advanceGame(this.state, delta);
-    if (this.phaseBeforeUpdate === 'restart' && this.state.phase === 'playing') {
-      this.spawnAfterMs = 450;
+    const frameDeltaMs = Math.max(0, Number.isFinite(delta) ? delta : 0);
+    const previousInput = this.lastInput;
+    const currentInput = this.inputAdapter?.read() ?? previousInput;
+    const phaseBeforeFrame = this.state.phase;
+    this.state = advanceGameFrame(this.state, frameDeltaMs, (state, stepMs, elapsedMs) => {
+      this.state = state;
+      this.lastInput = isCurrentInputStep(elapsedMs, stepMs, frameDeltaMs) ? currentInput : previousInput;
+      const playerXAtStepStart = { ...this.playerX };
+      this.movePlayers(stepMs);
+      this.updateFallingItems(stepMs, playerXAtStepStart);
+      if (hasTimeAfterStep(state, stepMs)) {
+        this.spawnAfterMs -= stepMs;
+        if (this.spawnAfterMs <= 0) this.spawnItem();
+      }
+      return this.state;
+    });
+    this.lastInput = currentInput;
+    if (this.state.phase !== phaseBeforeFrame) {
+      if (this.state.phase === 'results') this.clearItems();
+      this.showPhase(this.state.phase);
     }
-    if (this.state.phase === 'playing') {
-      this.movePlayers(dt);
-      this.updateFallingItems(dt);
-      this.spawnAfterMs -= dt;
-      if (this.spawnAfterMs <= 0) this.spawnItem();
-    }
-    if (this.state.phase !== this.phaseBeforeUpdate) this.showPhase(this.state.phase);
     this.updateHud();
+    this.announceActiveItems();
   }
 
   private handleStartRequested = (): void => {
@@ -225,7 +287,7 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui!.cameraCalibrateButton.disabled = true;
     this.ui!.cameraStartButton.disabled = true;
     this.ui!.cameraStatus.textContent = 'Camera is off. It starts only after you choose Enable Camera.';
-    this.ui!.cameraHandsStatus.textContent = 'P1: waiting · P2: waiting';
+    this.setCameraHandsStatus('P1: waiting · P2: waiting');
     this.showPhase('menu');
   };
 
@@ -239,7 +301,7 @@ class EnergyCatchScene extends Phaser.Scene {
       adapter.stop();
       this.ui.cameraCalibrateButton.disabled = true;
       this.ui.cameraStartButton.disabled = true;
-      this.ui.cameraHandsStatus.textContent = 'P1: waiting · P2: waiting';
+      this.setCameraHandsStatus('P1: waiting · P2: waiting');
       this.ui.cameraStatus.textContent = 'Consent withdrawn. Camera stream and model worker stopped.';
       this.updateInputModeUi();
       return;
@@ -276,7 +338,7 @@ class EnergyCatchScene extends Phaser.Scene {
   };
 
   private handleCameraStartRequested = (): void => {
-    if (!this.cameraAdapter?.isCalibrated || this.cameraAdapter.currentStatus !== 'ready') return;
+    if (!this.cameraAdapter?.canStart()) return;
     this.cameraMode = true;
     this.inputAdapter = this.cameraAdapter;
     this.cameraSetupVisible = false;
@@ -301,6 +363,7 @@ class EnergyCatchScene extends Phaser.Scene {
     this.cameraSetupVisible = false;
     this.inputAdapter = this.keyboardAdapter;
     this.updateInputModeUi();
+    this.showPhase(this.state.phase);
   };
 
   private updateCameraStatus(status: CameraInputStatus, message?: string): void {
@@ -333,7 +396,8 @@ class EnergyCatchScene extends Phaser.Scene {
     if (!this.ui) return;
     const hasP1 = players.includes('p1');
     const hasP2 = players.includes('p2');
-    this.ui.cameraHandsStatus.textContent = `P1: ${hasP1 ? 'hand detected' : 'waiting'} · P2: ${hasP2 ? 'hand detected' : 'waiting'}`;
+    const handsStatus = `P1: ${hasP1 ? 'hand detected' : 'waiting'} · P2: ${hasP2 ? 'hand detected' : 'waiting'}`;
+    this.setCameraHandsStatus(handsStatus);
     this.ui.cameraCalibrateButton.disabled = !canCalibrate;
     this.ui.cameraStartButton.disabled = !calibrated || !hasP1 || !hasP2;
   }
@@ -384,15 +448,32 @@ class EnergyCatchScene extends Phaser.Scene {
     }
   }
 
-  private updateFallingItems(deltaMs: number): void {
+  private updateFallingItems(deltaMs: number, playerXAtStepStart: Record<PlayerId, number>): void {
     for (let i = this.items.length - 1; i >= 0; i -= 1) {
       const item = this.items[i];
+      const previousY = item.y;
       item.y += item.speed * deltaMs / 1000;
       item.view.setY(item.y);
       const command = this.lastInput[item.player];
-      const inCatchBand = item.y >= CATCH_MIN_Y && item.y <= CATCH_MAX_Y;
-      if (inCatchBand && command.catch && Math.abs(item.x - this.playerX[item.player]) <= CATCH_DISTANCE) {
+      if (canCatchFallingItem(
+        command.catch,
+        previousY,
+        item.y,
+        item.x,
+        playerXAtStepStart[item.player],
+        command.moveAxis * MOVE_SPEED * deltaMs / 1000,
+        PLAYER_LIMITS[item.player].min,
+        PLAYER_LIMITS[item.player].max,
+        CATCH_MIN_Y,
+        CATCH_MAX_Y,
+        CATCH_DISTANCE
+      )) {
+        const previousScore = this.state.players[item.player].score;
         this.state = applyCatch(this.state, item.player, item.kind);
+        const playerState = this.state.players[item.player];
+        const scoreDelta = playerState.score - previousScore;
+        this.announceCatch(item.player, item.kind, scoreDelta, playerState.score, playerState.combo);
+        this.showCatchFeedback(item.player, item.y, scoreDelta, item.kind);
         this.rigs[item.player].play('catch');
         this.removeItem(i);
         continue;
@@ -411,6 +492,45 @@ class EnergyCatchScene extends Phaser.Scene {
     this.items.push({ player, kind, x, y: -34, speed: 185 + elapsed / this.state.durationMs * 90, view });
     this.spawnPlayer = player === 'p1' ? 'p2' : 'p1';
     this.spawnAfterMs = Phaser.Math.Between(650, 950);
+  }
+
+  private announceActiveItems(): void {
+    if (!this.ui || this.state.phase !== 'playing') return;
+    const now = performance.now();
+    if (now - this.lastItemCueAt < ITEM_CUE_INTERVAL_MS) return;
+    if (now - this.lastCatchAnnouncementAt < ITEM_CUE_AFTER_CATCH_MS) return;
+    const pendingCues = (['p1', 'p2'] as const).flatMap((player) => {
+      const limits = PLAYER_LIMITS[player];
+      const third = (limits.max - limits.min) / 3;
+      return this.items
+        .filter((item) => item.player === player && !this.announcedItemCues.has(item))
+        .map((item) => {
+          const position = item.x < limits.min + third ? 'left' : item.x > limits.max - third ? 'right' : 'center';
+          const cue = getFallingItemCue({
+            player,
+            position,
+            kind: item.kind,
+            y: item.y,
+            speed: item.speed,
+            catchMinY: CATCH_MIN_Y,
+            catchMaxY: CATCH_MAX_Y,
+            leadTimeMs: ITEM_CUE_LEAD_TIME_MS
+          });
+          return cue ? { item, cue, timeToCatchBandMs: Math.max(0, ((CATCH_MIN_Y - item.y) / item.speed) * 1_000) } : null;
+        })
+        .filter((candidate): candidate is NonNullable<typeof candidate> => candidate !== null)
+        .sort((a, b) => a.timeToCatchBandMs - b.timeToCatchBandMs)
+        .slice(0, 1);
+    });
+    if (!pendingCues.length) return;
+    this.lastItemCueAt = now;
+    for (const { item } of pendingCues) this.announcedItemCues.add(item);
+    this.ui.gameAnnouncer.textContent = pendingCues.map(({ cue }) => cue).join('. ');
+  }
+
+  private setCameraHandsStatus(status: string): void {
+    const handsStatus = this.ui?.cameraHandsStatus;
+    if (handsStatus && handsStatus.textContent !== status) handsStatus.textContent = status;
   }
 
   private createItemView(kind: FallingKind, x: number, y: number): Phaser.GameObjects.Container {
@@ -433,6 +553,41 @@ class EnergyCatchScene extends Phaser.Scene {
   private removeItem(index: number): void {
     this.items[index].view.destroy(true);
     this.items.splice(index, 1);
+  }
+
+  private announceCatch(player: PlayerId, kind: FallingKind, scoreDelta: number, score: number, combo: number): void {
+    if (!this.ui) return;
+    this.lastCatchAnnouncementAt = performance.now();
+    const label = player === 'p1' ? 'Player 1 Cyan' : 'Player 2 Pink';
+    if (kind === 'hazard') {
+      const loss = scoreDelta === 0 ? 'Score remains zero.' : `Minus ${Math.abs(scoreDelta)} points. Score ${score}.`;
+      this.ui.gameAnnouncer.textContent = `${label} caught a hazard. ${loss} Combo reset.`;
+      return;
+    }
+    this.ui.gameAnnouncer.textContent = `${label} caught energy, plus ${scoreDelta} points. Score ${score}. Combo ${combo}.`;
+  }
+
+  private showCatchFeedback(player: PlayerId, y: number, scoreDelta: number, kind: FallingKind): void {
+    const color = player === 'p1' ? '#a4efff' : '#ffc2dd';
+    const label = kind === 'hazard' && scoreDelta === 0
+      ? 'COMBO RESET'
+      : `${scoreDelta > 0 ? '+' : ''}${scoreDelta}`;
+    const text = this.add.text(this.playerX[player], y - 24, label, {
+      fontFamily: 'Segoe UI, system-ui, sans-serif', fontSize: '22px', fontStyle: 'bold', color,
+      stroke: '#10142c', strokeThickness: 4
+    }).setOrigin(0.5).setDepth(5);
+    if (this.reducedMotionQuery?.matches) {
+      this.time.delayedCall(900, () => text.destroy());
+      return;
+    }
+    this.tweens.add({
+      targets: text,
+      y: text.y - 42,
+      alpha: 0,
+      duration: 620,
+      ease: 'Cubic.Out',
+      onComplete: () => text.destroy()
+    });
   }
 
   private clearItems(): void {
@@ -471,6 +626,7 @@ class EnergyCatchScene extends Phaser.Scene {
       cameraBackButton: get<HTMLButtonElement>('camera-to-keyboard'),
       cameraVideo: get<HTMLVideoElement>('camera-preview'),
       cameraStatus: get('camera-status'),
+      cameraTitle: get('camera-title'),
       cameraHandsStatus: get('camera-hands-status'),
       cameraStopButton: get<HTMLButtonElement>('stop-camera'),
       resultCameraStopButton: get<HTMLButtonElement>('stop-camera-results'),
@@ -485,7 +641,10 @@ class EnergyCatchScene extends Phaser.Scene {
       resultP2Score: get('result-p2-score'),
       resultP1Combo: get('result-p1-combo'),
       resultP2Combo: get('result-p2-combo'),
-      resultTeamTotal: get('result-team-total')
+      resultTeamTotal: get('result-team-total'),
+      readyTitle: get('ready-title'),
+      resultsTitle: get('results-title'),
+      gameAnnouncer: get('game-announcer')
     };
   }
 
@@ -515,6 +674,7 @@ class EnergyCatchScene extends Phaser.Scene {
 
   private showPhase(phase: GameState['phase']): void {
     if (!this.ui) return;
+    const showCameraDialog = phase === 'menu' && this.cameraSetupVisible;
     this.ui.root.dataset.phase = phase;
     this.ui.menu.hidden = phase !== 'menu' || this.cameraSetupVisible;
     this.ui.cameraSetup.hidden = phase !== 'menu' || !this.cameraSetupVisible;
@@ -523,6 +683,12 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui.results.hidden = phase !== 'results';
     this.updateInputModeUi();
     this.updateHud();
+    if (showCameraDialog) this.ui.cameraTitle.focus({ preventScroll: true });
+    else if (this.cameraSetupWasVisible && phase === 'menu') this.ui.chooseCameraButton.focus({ preventScroll: true });
+    else if (phase === 'restart') this.ui.readyTitle.focus({ preventScroll: true });
+    else if (phase === 'playing') this.game.canvas.focus({ preventScroll: true });
+    else if (phase === 'results') this.ui.resultsTitle.focus({ preventScroll: true });
+    this.cameraSetupWasVisible = showCameraDialog;
   }
 
   private drawStage(): void {

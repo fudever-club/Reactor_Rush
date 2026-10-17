@@ -25,6 +25,8 @@ const NEUTRAL_FRAME: InputFrame = {
   p2: { ...NEUTRAL_PLAYER }
 };
 
+export const HAND_TRACKING_STALE_MS = 250;
+
 interface PlayerControl {
   neutralX: number;
   moveAxis: -1 | 0 | 1;
@@ -89,7 +91,7 @@ export class HandInputMapper {
     this.moveReleaseThreshold = options.moveReleaseThreshold ?? 0.055;
     this.pinchEnterRatio = options.pinchEnterRatio ?? 0.3;
     this.pinchReleaseRatio = options.pinchReleaseRatio ?? 0.43;
-    this.staleAfterMs = options.staleAfterMs ?? 250;
+    this.staleAfterMs = options.staleAfterMs ?? HAND_TRACKING_STALE_MS;
     this.centerDeadBand = options.centerDeadBand ?? 0.035;
   }
 
