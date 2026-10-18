@@ -95,6 +95,14 @@ interface RuntimeUi {
   readyTitle: HTMLElement;
   resultsTitle: HTMLElement;
   gameAnnouncer: HTMLElement;
+  modeSoloButton?: HTMLButtonElement;
+  modeCoopButton?: HTMLButtonElement;
+  cameraModeSoloButton?: HTMLButtonElement;
+  cameraModeCoopButton?: HTMLButtonElement;
+  menuSubtitle?: HTMLElement;
+  cameraInstructions?: HTMLElement;
+  cameraCalibrationInstructions?: HTMLElement;
+  cameraPreviewLabel?: HTMLElement;
 }
 
 class EnergyCatchScene extends Phaser.Scene {
@@ -103,6 +111,7 @@ class EnergyCatchScene extends Phaser.Scene {
   private inputAdapter?: InputAdapter;
   private cameraAdapter?: MediaPipeHandInputAdapter;
   private cameraMode = false;
+  private isSoloMode = true;
   private cameraSetupVisible = false;
   private ui?: RuntimeUi;
   private reducedMotionQuery?: MediaQueryList;
@@ -148,6 +157,10 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui.cameraBackButton.addEventListener('click', this.handleCameraBackRequested);
     this.ui.cameraStopButton.addEventListener('click', this.handleCameraStopRequested);
     this.ui.resultCameraStopButton.addEventListener('click', this.handleCameraStopRequested);
+    this.ui.modeSoloButton?.addEventListener('click', () => this.setSoloMode(true));
+    this.ui.modeCoopButton?.addEventListener('click', () => this.setSoloMode(false));
+    this.ui.cameraModeSoloButton?.addEventListener('click', () => this.setSoloMode(true));
+    this.ui.cameraModeCoopButton?.addEventListener('click', () => this.setSoloMode(false));
     const onWindowKeyDown = (event: KeyboardEvent) => {
       if (this.cameraSetupVisible) {
         if (event.code === 'Escape') {
@@ -206,6 +219,7 @@ class EnergyCatchScene extends Phaser.Scene {
     this.reducedMotionQuery.addEventListener('change', applyMotionPreference);
     this.updateHud();
     this.showPhase('menu');
+    this.setSoloMode(true);
     const harness = {
       ready: true,
       getState: () => ({
@@ -287,7 +301,7 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui!.cameraCalibrateButton.disabled = true;
     this.ui!.cameraStartButton.disabled = true;
     this.ui!.cameraStatus.textContent = 'Camera is off. It starts only after you choose Enable Camera.';
-    this.setCameraHandsStatus('P1: waiting · P2: waiting');
+    this.setCameraHandsStatus(this.isSoloMode ? 'P1: waiting' : 'P1: waiting · P2: waiting');
     this.showPhase('menu');
   };
 
@@ -301,7 +315,7 @@ class EnergyCatchScene extends Phaser.Scene {
       adapter.stop();
       this.ui.cameraCalibrateButton.disabled = true;
       this.ui.cameraStartButton.disabled = true;
-      this.setCameraHandsStatus('P1: waiting · P2: waiting');
+      this.setCameraHandsStatus(this.isSoloMode ? 'P1: waiting' : 'P1: waiting · P2: waiting');
       this.ui.cameraStatus.textContent = 'Consent withdrawn. Camera stream and model worker stopped.';
       this.updateInputModeUi();
       return;
@@ -319,6 +333,7 @@ class EnergyCatchScene extends Phaser.Scene {
 
     this.cameraAdapter?.stop();
     const adapter = new MediaPipeHandInputAdapter(this.ui.cameraVideo, {
+      soloMode: this.isSoloMode,
       onStatus: (status, message) => this.updateCameraStatus(status, message),
       onDetection: (players, canCalibrate, calibrated) => this.updateCameraDetection(players, canCalibrate, calibrated)
     });
@@ -334,7 +349,11 @@ class EnergyCatchScene extends Phaser.Scene {
 
   private handleCameraCalibrationRequested = (): void => {
     const calibrated = this.cameraAdapter?.calibrate() ?? false;
-    if (calibrated && this.ui) this.ui.cameraStatus.textContent = 'Neutral hand positions saved. Move left/right and pinch thumb to index to catch.';
+    if (calibrated && this.ui) {
+      this.ui.cameraStatus.textContent = this.isSoloMode
+        ? 'Neutral hand position saved. Move left/right and pinch thumb to index to catch.'
+        : 'Neutral hand positions saved. Move left/right and pinch thumb to index to catch.';
+    }
   };
 
   private handleCameraStartRequested = (): void => {
@@ -366,13 +385,49 @@ class EnergyCatchScene extends Phaser.Scene {
     this.showPhase(this.state.phase);
   };
 
+  private setSoloMode(solo: boolean): void {
+    this.isSoloMode = solo;
+    this.ui?.modeSoloButton?.classList.toggle('active', solo);
+    this.ui?.modeCoopButton?.classList.toggle('active', !solo);
+    this.ui?.cameraModeSoloButton?.classList.toggle('active', solo);
+    this.ui?.cameraModeCoopButton?.classList.toggle('active', !solo);
+    if (this.ui?.menuSubtitle) {
+      this.ui.menuSubtitle.innerHTML = solo
+        ? 'Single player <span aria-hidden="true">·</span> 60 seconds'
+        : 'Two-player co-op <span aria-hidden="true">·</span> 60 seconds';
+    }
+    document.querySelector('.player-card-p2')?.classList.toggle('solo-inactive', solo);
+    if (this.ui?.cameraInstructions) {
+      this.ui.cameraInstructions.textContent = solo
+        ? 'Move one hand left or right; pinch thumb and index finger to catch.'
+        : 'Stand side by side. P1 stays camera-left, P2 camera-right. Move one hand left or right; pinch thumb and index finger to catch.';
+    }
+    if (this.ui?.cameraCalibrationInstructions) {
+      this.ui.cameraCalibrationInstructions.textContent = solo
+        ? 'Hold one visible hand near the center of the camera, then calibrate.'
+        : 'Hold one visible hand near the center of each half, then calibrate both players.';
+    }
+    if (this.ui?.cameraPreviewLabel) {
+      this.ui.cameraPreviewLabel.textContent = solo ? 'P1 (SOLO CONTROLS)' : 'P1 LEFT · P2 RIGHT';
+    }
+    if (this.ui?.cameraCalibrateButton) {
+      this.ui.cameraCalibrateButton.textContent = solo ? 'CALIBRATE HAND' : 'CALIBRATE BOTH HANDS';
+    }
+    this.cameraAdapter?.setSoloMode(solo);
+    this.rigs.p2?.root.setVisible(!solo);
+    this.updateHud();
+    this.setCameraHandsStatus(solo ? 'P1: waiting' : 'P1: waiting · P2: waiting');
+  }
+
   private updateCameraStatus(status: CameraInputStatus, message?: string): void {
     if (!this.ui) return;
     const fallbackMessages: Record<CameraInputStatus, string> = {
       idle: 'Camera is off. It starts only after you choose Enable Camera.',
       'requesting-camera': 'Waiting for camera permission…',
       'loading-model': 'Camera connected. Loading the hand model…',
-      ready: 'Camera ready. Place one visible hand in each half, then calibrate.',
+      ready: this.isSoloMode
+        ? 'Camera ready. Place one visible hand in front of the camera, then calibrate.'
+        : 'Camera ready. Place one visible hand in each half, then calibrate.',
       stopped: 'Camera stopped. Keyboard controls remain available.',
       error: 'Camera controls could not start. Keyboard controls remain available.'
     };
@@ -396,10 +451,14 @@ class EnergyCatchScene extends Phaser.Scene {
     if (!this.ui) return;
     const hasP1 = players.includes('p1');
     const hasP2 = players.includes('p2');
-    const handsStatus = `P1: ${hasP1 ? 'hand detected' : 'waiting'} · P2: ${hasP2 ? 'hand detected' : 'waiting'}`;
+    const handsStatus = this.isSoloMode
+      ? `P1: ${hasP1 ? 'hand detected' : 'waiting'}`
+      : `P1: ${hasP1 ? 'hand detected' : 'waiting'} · P2: ${hasP2 ? 'hand detected' : 'waiting'}`;
     this.setCameraHandsStatus(handsStatus);
     this.ui.cameraCalibrateButton.disabled = !canCalibrate;
-    this.ui.cameraStartButton.disabled = !calibrated || !hasP1 || !hasP2;
+    this.ui.cameraStartButton.disabled = this.isSoloMode
+      ? (!calibrated || !hasP1)
+      : (!calibrated || !hasP1 || !hasP2);
   }
 
   private updateInputModeUi(): void {
@@ -432,7 +491,8 @@ class EnergyCatchScene extends Phaser.Scene {
   }
 
   private movePlayers(deltaMs: number): void {
-    for (const player of ['p1', 'p2'] as const) {
+    const activePlayers = this.isSoloMode ? (['p1'] as const) : (['p1', 'p2'] as const);
+    for (const player of activePlayers) {
       const command = this.lastInput[player];
       const limits = PLAYER_LIMITS[player];
       this.playerX[player] = Phaser.Math.Clamp(
@@ -483,14 +543,14 @@ class EnergyCatchScene extends Phaser.Scene {
   }
 
   private spawnItem(): void {
-    const player = this.spawnPlayer;
+    const player = this.isSoloMode ? 'p1' : this.spawnPlayer;
     const limits = PLAYER_LIMITS[player];
     const x = Phaser.Math.Between(limits.min + 22, limits.max - 22);
     const kind: FallingKind = Phaser.Math.Between(0, 99) < 24 ? 'hazard' : 'energy';
     const view = this.createItemView(kind, x, -34);
     const elapsed = this.state.durationMs - this.state.timeRemainingMs;
     this.items.push({ player, kind, x, y: -34, speed: 185 + elapsed / this.state.durationMs * 90, view });
-    this.spawnPlayer = player === 'p1' ? 'p2' : 'p1';
+    this.spawnPlayer = this.isSoloMode ? 'p1' : (player === 'p1' ? 'p2' : 'p1');
     this.spawnAfterMs = Phaser.Math.Between(650, 950);
   }
 
@@ -499,7 +559,8 @@ class EnergyCatchScene extends Phaser.Scene {
     const now = performance.now();
     if (now - this.lastItemCueAt < ITEM_CUE_INTERVAL_MS) return;
     if (now - this.lastCatchAnnouncementAt < ITEM_CUE_AFTER_CATCH_MS) return;
-    const pendingCues = (['p1', 'p2'] as const).flatMap((player) => {
+    const activePlayers = this.isSoloMode ? (['p1'] as const) : (['p1', 'p2'] as const);
+    const pendingCues = activePlayers.flatMap((player) => {
       const limits = PLAYER_LIMITS[player];
       const third = (limits.max - limits.min) / 3;
       return this.items
@@ -644,7 +705,15 @@ class EnergyCatchScene extends Phaser.Scene {
       resultTeamTotal: get('result-team-total'),
       readyTitle: get('ready-title'),
       resultsTitle: get('results-title'),
-      gameAnnouncer: get('game-announcer')
+      gameAnnouncer: get('game-announcer'),
+      modeSoloButton: (document.getElementById('mode-solo') as HTMLButtonElement) || undefined,
+      modeCoopButton: (document.getElementById('mode-coop') as HTMLButtonElement) || undefined,
+      cameraModeSoloButton: (document.getElementById('camera-mode-solo') as HTMLButtonElement) || undefined,
+      cameraModeCoopButton: (document.getElementById('camera-mode-coop') as HTMLButtonElement) || undefined,
+      menuSubtitle: document.getElementById('menu-subtitle') || undefined,
+      cameraInstructions: document.getElementById('camera-instructions') || undefined,
+      cameraCalibrationInstructions: document.getElementById('camera-calibration-instructions') || undefined,
+      cameraPreviewLabel: document.getElementById('camera-preview-label') || undefined
     };
   }
 
@@ -653,6 +722,15 @@ class EnergyCatchScene extends Phaser.Scene {
     const p1 = this.state.players.p1;
     const p2 = this.state.players.p2;
     const time = String(Math.ceil(this.state.timeRemainingMs / 1000)).padStart(2, '0');
+
+    if (this.isSoloMode) {
+      this.ui.p2Score.parentElement?.classList.add('solo-inactive');
+      this.ui.resultP2Score.parentElement?.classList.add('solo-inactive');
+    } else {
+      this.ui.p2Score.parentElement?.classList.remove('solo-inactive');
+      this.ui.resultP2Score.parentElement?.classList.remove('solo-inactive');
+    }
+
     const values: Array<[HTMLElement, string]> = [
       [this.ui.timer, time],
       [this.ui.p1Score, p1.score.toLocaleString()],
@@ -663,9 +741,9 @@ class EnergyCatchScene extends Phaser.Scene {
       [this.ui.resultP2Score, p2.score.toLocaleString()],
       [this.ui.resultP1Combo, `BEST COMBO ${p1.bestCombo}`],
       [this.ui.resultP2Combo, `BEST COMBO ${p2.bestCombo}`],
-      [this.ui.resultTeamTotal, (p1.score + p2.score).toLocaleString()]
+      [this.ui.resultTeamTotal, (this.isSoloMode ? p1.score : (p1.score + p2.score)).toLocaleString()]
     ];
-    const signature = `${time}|${values.map(([, value]) => value).join('|')}`;
+    const signature = `${this.isSoloMode ? 'solo' : 'coop'}|${time}|${values.map(([, value]) => value).join('|')}`;
     if (signature === this.lastHudSignature) return;
     this.lastHudSignature = signature;
     for (const [element, value] of values) element.textContent = value;
@@ -681,6 +759,7 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui.ready.hidden = phase !== 'restart';
     this.ui.hud.hidden = phase !== 'playing';
     this.ui.results.hidden = phase !== 'results';
+    this.rigs.p2?.root.setVisible(!this.isSoloMode);
     this.updateInputModeUi();
     this.updateHud();
     if (showCameraDialog) this.ui.cameraTitle.focus({ preventScroll: true });

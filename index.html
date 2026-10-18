@@ -16,7 +16,11 @@
               <header class="menu-title">
                 <p class="menu-eyebrow"><span class="status-dot" aria-hidden="true"></span> REACTOR RUSH</p>
                 <h1 id="menu-title">Energy Catch</h1>
-                <p class="menu-subtitle">Two-player co-op <span aria-hidden="true">·</span> 60 seconds</p>
+                <p id="menu-subtitle" class="menu-subtitle">Single player <span aria-hidden="true">·</span> 60 seconds</p>
+                <div class="mode-select-row" role="group" aria-label="Game Mode">
+                  <button id="mode-solo" class="mode-btn active" type="button">1 PLAYER (SOLO)</button>
+                  <button id="mode-coop" class="mode-btn" type="button">2 PLAYERS (CO-OP)</button>
+                </div>
               </header>
 
               <div class="player-cards">
@@ -34,7 +38,7 @@
                   </div>
                 </article>
 
-                <article class="player-card player-card-p2" aria-label="Player 2 Pink controls">
+                <article class="player-card player-card-p2 solo-inactive" aria-label="Player 2 Pink controls">
                   <div class="player-card-heading">
                     <span class="player-index">02</span>
                     <div>
@@ -61,17 +65,21 @@
             <div class="camera-setup-copy">
               <p class="camera-eyebrow">OPTIONAL INPUT</p>
               <h2 id="camera-title" tabindex="-1">WEB CAM CONTROLS</h2>
-              <p id="camera-instructions" class="camera-instructions">Stand side by side. P1 stays camera-left, P2 camera-right. Move one hand left or right; pinch thumb and index finger to catch.</p>
-              <p class="camera-instructions camera-calibration-instructions">Hold one visible hand near the center of each half, then calibrate both players.</p>
+              <div class="camera-mode-select-row" role="group" aria-label="Camera Setup Mode">
+                <button id="camera-mode-solo" class="mode-btn active" type="button">1 PLAYER (SOLO)</button>
+                <button id="camera-mode-coop" class="mode-btn" type="button">2 PLAYERS (CO-OP)</button>
+              </div>
+              <p id="camera-instructions" class="camera-instructions">Move one hand left or right; pinch thumb and index finger to catch.</p>
+              <p id="camera-calibration-instructions" class="camera-instructions camera-calibration-instructions">Hold one visible hand near the center of the camera, then calibrate.</p>
               <p id="camera-status" class="camera-status" role="status" aria-live="polite">Camera is off. It starts only after you choose Enable Camera.</p>
-              <p id="camera-hands-status" class="camera-hands-status" role="status" aria-live="polite" aria-atomic="true">P1: waiting <span aria-hidden="true">·</span> P2: waiting</p>
+              <p id="camera-hands-status" class="camera-hands-status" role="status" aria-live="polite" aria-atomic="true">P1: waiting</p>
               <label class="camera-consent">
                 <input id="camera-consent" type="checkbox" />
                 <span>Camera frames are processed on this device and are not uploaded or recorded. MediaPipe’s documentation says its usage/performance metrics may be sent to Google. I understand and want to enable camera controls.</span>
               </label>
               <div class="camera-actions">
                 <button id="enable-camera" class="game-action" type="button" disabled>ENABLE CAMERA &amp; LOAD MODEL</button>
-                <button id="calibrate-camera" class="game-action secondary-action" type="button" disabled>CALIBRATE BOTH HANDS</button>
+                <button id="calibrate-camera" class="game-action secondary-action" type="button" disabled>CALIBRATE HAND</button>
                 <button id="start-camera-round" class="game-action" type="button" disabled>START WITH CAMERA</button>
                 <button id="camera-to-keyboard" class="camera-back-action" type="button">CANCEL / USE KEYBOARD</button>
               </div>
@@ -79,7 +87,7 @@
             <div class="camera-preview-frame">
               <video id="camera-preview" muted playsinline aria-label="Mirrored webcam preview"></video>
               <div class="camera-preview-placeholder" aria-hidden="true">CAMERA PREVIEW</div>
-              <span class="camera-preview-label">P1 LEFT <span aria-hidden="true">·</span> P2 RIGHT</span>
+              <span id="camera-preview-label" class="camera-preview-label">P1 (SOLO CONTROLS)</span>
             </div>
           </div>
         </section>

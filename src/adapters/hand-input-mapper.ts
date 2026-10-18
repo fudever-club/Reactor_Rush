@@ -17,6 +17,7 @@ export interface HandInputMapperOptions {
   pinchReleaseRatio?: number;
   staleAfterMs?: number;
   centerDeadBand?: number;
+  soloMode?: boolean;
 }
 
 const NEUTRAL_PLAYER: PlayerInput = { moveAxis: 0, catch: false };
@@ -82,6 +83,7 @@ export class HandInputMapper {
   private readonly pinchReleaseRatio: number;
   private readonly staleAfterMs: number;
   private readonly centerDeadBand: number;
+  private soloMode: boolean;
   private controls?: Record<PlayerId, PlayerControl>;
   private lastUpdateAt = Number.NEGATIVE_INFINITY;
   private frame: InputFrame = cloneFrame(NEUTRAL_FRAME);
@@ -93,15 +95,29 @@ export class HandInputMapper {
     this.pinchReleaseRatio = options.pinchReleaseRatio ?? 0.43;
     this.staleAfterMs = options.staleAfterMs ?? HAND_TRACKING_STALE_MS;
     this.centerDeadBand = options.centerDeadBand ?? 0.035;
+    this.soloMode = options.soloMode ?? false;
+  }
+
+  setSoloMode(solo: boolean): void {
+    if (this.soloMode === solo) return;
+    this.soloMode = solo;
+    this.reset();
+  }
+
+  isSoloMode(): boolean {
+    return this.soloMode;
   }
 
   calibrate(hands: readonly DetectedHand[], nowMs: number): boolean {
     const assignments = this.assign(hands);
-    if (!assignments || !assignments.p1 || !assignments.p2) return false;
+    if (!assignments || !assignments.p1) return false;
+    if (!this.soloMode && !assignments.p2) return false;
 
     this.controls = {
       p1: { neutralX: assignments.p1.x, moveAxis: 0, catch: false },
-      p2: { neutralX: assignments.p2.x, moveAxis: 0, catch: false }
+      p2: assignments.p2
+        ? { neutralX: assignments.p2.x, moveAxis: 0, catch: false }
+        : { neutralX: 0.75, moveAxis: 0, catch: false }
     };
     this.lastUpdateAt = nowMs;
     this.frame = cloneFrame(NEUTRAL_FRAME);
@@ -110,7 +126,8 @@ export class HandInputMapper {
 
   canCalibrate(hands: readonly DetectedHand[]): boolean {
     const assignments = this.assign(hands);
-    return Boolean(assignments?.p1 && assignments.p2);
+    if (!assignments?.p1) return false;
+    return this.soloMode ? true : Boolean(assignments.p2);
   }
 
   update(hands: readonly DetectedHand[], nowMs: number): InputFrame {
@@ -166,14 +183,31 @@ export class HandInputMapper {
 
   private assign(hands: readonly DetectedHand[]): Partial<Record<PlayerId, { hand: DetectedHand; x: number }>> | undefined {
     const assignments: Partial<Record<PlayerId, { hand: DetectedHand; x: number }>> = {};
+    const validHands: Array<{ hand: DetectedHand; x: number }> = [];
+
     for (const hand of hands) {
       if (!Array.isArray(hand.landmarks) || hand.landmarks.length < 18) continue;
       const x = screenX(hand);
       if (x === undefined) continue;
-      const player = sideFor(x, this.centerDeadBand);
+      validHands.push({ hand, x });
+    }
+
+    if (this.soloMode) {
+      if (validHands.length === 0) return assignments;
+      if (validHands.length === 1) {
+        assignments.p1 = validHands[0];
+        return assignments;
+      }
+      const p1Hand = validHands.find((h) => sideFor(h.x, this.centerDeadBand) === 'p1') ?? validHands[0];
+      assignments.p1 = p1Hand;
+      return assignments;
+    }
+
+    for (const item of validHands) {
+      const player = sideFor(item.x, this.centerDeadBand);
       if (!player) continue;
       if (assignments[player]) return undefined;
-      assignments[player] = { hand, x };
+      assignments[player] = item;
     }
     return assignments;
   }

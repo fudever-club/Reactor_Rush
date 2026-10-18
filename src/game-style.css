@@ -226,3 +226,43 @@ kbd { display: inline-grid; min-width: 2em; height: 2em; padding: 0 .4em; place-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+.mode-select-row, .camera-mode-select-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.6em;
+  margin-top: 0.7em;
+  pointer-events: auto;
+}
+
+.mode-btn {
+  background: #18203d;
+  color: #aeb7d2;
+  border: 1px solid #45527a;
+  border-radius: 6px;
+  padding: 0.45em 1em;
+  font-size: clamp(10px, 0.9cqw, 13px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-btn:hover {
+  background: #25315e;
+  color: #ffffff;
+  border-color: #697cae;
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, #0d5f7a, #0c7696);
+  color: #55dfff;
+  border-color: #55dfff;
+  box-shadow: 0 0 12px #55dfff44;
+}
+
+.player-card.solo-inactive, .hud-player.solo-inactive, .result-player.solo-inactive {
+  opacity: 0.25;
+  filter: grayscale(80%);
+  pointer-events: none;
+}

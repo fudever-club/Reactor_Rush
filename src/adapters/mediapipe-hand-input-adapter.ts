@@ -12,6 +12,7 @@ export interface MediaPipeHandInputOptions {
   now?: () => number;
   requestFrame?: (callback: FrameRequestCallback) => number;
   cancelFrame?: (handle: number) => void;
+  soloMode?: boolean;
 }
 
 interface WorkerReadyMessage { type: 'ready' }
@@ -63,7 +64,7 @@ function errorMessage(error: unknown): string {
 }
 
 export class MediaPipeHandInputAdapter implements InputAdapter {
-  private readonly mapper = new HandInputMapper();
+  private readonly mapper: HandInputMapper;
   private readonly createWorker: () => Worker;
   private readonly getUserMedia: (constraints: MediaStreamConstraints) => Promise<MediaStream>;
   private readonly createBitmap: (video: HTMLVideoElement) => Promise<ImageBitmap>;
@@ -72,6 +73,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private readonly cancelFrame: (handle: number) => void;
   private readonly onStatus?: MediaPipeHandInputOptions['onStatus'];
   private readonly onDetection?: MediaPipeHandInputOptions['onDetection'];
+  private soloMode: boolean;
   private stream?: MediaStream;
   private worker?: Worker;
   private frameHandle?: number;
@@ -92,6 +94,8 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
 
   constructor(video: HTMLVideoElement, options: MediaPipeHandInputOptions = {}) {
     this.video = video;
+    this.soloMode = options.soloMode ?? false;
+    this.mapper = new HandInputMapper({ soloMode: this.soloMode });
     this.createWorker = options.createWorker ?? (() => new Worker(
       new URL('../workers/hand-landmarker.worker.ts', import.meta.url), { type: 'module' }
     ));
@@ -107,6 +111,18 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     this.cancelFrame = options.cancelFrame ?? ((handle) => cancelAnimationFrame(handle));
     this.onStatus = options.onStatus;
     this.onDetection = options.onDetection;
+  }
+
+  setSoloMode(solo: boolean): void {
+    if (this.soloMode === solo) return;
+    this.soloMode = solo;
+    this.mapper.setSoloMode(solo);
+    this.calibrated = false;
+    this.notifyDetection();
+  }
+
+  isSoloMode(): boolean {
+    return this.soloMode;
   }
 
   get currentStatus(): CameraInputStatus {
@@ -362,10 +378,14 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private notifyDetection(): void {
     const visiblePlayers: PlayerId[] = [];
     if (this.isDetectionFresh()) {
-      const left = this.latestHands.some((hand) => hand.landmarks[0] && 1 - hand.landmarks[0].x < 0.465);
-      const right = this.latestHands.some((hand) => hand.landmarks[0] && 1 - hand.landmarks[0].x > 0.535);
-      if (left) visiblePlayers.push(PLAYER_ID.p1);
-      if (right) visiblePlayers.push(PLAYER_ID.p2);
+      if (this.soloMode) {
+        if (this.latestHands.length > 0) visiblePlayers.push(PLAYER_ID.p1);
+      } else {
+        const left = this.latestHands.some((hand) => hand.landmarks[0] && 1 - hand.landmarks[0].x < 0.465);
+        const right = this.latestHands.some((hand) => hand.landmarks[0] && 1 - hand.landmarks[0].x > 0.535);
+        if (left) visiblePlayers.push(PLAYER_ID.p1);
+        if (right) visiblePlayers.push(PLAYER_ID.p2);
+      }
     }
     this.onDetection?.(visiblePlayers, this.canCalibrate(), this.calibrated);
   }

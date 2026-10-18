@@ -36,9 +36,12 @@ workerScope.onmessage = async (event) => {
 
   if (request.type === 'init') {
     try {
-      const fileset = await FilesetResolver.forVisionTasks(request.wasmRoot);
+      const fileset = await FilesetResolver.forVisionTasks(request.wasmRoot, true);
+      const modelAssetPath = typeof location !== 'undefined' && location.origin
+        ? new URL(request.modelPath, location.origin).href
+        : request.modelPath;
       landmarker = await HandLandmarker.createFromOptions(fileset, {
-        baseOptions: { modelAssetPath: request.modelPath, delegate: 'CPU' },
+        baseOptions: { modelAssetPath, delegate: 'CPU' },
         runningMode: 'VIDEO',
         numHands: 2,
         minHandDetectionConfidence: 0.55,

@@ -74,3 +74,17 @@ test('stale tracking and malformed landmarks return neutral inputs', () => {
   const invalid = makeHand(Number.NaN);
   assert.equal(mapper.calibrate([invalid, makeHand(0.22)], 300), false);
 });
+
+test('solo mode allows calibration and control with a single hand', () => {
+  const mapper = new HandInputMapper({ soloMode: true });
+  assert.equal(mapper.canCalibrate([makeHand(0.5)]), true);
+  assert.equal(mapper.calibrate([makeHand(0.5)], 0), true);
+
+  const movedLeft = mapper.update([makeHand(0.65)], 20);
+  assert.equal(movedLeft.p1.moveAxis, -1);
+  assert.equal(movedLeft.p2.moveAxis, 0);
+
+  const pinched = mapper.update([makeHand(0.5, { pinched: true })], 30);
+  assert.equal(pinched.p1.catch, true);
+  assert.equal(pinched.p2.catch, false);
+});
