@@ -10,7 +10,10 @@ class FakeWorker {
   messages = [];
   terminated = false;
 
-  constructor(autoReady = true) { this.autoReady = autoReady; }
+  constructor(autoReady = true, delegate = undefined) {
+    this.autoReady = autoReady;
+    this.delegate = delegate;
+  }
 
   addEventListener(type, callback) {
     const listeners = this.listeners.get(type) ?? new Set();
@@ -25,7 +28,7 @@ class FakeWorker {
   postMessage(message) {
     this.messages.push(message);
     if (message.type === 'init' && this.autoReady) {
-      queueMicrotask(() => this.emit('message', { data: { type: 'ready' } }));
+      queueMicrotask(() => this.emit('message', { data: { type: 'ready', delegate: this.delegate } }));
     }
   }
 
@@ -76,9 +79,9 @@ function fakeVideo() {
 function createAdapter(overrides = {}) {
   const { track, stream } = fakeStream();
   const video = fakeVideo();
-  const worker = new FakeWorker(overrides.autoReady !== false);
+  const worker = new FakeWorker(overrides.autoReady !== false, overrides.delegate);
   const calls = { camera: 0, worker: 0, stoppedTrack: track, cancelledFrames: [] };
-  const clock = { now: 10 };
+  const clock = { now: overrides.now ?? 10 };
   const adapter = new MediaPipeHandInputAdapter(video, {
     getUserMedia: async (constraints) => {
       calls.camera += 1;
@@ -89,13 +92,16 @@ function createAdapter(overrides = {}) {
     createWorker: () => { calls.worker += 1; return worker; },
     createBitmap: overrides.createBitmap,
     onStatus: overrides.onStatus,
-    onDetection: (players, canCalibrate, calibrated) => {
-      calls.lastDetection = { players, canCalibrate, calibrated };
-      overrides.onDetection?.(players, canCalibrate, calibrated);
+    onMetrics: overrides.onMetrics,
+    onDetection: (players, canCalibrate, calibrated, metrics) => {
+      calls.lastDetection = { players, canCalibrate, calibrated, metrics };
+      overrides.onDetection?.(players, canCalibrate, calibrated, metrics);
     },
     requestFrame: (callback) => { calls.frameCallback = callback; return 17; },
     cancelFrame: (id) => calls.cancelledFrames.push(id),
-    now: () => clock.now
+    now: () => clock.now,
+    wasmRoot: overrides.wasmRoot,
+    modelPath: overrides.modelPath
   });
   return { adapter, calls, video, worker, stream, track, clock };
 }
@@ -305,6 +311,99 @@ test('latest hands are exposed and cleared on stop or stale expiration', async (
   clock.now = 400;
   calls.frameCallback(0);
   assert.equal(adapter.getLatestHands().length, 0);
+
+  adapter.stop();
+});
+
+test('adapter initializes worker with local wasm root by default and supports custom path', async () => {
+  const { adapter, worker } = createAdapter();
+  await adapter.start();
+  assert.equal(worker.messages[0].type, 'init');
+  assert.equal(worker.messages[0].wasmRoot, '/mediapipe/wasm');
+  assert.equal(worker.messages[0].modelPath, '/mediapipe/hand_landmarker.task');
+  adapter.stop();
+
+  const custom = createAdapter({ wasmRoot: '/custom/wasm', modelPath: '/custom/model.task' });
+  await custom.adapter.start();
+  assert.equal(custom.worker.messages[0].wasmRoot, '/custom/wasm');
+  assert.equal(custom.worker.messages[0].modelPath, '/custom/model.task');
+  custom.adapter.stop();
+});
+
+test('adapter captures delegate and reports inference latency, fps, and metrics callback', async () => {
+  const receivedMetrics = [];
+  const { adapter, worker, clock } = createAdapter({
+    delegate: 'GPU',
+    onMetrics: (m) => receivedMetrics.push(m)
+  });
+
+  await adapter.start();
+  assert.equal(adapter.getMetrics().delegate, 'GPU');
+
+  clock.now = 1000;
+  worker.emit('message', {
+    data: {
+      type: 'result',
+      timestamp: 1000,
+      hands: [makeLandmarks(0.78), makeLandmarks(0.22)],
+      inferenceMs: 32,
+      delegate: 'GPU'
+    }
+  });
+
+  clock.now = 1085;
+  worker.emit('message', {
+    data: {
+      type: 'result',
+      timestamp: 1085,
+      hands: [makeLandmarks(0.78), makeLandmarks(0.22)],
+      inferenceMs: 30,
+      delegate: 'GPU'
+    }
+  });
+
+  const metrics = adapter.getMetrics();
+  assert.equal(metrics.delegate, 'GPU');
+  assert.ok(metrics.inferenceMs >= 28 && metrics.inferenceMs <= 33);
+  assert.ok(metrics.fps >= 10 && metrics.fps <= 14);
+  assert.ok(receivedMetrics.length >= 2);
+
+  adapter.stop();
+});
+
+test('adapter metrics reflect ambiguity reason when hands conflict', async () => {
+  let latestMetrics;
+  const { adapter, worker } = createAdapter({
+    onDetection: (_players, _canCalibrate, _calibrated, metrics) => {
+      latestMetrics = metrics;
+    }
+  });
+  await adapter.start();
+
+  worker.emit('message', {
+    data: {
+      type: 'result',
+      timestamp: 50,
+      hands: [makeLandmarks(0.78), makeLandmarks(0.22)],
+      inferenceMs: 31,
+      delegate: 'GPU'
+    }
+  });
+  assert.equal(adapter.calibrate(), true);
+
+  // Hands too close (< 0.08 distance)
+  worker.emit('message', {
+    data: {
+      type: 'result',
+      timestamp: 100,
+      hands: [makeLandmarks(0.50), makeLandmarks(0.52)],
+      inferenceMs: 31,
+      delegate: 'GPU'
+    }
+  });
+
+  assert.ok(latestMetrics);
+  assert.equal(latestMetrics.ambiguityReason, 'too-close');
 
   adapter.stop();
 });

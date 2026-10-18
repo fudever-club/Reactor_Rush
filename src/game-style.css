@@ -129,7 +129,9 @@ kbd { display: inline-grid; min-width: 2em; height: 2em; padding: 0 .4em; place-
 .camera-instructions { max-width: 60ch; margin: .55em 0; color: #c0c9e1; font-size: clamp(11px, 1.05cqw, 14px); line-height: 1.45; }
 .camera-calibration-instructions { color: #8893b3; }
 .camera-status { min-height: 2.6em; margin: .85em 0 .35em; color: #f6d55c; font-size: clamp(10px, .92cqw, 12px); font-weight: 700; line-height: 1.4; }
-.camera-hands-status { display: flex; gap: .45em; margin: .25em 0 .8em; color: #aeb7d2; font-size: clamp(10px, .9cqw, 12px); font-weight: 750; letter-spacing: .05em; }
+.camera-hands-status { display: flex; gap: .45em; margin: .25em 0 .8em; color: #aeb7d2; font-size: clamp(10px, .9cqw, 12px); font-weight: 750; letter-spacing: .05em; transition: color .2s ease; }
+.camera-hands-status.is-ambiguous { color: #ff8b83; text-shadow: 0 0 10px #ff596855; }
+.camera-hands-status.is-ready { color: #55dfff; }
 .camera-consent { display: flex; align-items: flex-start; gap: .75em; margin: .7em 0 1em; padding: .85em; border: 1px solid #39405e; border-radius: 9px; background: #0d1328; color: #aeb7d2; font-size: clamp(9px, .82cqw, 11px); line-height: 1.45; cursor: pointer; }
 .camera-consent input { width: 1.2em; height: 1.2em; flex: 0 0 auto; margin: .1em 0 0; accent-color: #55dfff; }
 .camera-actions { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: .65em; }

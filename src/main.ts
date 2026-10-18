@@ -4,7 +4,11 @@ import p1Animations from '../assets/characters/p1-cyan/animations.json';
 import p2Rig from '../assets/characters/p2-pink/rig.json';
 import p2Animations from '../assets/characters/p2-pink/animations.json';
 import { KeyboardInputAdapter } from './adapters/keyboard-input-adapter';
-import { MediaPipeHandInputAdapter, type CameraInputStatus } from './adapters/mediapipe-hand-input-adapter';
+import {
+  MediaPipeHandInputAdapter,
+  type CameraInputStatus,
+  type CameraMetrics
+} from './adapters/mediapipe-hand-input-adapter';
 import {
   advanceGameFrame,
   applyCatch,
@@ -337,7 +341,7 @@ class EnergyCatchScene extends Phaser.Scene {
       soloMode: this.isSoloMode,
       overlayCanvas: this.ui.cameraCanvas,
       onStatus: (status, message) => this.updateCameraStatus(status, message),
-      onDetection: (players, canCalibrate, calibrated) => this.updateCameraDetection(players, canCalibrate, calibrated)
+      onDetection: (players, canCalibrate, calibrated, metrics) => this.updateCameraDetection(players, canCalibrate, calibrated, metrics)
     });
     this.cameraAdapter = adapter;
     this.ui.cameraEnableButton.disabled = true;
@@ -352,9 +356,11 @@ class EnergyCatchScene extends Phaser.Scene {
   private handleCameraCalibrationRequested = (): void => {
     const calibrated = this.cameraAdapter?.calibrate() ?? false;
     if (calibrated && this.ui) {
+      const metrics = this.cameraAdapter?.getMetrics();
+      const delegateTag = metrics?.delegate ? ` (${metrics.delegate} active)` : '';
       this.ui.cameraStatus.textContent = this.isSoloMode
-        ? 'Neutral hand position saved. Move left/right and pinch thumb to index to catch.'
-        : 'Neutral hand positions saved. Move left/right and pinch thumb to index to catch.';
+        ? `Neutral hand position saved${delegateTag}. Move left/right and pinch thumb to index to catch.`
+        : `Neutral hand positions saved${delegateTag}. Move left/right and pinch thumb to index to catch.`;
     }
   };
 
@@ -423,13 +429,15 @@ class EnergyCatchScene extends Phaser.Scene {
 
   private updateCameraStatus(status: CameraInputStatus, message?: string): void {
     if (!this.ui) return;
+    const metrics = this.cameraAdapter?.getMetrics();
+    const delegateTag = metrics?.delegate ? ` (${metrics.delegate} active)` : '';
     const fallbackMessages: Record<CameraInputStatus, string> = {
       idle: 'Camera is off. It starts only after you choose Enable Camera.',
       'requesting-camera': 'Waiting for camera permission…',
       'loading-model': 'Camera connected. Loading the hand model…',
       ready: this.isSoloMode
-        ? 'Camera ready. Place one visible hand in front of the camera, then calibrate.'
-        : 'Camera ready. Place one visible hand in each half, then calibrate.',
+        ? `Camera ready${delegateTag}. Place one visible hand in front of the camera, then calibrate.`
+        : `Camera ready${delegateTag}. Place one visible hand in each half, then calibrate.`,
       stopped: 'Camera stopped. Keyboard controls remain available.',
       error: 'Camera controls could not start. Keyboard controls remain available.'
     };
@@ -449,18 +457,61 @@ class EnergyCatchScene extends Phaser.Scene {
     }
   }
 
-  private updateCameraDetection(players: readonly PlayerId[], canCalibrate: boolean, calibrated: boolean): void {
+  private updateCameraDetection(
+    players: readonly PlayerId[],
+    canCalibrate: boolean,
+    calibrated: boolean,
+    metrics?: CameraMetrics
+  ): void {
     if (!this.ui) return;
     const hasP1 = players.includes('p1');
     const hasP2 = players.includes('p2');
-    const handsStatus = this.isSoloMode
-      ? `P1: ${hasP1 ? 'hand detected' : 'waiting'}`
-      : `P1: ${hasP1 ? 'hand detected' : 'waiting'} · P2: ${hasP2 ? 'hand detected' : 'waiting'}`;
+    const ambiguity = metrics?.ambiguityReason;
+    const metricsSuffix = metrics && metrics.fps > 0
+      ? ` · ${metrics.delegate} (${metrics.inferenceMs}ms · ${metrics.fps}fps)`
+      : metrics?.delegate ? ` · ${metrics.delegate}` : '';
+
+    let handsStatus = '';
+    if (this.isSoloMode) {
+      if (ambiguity === 'multiple-hands') {
+        handsStatus = `P1: ambiguous (multiple hands)${metricsSuffix}`;
+      } else if (hasP1) {
+        handsStatus = `P1: hand detected${metricsSuffix}`;
+      } else {
+        handsStatus = 'P1: waiting';
+      }
+    } else {
+      if (ambiguity === 'hands-crossed') {
+        handsStatus = `P1: ambiguous (hands crossed) · P2: ambiguous (hands crossed)${metricsSuffix}`;
+      } else if (ambiguity === 'too-close') {
+        handsStatus = `P1/P2: ambiguous (hands too close)${metricsSuffix}`;
+      } else if (ambiguity === 'multiple-hands') {
+        handsStatus = `P1: ${hasP1 ? 'hand detected' : 'ambiguous (multiple hands)'} · P2: ${hasP2 ? 'hand detected' : 'ambiguous (multiple hands)'}${metricsSuffix}`;
+      } else if (hasP1 && hasP2) {
+        handsStatus = `P1: hand detected · P2: hand detected${metricsSuffix}`;
+      } else {
+        handsStatus = `P1: ${hasP1 ? 'hand detected' : 'waiting'} · P2: ${hasP2 ? 'hand detected' : 'waiting'}${metricsSuffix}`;
+      }
+    }
+
     this.setCameraHandsStatus(handsStatus);
-    this.ui.cameraCalibrateButton.disabled = !canCalibrate;
+    this.ui.cameraHandsStatus.classList.toggle('is-ambiguous', Boolean(ambiguity));
+    this.ui.cameraHandsStatus.classList.toggle('is-ready', Boolean(!ambiguity && (this.isSoloMode ? hasP1 : (hasP1 && hasP2))));
+
+    this.ui.cameraCalibrateButton.disabled = !canCalibrate || Boolean(ambiguity);
     this.ui.cameraStartButton.disabled = this.isSoloMode
-      ? (!calibrated || !hasP1)
-      : (!calibrated || !hasP1 || !hasP2);
+      ? (!calibrated || !hasP1 || Boolean(ambiguity))
+      : (!calibrated || !hasP1 || !hasP2 || Boolean(ambiguity));
+
+    if (this.cameraMode) {
+      if (ambiguity === 'hands-crossed') {
+        this.ui.controlsHint.textContent = 'HANDS CROSSED · RETURN TO YOUR HALF';
+      } else if (ambiguity === 'too-close') {
+        this.ui.controlsHint.textContent = 'HANDS TOO CLOSE · SEPARATE HANDS';
+      } else {
+        this.ui.controlsHint.textContent = 'MOVE HAND LEFT/RIGHT · PINCH TO CATCH';
+      }
+    }
   }
 
   private updateInputModeUi(): void {

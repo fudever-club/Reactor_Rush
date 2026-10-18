@@ -4,9 +4,22 @@ import { renderHandOverlay } from './hand-landmarks-renderer.ts';
 
 export type CameraInputStatus = 'idle' | 'requesting-camera' | 'loading-model' | 'ready' | 'stopped' | 'error';
 
+export interface CameraMetrics {
+  delegate: 'GPU' | 'CPU';
+  inferenceMs: number;
+  fps: number;
+  ambiguityReason?: 'hands-crossed' | 'too-close' | 'multiple-hands' | 'in-deadband';
+}
+
 export interface MediaPipeHandInputOptions {
   onStatus?: (status: CameraInputStatus, message?: string) => void;
-  onDetection?: (visiblePlayers: readonly PlayerId[], canCalibrate: boolean, calibrated: boolean) => void;
+  onDetection?: (
+    visiblePlayers: readonly PlayerId[],
+    canCalibrate: boolean,
+    calibrated: boolean,
+    metrics?: CameraMetrics
+  ) => void;
+  onMetrics?: (metrics: CameraMetrics) => void;
   createWorker?: () => Worker;
   getUserMedia?: (constraints: MediaStreamConstraints) => Promise<MediaStream>;
   createBitmap?: (video: HTMLVideoElement) => Promise<ImageBitmap>;
@@ -15,18 +28,25 @@ export interface MediaPipeHandInputOptions {
   cancelFrame?: (handle: number) => void;
   soloMode?: boolean;
   overlayCanvas?: HTMLCanvasElement;
+  wasmRoot?: string;
+  modelPath?: string;
 }
 
-interface WorkerReadyMessage { type: 'ready' }
+interface WorkerReadyMessage {
+  type: 'ready';
+  delegate?: 'GPU' | 'CPU';
+}
 interface WorkerResultMessage {
   type: 'result';
   timestamp: number;
   hands: Array<Array<{ x: number; y: number }>>;
+  inferenceMs?: number;
+  delegate?: 'GPU' | 'CPU';
 }
 interface WorkerErrorMessage { type: 'error'; message: string }
 type WorkerResponse = WorkerReadyMessage | WorkerResultMessage | WorkerErrorMessage;
 
-const WASM_ROOT = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.1/wasm';
+const WASM_ROOT = '/mediapipe/wasm';
 const MODEL_PATH = '/mediapipe/hand_landmarker.task';
 const SAMPLE_INTERVAL_MS = 85;
 const MODEL_READY_TIMEOUT_MS = 30_000;
@@ -75,6 +95,13 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private readonly cancelFrame: (handle: number) => void;
   private readonly onStatus?: MediaPipeHandInputOptions['onStatus'];
   private readonly onDetection?: MediaPipeHandInputOptions['onDetection'];
+  private readonly onMetrics?: MediaPipeHandInputOptions['onMetrics'];
+  private readonly wasmRoot: string;
+  private readonly modelPath: string;
+  private activeDelegate: 'GPU' | 'CPU' = 'CPU';
+  private lastResultAt = 0;
+  private smoothedFps = 0;
+  private smoothedInferenceMs = 0;
   private soloMode: boolean;
   private stream?: MediaStream;
   private worker?: Worker;
@@ -102,6 +129,8 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     this.overlayContext = options.overlayCanvas?.getContext('2d');
     this.soloMode = options.soloMode ?? false;
     this.mapper = new HandInputMapper({ soloMode: this.soloMode });
+    this.wasmRoot = options.wasmRoot ?? WASM_ROOT;
+    this.modelPath = options.modelPath ?? MODEL_PATH;
     this.createWorker = options.createWorker ?? (() => new Worker(
       new URL('../workers/hand-landmarker.worker.ts', import.meta.url), { type: 'module' }
     ));
@@ -117,6 +146,16 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     this.cancelFrame = options.cancelFrame ?? ((handle) => cancelAnimationFrame(handle));
     this.onStatus = options.onStatus;
     this.onDetection = options.onDetection;
+    this.onMetrics = options.onMetrics;
+  }
+
+  getMetrics(): CameraMetrics {
+    return {
+      delegate: this.activeDelegate,
+      inferenceMs: Math.round(this.smoothedInferenceMs),
+      fps: Math.round(this.smoothedFps),
+      ambiguityReason: this.mapper.getLastAmbiguityReason()
+    };
   }
 
   getLatestHands(): readonly DetectedHand[] {
@@ -258,6 +297,9 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       };
       const onMessage = (event: MessageEvent<WorkerResponse>) => {
         if (event.data.type === 'ready') {
+          if (event.data.delegate) {
+            this.activeDelegate = event.data.delegate;
+          }
           cleanup();
           worker.addEventListener('message', this.handleWorkerMessage);
           worker.addEventListener('error', this.handleWorkerError);
@@ -273,7 +315,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       };
       worker.addEventListener('message', onMessage);
       worker.addEventListener('error', onError);
-      worker.postMessage({ type: 'init', wasmRoot: WASM_ROOT, modelPath: MODEL_PATH });
+      worker.postMessage({ type: 'init', wasmRoot: this.wasmRoot, modelPath: this.modelPath });
     });
   }
 
@@ -328,6 +370,22 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       this.inFlight = false;
       this.inFlightSince = Number.NEGATIVE_INFINITY;
       const now = this.now();
+      if (this.lastResultAt > 0) {
+        const dt = now - this.lastResultAt;
+        if (dt > 0) {
+          const instantFps = 1000 / dt;
+          this.smoothedFps = this.smoothedFps === 0 ? instantFps : this.smoothedFps * 0.8 + instantFps * 0.2;
+        }
+      }
+      this.lastResultAt = now;
+      if (typeof event.data.inferenceMs === 'number') {
+        this.smoothedInferenceMs = this.smoothedInferenceMs === 0
+          ? event.data.inferenceMs
+          : this.smoothedInferenceMs * 0.8 + event.data.inferenceMs * 0.2;
+      }
+      if (event.data.delegate) {
+        this.activeDelegate = event.data.delegate;
+      }
       this.lastDetectionAt = now;
       this.latestHands = event.data.hands.map((landmarks) => ({ landmarks }));
       this.detectionWasFresh = this.latestHands.length > 0;
@@ -385,6 +443,9 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     this.inFlight = false;
     this.inFlightSince = Number.NEGATIVE_INFINITY;
     this.frameCaptureFailures = 0;
+    this.lastResultAt = 0;
+    this.smoothedFps = 0;
+    this.smoothedInferenceMs = 0;
   }
 
   private notifyDetection(): void {
@@ -409,7 +470,9 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       }
       renderHandOverlay(this.overlayContext, this.overlayCanvas, fresh ? this.latestHands : [], this.soloMode);
     }
-    this.onDetection?.(visiblePlayers, this.canCalibrate(), this.calibrated);
+    const metrics = this.getMetrics();
+    this.onMetrics?.(metrics);
+    this.onDetection?.(visiblePlayers, this.canCalibrate(), this.calibrated, metrics);
   }
 
   private isDetectionFresh(now = this.now()): boolean {

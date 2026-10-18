@@ -14,8 +14,14 @@ interface FrameMessage {
 
 type WorkerRequest = InitMessage | FrameMessage | { type: 'close' };
 type WorkerResponse =
-  | { type: 'ready' }
-  | { type: 'result'; timestamp: number; hands: Array<Array<{ x: number; y: number }>> }
+  | { type: 'ready'; delegate: 'GPU' | 'CPU' }
+  | {
+      type: 'result';
+      timestamp: number;
+      hands: Array<Array<{ x: number; y: number }>>;
+      inferenceMs: number;
+      delegate: 'GPU' | 'CPU';
+    }
   | { type: 'error'; message: string };
 
 const workerScope = self as unknown as {
@@ -25,6 +31,7 @@ const workerScope = self as unknown as {
 
 let landmarker: HandLandmarker | undefined;
 let lastTimestamp = -1;
+let activeDelegate: 'GPU' | 'CPU' = 'CPU';
 
 workerScope.onmessage = async (event) => {
   const request = event.data;
@@ -36,7 +43,10 @@ workerScope.onmessage = async (event) => {
 
   if (request.type === 'init') {
     try {
-      const fileset = await FilesetResolver.forVisionTasks(request.wasmRoot, true);
+      const wasmPath = typeof location !== 'undefined' && location.origin && request.wasmRoot.startsWith('/')
+        ? new URL(request.wasmRoot, location.origin).href
+        : request.wasmRoot;
+      const fileset = await FilesetResolver.forVisionTasks(wasmPath, true);
       const modelAssetPath = typeof location !== 'undefined' && location.origin
         ? new URL(request.modelPath, location.origin).href
         : request.modelPath;
@@ -52,11 +62,13 @@ workerScope.onmessage = async (event) => {
           ...options,
           baseOptions: { modelAssetPath, delegate: 'GPU' }
         });
+        activeDelegate = 'GPU';
       } catch {
         landmarker = await HandLandmarker.createFromOptions(fileset, {
           ...options,
           baseOptions: { modelAssetPath, delegate: 'CPU' }
         });
+        activeDelegate = 'CPU';
       }
       try {
         if (typeof OffscreenCanvas !== 'undefined') {
@@ -71,7 +83,7 @@ workerScope.onmessage = async (event) => {
       } catch {
         // Non-fatal warmup failure
       }
-      workerScope.postMessage({ type: 'ready' });
+      workerScope.postMessage({ type: 'ready', delegate: activeDelegate });
     } catch (error) {
       workerScope.postMessage({ type: 'error', message: error instanceof Error ? error.message : String(error) });
     }
@@ -87,9 +99,11 @@ workerScope.onmessage = async (event) => {
   try {
     const timestamp = Math.max(request.timestamp, lastTimestamp + 1);
     lastTimestamp = timestamp;
+    const start = performance.now();
     const result = landmarker.detectForVideo(request.bitmap, timestamp);
+    const inferenceMs = performance.now() - start;
     const hands = result.landmarks.map((landmarks) => landmarks.map(({ x, y }) => ({ x, y })));
-    workerScope.postMessage({ type: 'result', timestamp, hands });
+    workerScope.postMessage({ type: 'result', timestamp, hands, inferenceMs, delegate: activeDelegate });
   } catch (error) {
     workerScope.postMessage({ type: 'error', message: error instanceof Error ? error.message : String(error) });
   } finally {

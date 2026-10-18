@@ -28,6 +28,8 @@ const NEUTRAL_FRAME: InputFrame = {
 
 export const HAND_TRACKING_STALE_MS = 250;
 
+export type AmbiguityReason = 'hands-crossed' | 'too-close' | 'multiple-hands' | 'in-deadband';
+
 interface PlayerControl {
   neutralX: number;
   moveAxis: -1 | 0 | 1;
@@ -85,7 +87,9 @@ export class HandInputMapper {
   private readonly centerDeadBand: number;
   private soloMode: boolean;
   private controls?: Record<PlayerId, PlayerControl>;
+  private lastKnownX?: Record<PlayerId, number>;
   private lastUpdateAt = Number.NEGATIVE_INFINITY;
+  private lastAmbiguityReason?: AmbiguityReason;
   private frame: InputFrame = cloneFrame(NEUTRAL_FRAME);
 
   constructor(options: HandInputMapperOptions = {}) {
@@ -96,6 +100,10 @@ export class HandInputMapper {
     this.staleAfterMs = options.staleAfterMs ?? HAND_TRACKING_STALE_MS;
     this.centerDeadBand = options.centerDeadBand ?? 0.035;
     this.soloMode = options.soloMode ?? false;
+  }
+
+  getLastAmbiguityReason(): AmbiguityReason | undefined {
+    return this.lastAmbiguityReason;
   }
 
   setSoloMode(solo: boolean): void {
@@ -118,6 +126,10 @@ export class HandInputMapper {
       p2: assignments.p2
         ? { neutralX: assignments.p2.x, moveAxis: 0, catch: false }
         : { neutralX: 0.75, moveAxis: 0, catch: false }
+    };
+    this.lastKnownX = {
+      p1: assignments.p1.x,
+      p2: assignments.p2 ? assignments.p2.x : 0.75
     };
     this.lastUpdateAt = nowMs;
     this.frame = cloneFrame(NEUTRAL_FRAME);
@@ -144,6 +156,9 @@ export class HandInputMapper {
         continue;
       }
 
+      if (this.lastKnownX) {
+        this.lastKnownX[player] = hand.x;
+      }
       const delta = hand.x - control.neutralX;
       control.moveAxis = this.resolveAxis(control.moveAxis, delta);
       const pinch = pinchRatio(hand.hand);
@@ -177,7 +192,9 @@ export class HandInputMapper {
 
   reset(): void {
     this.controls = undefined;
+    this.lastKnownX = undefined;
     this.lastUpdateAt = Number.NEGATIVE_INFINITY;
+    this.lastAmbiguityReason = undefined;
     this.frame = cloneFrame(NEUTRAL_FRAME);
   }
 
@@ -192,23 +209,96 @@ export class HandInputMapper {
       validHands.push({ hand, x });
     }
 
+    if (validHands.length === 0) {
+      this.lastAmbiguityReason = undefined;
+      return assignments;
+    }
+
     if (this.soloMode) {
-      if (validHands.length === 0) return assignments;
+      if (validHands.length > 2) {
+        this.lastAmbiguityReason = 'multiple-hands';
+      } else {
+        this.lastAmbiguityReason = undefined;
+      }
       if (validHands.length === 1) {
         assignments.p1 = validHands[0];
         return assignments;
       }
-      const p1Hand = validHands.find((h) => sideFor(h.x, this.centerDeadBand) === 'p1') ?? validHands[0];
-      assignments.p1 = p1Hand;
+      const targetX = this.lastKnownX?.p1 ?? this.controls?.p1.neutralX ?? 0.5;
+      let bestHand = validHands[0];
+      let bestDist = Math.abs(bestHand.x - targetX);
+      for (let i = 1; i < validHands.length; i++) {
+        const dist = Math.abs(validHands[i].x - targetX);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestHand = validHands[i];
+        }
+      }
+      assignments.p1 = bestHand;
       return assignments;
     }
 
-    for (const item of validHands) {
-      const player = sideFor(item.x, this.centerDeadBand);
-      if (!player) continue;
-      if (assignments[player]) return undefined;
-      assignments[player] = item;
+    // 2-Player Co-op Mode:
+    // 1. Minimum hand separation check: overlapping or crossing hands neutralize both players
+    if (validHands.length >= 2) {
+      for (let i = 0; i < validHands.length; i++) {
+        for (let j = i + 1; j < validHands.length; j++) {
+          if (Math.abs(validHands[i].x - validHands[j].x) < 0.08) {
+            this.lastAmbiguityReason = 'too-close';
+            return assignments;
+          }
+        }
+      }
     }
+
+    const leftBoundary = 0.5 - this.centerDeadBand;
+    const rightBoundary = 0.5 + this.centerDeadBand;
+
+    const leftHands = validHands.filter((h) => h.x < leftBoundary);
+    const rightHands = validHands.filter((h) => h.x > rightBoundary);
+    const deadbandHands = validHands.filter((h) => h.x >= leftBoundary && h.x <= rightBoundary);
+
+    if (leftHands.length > 1 || rightHands.length > 1) {
+      this.lastAmbiguityReason = 'multiple-hands';
+    } else if (deadbandHands.length > 0 && leftHands.length === 0 && rightHands.length === 0) {
+      this.lastAmbiguityReason = 'in-deadband';
+    } else {
+      this.lastAmbiguityReason = undefined;
+    }
+
+    const p1Candidate = leftHands.length === 1 ? leftHands[0] : undefined;
+    const p2Candidate = rightHands.length === 1 ? rightHands[0] : undefined;
+
+    if (this.lastKnownX) {
+      if (p1Candidate) {
+        const distToP1 = Math.abs(p1Candidate.x - this.lastKnownX.p1);
+        const distToP2 = Math.abs(p1Candidate.x - this.lastKnownX.p2);
+        if (distToP2 < distToP1 && distToP2 < 0.25) {
+          // Hand belonged to P2 crossing into P1 territory -> ignore
+          this.lastAmbiguityReason = 'hands-crossed';
+        } else {
+          assignments.p1 = p1Candidate;
+        }
+      }
+      if (p2Candidate) {
+        const distToP1 = Math.abs(p2Candidate.x - this.lastKnownX.p1);
+        const distToP2 = Math.abs(p2Candidate.x - this.lastKnownX.p2);
+        if (distToP1 < distToP2 && distToP1 < 0.25) {
+          // Hand belonged to P1 crossing into P2 territory -> ignore
+          this.lastAmbiguityReason = 'hands-crossed';
+        } else {
+          assignments.p2 = p2Candidate;
+        }
+      }
+    } else {
+      if (p1Candidate) assignments.p1 = p1Candidate;
+      if (p2Candidate) assignments.p2 = p2Candidate;
+    }
+
+    if (assignments.p1 && assignments.p2) {
+      this.lastAmbiguityReason = undefined;
+    }
+
     return assignments;
   }
 

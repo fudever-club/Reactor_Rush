@@ -88,3 +88,56 @@ test('solo mode allows calibration and control with a single hand', () => {
   assert.equal(pinched.p1.catch, true);
   assert.equal(pinched.p2.catch, false);
 });
+
+test('never silently reassigns players when hands cross boundary', () => {
+  const mapper = new HandInputMapper();
+  // Calibrate P1 at screenX = 0.22 (wristX 0.78) and P2 at screenX = 0.78 (wristX 0.22)
+  mapper.calibrate([makeHand(0.78), makeHand(0.22)], 0);
+
+  // P1 stays at 0.22; P2 moves towards center line: wristX 0.45 -> screenX 0.55
+  mapper.update([makeHand(0.78), makeHand(0.45)], 10);
+
+  // P1 withdraws hand; P2 continues crossing into P1 territory: wristX 0.58 -> screenX 0.42
+  // This single hand belongs to P2 crossing boundary. It must NEVER silently control P1!
+  const crossedP2 = mapper.update([makeHand(0.58)], 20);
+  assert.equal(crossedP2.p1.moveAxis, 0, 'P1 must not be controlled by crossed hand');
+  assert.equal(crossedP2.p1.catch, false);
+  assert.equal(crossedP2.p2.moveAxis, 0, 'Crossed hand must not control P2');
+  assert.equal(crossedP2.p2.catch, false);
+});
+
+test('ambiguous detections safely neutralize affected players', () => {
+  const mapper = new HandInputMapper();
+  mapper.calibrate([makeHand(0.78), makeHand(0.22)], 0);
+
+  // Two hands on P1 side (wristX 0.78 and 0.85 -> screenX 0.22 and 0.15) and none on P2 side
+  const twoHandsOnP1 = mapper.update([makeHand(0.78), makeHand(0.85)], 20);
+  assert.deepEqual(twoHandsOnP1.p1, { moveAxis: 0, catch: false }, 'Ambiguous multiple hands neutralize P1');
+  assert.deepEqual(twoHandsOnP1.p2, { moveAxis: 0, catch: false });
+
+  // Hands crossing too close together at the center boundary (wristX 0.51 and 0.49 -> screenX 0.49 and 0.51)
+  const handsAtCenter = mapper.update([makeHand(0.51), makeHand(0.49)], 30);
+  assert.deepEqual(handsAtCenter.p1, { moveAxis: 0, catch: false }, 'Center boundary collision neutralizes P1');
+  assert.deepEqual(handsAtCenter.p2, { moveAxis: 0, catch: false }, 'Center boundary collision neutralizes P2');
+});
+
+test('calibration recovery preserves player neutral point after temporary tracking loss', () => {
+  const mapper = new HandInputMapper();
+  mapper.calibrate([makeHand(0.78), makeHand(0.22)], 0);
+
+  // P1 active and moving right (screenX 0.35 vs neutral 0.22, delta +0.13 > 0.1 threshold -> moveAxis = 1)
+  const movedP1 = mapper.update([makeHand(0.65), makeHand(0.22)], 20);
+  assert.equal(movedP1.p1.moveAxis, 1);
+
+  // P1 temporarily disappears (e.g. occlusion)
+  const lostP1 = mapper.update([makeHand(0.22)], 30);
+  assert.equal(lostP1.p1.moveAxis, 0);
+  assert.equal(lostP1.p1.catch, false);
+  assert.equal(lostP1.p2.moveAxis, 0);
+
+  // P1 recovers on their calibrated side at same position (screenX 0.35)
+  const recoveredP1 = mapper.update([makeHand(0.65), makeHand(0.22)], 40);
+  assert.equal(recoveredP1.p1.moveAxis, 1, 'P1 resumes move axis 1 from original calibrated baseline');
+  assert.equal(recoveredP1.p2.moveAxis, 0);
+});
+
