@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { MediaPipeHandInputAdapter } from '../src/adapters/mediapipe-hand-input-adapter.ts';
+import { renderHandOverlay } from '../src/adapters/hand-landmarks-renderer.ts';
 
 globalThis.HTMLMediaElement ??= { HAVE_CURRENT_DATA: 2 };
 
@@ -263,3 +264,48 @@ test('a worker that stops responding releases camera resources after the inferen
   assert.equal(worker.terminated, true);
   assert.match(statuses.at(-1).message, /stopped responding/i);
 });
+
+test('hand landmarks renderer draws connections and joints on canvas', () => {
+  const operations = [];
+  const fakeCtx = {
+    lineWidth: 1,
+    strokeStyle: '',
+    fillStyle: '',
+    clearRect(...args) { operations.push(['clearRect', ...args]); },
+    beginPath() { operations.push(['beginPath']); },
+    moveTo(x, y) { operations.push(['moveTo', x, y]); },
+    lineTo(x, y) { operations.push(['lineTo', x, y]); },
+    stroke() { operations.push(['stroke']); },
+    arc(...args) { operations.push(['arc', ...args]); },
+    fill() { operations.push(['fill']); }
+  };
+  const fakeCanvas = { width: 640, height: 360 };
+
+  renderHandOverlay(fakeCtx, fakeCanvas, [], true);
+  assert.equal(operations.length, 1);
+  assert.equal(operations[0][0], 'clearRect');
+
+  operations.length = 0;
+  const hands = [{ landmarks: makeLandmarks(0.5) }];
+  renderHandOverlay(fakeCtx, fakeCanvas, hands, true);
+  assert.ok(operations.some((op) => op[0] === 'moveTo'));
+  assert.ok(operations.some((op) => op[0] === 'lineTo'));
+  assert.ok(operations.some((op) => op[0] === 'arc'));
+});
+
+test('latest hands are exposed and cleared on stop or stale expiration', async () => {
+  const { adapter, worker, clock, calls } = createAdapter();
+  await adapter.start();
+
+  worker.emit('message', {
+    data: { type: 'result', timestamp: 10, hands: [makeLandmarks(0.78)] }
+  });
+  assert.equal(adapter.getLatestHands().length, 1);
+
+  clock.now = 400;
+  calls.frameCallback(0);
+  assert.equal(adapter.getLatestHands().length, 0);
+
+  adapter.stop();
+});
+

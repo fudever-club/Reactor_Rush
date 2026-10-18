@@ -75,6 +75,7 @@ interface RuntimeUi {
   cameraStartButton: HTMLButtonElement;
   cameraBackButton: HTMLButtonElement;
   cameraVideo: HTMLVideoElement;
+  cameraCanvas?: HTMLCanvasElement;
   cameraStatus: HTMLElement;
   cameraTitle: HTMLElement;
   cameraHandsStatus: HTMLElement;
@@ -334,6 +335,7 @@ class EnergyCatchScene extends Phaser.Scene {
     this.cameraAdapter?.stop();
     const adapter = new MediaPipeHandInputAdapter(this.ui.cameraVideo, {
       soloMode: this.isSoloMode,
+      overlayCanvas: this.ui.cameraCanvas,
       onStatus: (status, message) => this.updateCameraStatus(status, message),
       onDetection: (players, canCalibrate, calibrated) => this.updateCameraDetection(players, canCalibrate, calibrated)
     });
@@ -686,6 +688,7 @@ class EnergyCatchScene extends Phaser.Scene {
       cameraStartButton: get<HTMLButtonElement>('start-camera-round'),
       cameraBackButton: get<HTMLButtonElement>('camera-to-keyboard'),
       cameraVideo: get<HTMLVideoElement>('camera-preview'),
+      cameraCanvas: (document.getElementById('camera-preview-canvas') as HTMLCanvasElement) || undefined,
       cameraStatus: get('camera-status'),
       cameraTitle: get('camera-title'),
       cameraHandsStatus: get('camera-hands-status'),

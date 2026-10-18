@@ -40,14 +40,37 @@ workerScope.onmessage = async (event) => {
       const modelAssetPath = typeof location !== 'undefined' && location.origin
         ? new URL(request.modelPath, location.origin).href
         : request.modelPath;
-      landmarker = await HandLandmarker.createFromOptions(fileset, {
-        baseOptions: { modelAssetPath, delegate: 'CPU' },
-        runningMode: 'VIDEO',
+      const options = {
+        runningMode: 'VIDEO' as const,
         numHands: 2,
-        minHandDetectionConfidence: 0.55,
-        minHandPresenceConfidence: 0.5,
-        minTrackingConfidence: 0.5
-      });
+        minHandDetectionConfidence: 0.45,
+        minHandPresenceConfidence: 0.45,
+        minTrackingConfidence: 0.45
+      };
+      try {
+        landmarker = await HandLandmarker.createFromOptions(fileset, {
+          ...options,
+          baseOptions: { modelAssetPath, delegate: 'GPU' }
+        });
+      } catch {
+        landmarker = await HandLandmarker.createFromOptions(fileset, {
+          ...options,
+          baseOptions: { modelAssetPath, delegate: 'CPU' }
+        });
+      }
+      try {
+        if (typeof OffscreenCanvas !== 'undefined') {
+          const warmupCanvas = new OffscreenCanvas(64, 64);
+          const bitmap = await createImageBitmap(warmupCanvas);
+          try {
+            landmarker.detectForVideo(bitmap, 0);
+          } finally {
+            bitmap.close();
+          }
+        }
+      } catch {
+        // Non-fatal warmup failure
+      }
       workerScope.postMessage({ type: 'ready' });
     } catch (error) {
       workerScope.postMessage({ type: 'error', message: error instanceof Error ? error.message : String(error) });

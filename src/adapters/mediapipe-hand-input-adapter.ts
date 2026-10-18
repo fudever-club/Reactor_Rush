@@ -1,5 +1,6 @@
 import type { InputAdapter, InputFrame, PlayerId } from '../gameplay/core';
 import { HAND_TRACKING_STALE_MS, HandInputMapper, type DetectedHand } from './hand-input-mapper.ts';
+import { renderHandOverlay } from './hand-landmarks-renderer.ts';
 
 export type CameraInputStatus = 'idle' | 'requesting-camera' | 'loading-model' | 'ready' | 'stopped' | 'error';
 
@@ -13,6 +14,7 @@ export interface MediaPipeHandInputOptions {
   requestFrame?: (callback: FrameRequestCallback) => number;
   cancelFrame?: (handle: number) => void;
   soloMode?: boolean;
+  overlayCanvas?: HTMLCanvasElement;
 }
 
 interface WorkerReadyMessage { type: 'ready' }
@@ -91,9 +93,13 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private status: CameraInputStatus = 'idle';
   private startPromise?: Promise<void>;
   private readonly video: HTMLVideoElement;
+  private readonly overlayCanvas?: HTMLCanvasElement;
+  private readonly overlayContext?: CanvasRenderingContext2D | null;
 
   constructor(video: HTMLVideoElement, options: MediaPipeHandInputOptions = {}) {
     this.video = video;
+    this.overlayCanvas = options.overlayCanvas;
+    this.overlayContext = options.overlayCanvas?.getContext('2d');
     this.soloMode = options.soloMode ?? false;
     this.mapper = new HandInputMapper({ soloMode: this.soloMode });
     this.createWorker = options.createWorker ?? (() => new Worker(
@@ -111,6 +117,10 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     this.cancelFrame = options.cancelFrame ?? ((handle) => cancelAnimationFrame(handle));
     this.onStatus = options.onStatus;
     this.onDetection = options.onDetection;
+  }
+
+  getLatestHands(): readonly DetectedHand[] {
+    return this.isDetectionFresh() ? this.latestHands : [];
   }
 
   setSoloMode(solo: boolean): void {
@@ -317,10 +327,9 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     if (event.data.type === 'result') {
       this.inFlight = false;
       this.inFlightSince = Number.NEGATIVE_INFINITY;
-      this.lastDetectionAt = event.data.timestamp;
-      this.latestHands = this.now() - this.lastDetectionAt <= HAND_TRACKING_STALE_MS
-        ? event.data.hands.map((landmarks) => ({ landmarks }))
-        : [];
+      const now = this.now();
+      this.lastDetectionAt = now;
+      this.latestHands = event.data.hands.map((landmarks) => ({ landmarks }));
       this.detectionWasFresh = this.latestHands.length > 0;
       if (this.calibrated) this.mapper.update(this.latestHands, this.lastDetectionAt);
       this.notifyDetection();
@@ -366,6 +375,9 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     this.video.pause();
     this.video.srcObject = null;
     delete this.video.dataset.active;
+    if (this.overlayCanvas && this.overlayContext) {
+      this.overlayContext.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+    }
     this.worker?.removeEventListener('message', this.handleWorkerMessage);
     this.worker?.removeEventListener('error', this.handleWorkerError);
     this.worker?.terminate();
@@ -377,7 +389,8 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
 
   private notifyDetection(): void {
     const visiblePlayers: PlayerId[] = [];
-    if (this.isDetectionFresh()) {
+    const fresh = this.isDetectionFresh();
+    if (fresh) {
       if (this.soloMode) {
         if (this.latestHands.length > 0) visiblePlayers.push(PLAYER_ID.p1);
       } else {
@@ -386,6 +399,15 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
         if (left) visiblePlayers.push(PLAYER_ID.p1);
         if (right) visiblePlayers.push(PLAYER_ID.p2);
       }
+    }
+    if (this.overlayCanvas && this.overlayContext) {
+      if (this.video.videoWidth && this.video.videoHeight) {
+        if (this.overlayCanvas.width !== this.video.videoWidth || this.overlayCanvas.height !== this.video.videoHeight) {
+          this.overlayCanvas.width = this.video.videoWidth;
+          this.overlayCanvas.height = this.video.videoHeight;
+        }
+      }
+      renderHandOverlay(this.overlayContext, this.overlayCanvas, fresh ? this.latestHands : [], this.soloMode);
     }
     this.onDetection?.(visiblePlayers, this.canCalibrate(), this.calibrated);
   }
