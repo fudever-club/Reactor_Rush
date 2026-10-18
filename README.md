@@ -195,7 +195,7 @@ Reactor_Rush/
 </p>
 <br clear="left"/>
 
-- 🌐 **Website chính thức**: [https://fu-dever-landingpage-v2.vercel.app/](https://fu-dever-landingpage-v2.vercel.app/)
+- 🌐 **Website chính thức**: [https://fudever.com](https://fudever.com)
 - 📘 **Fanpage chính thức**: [https://www.facebook.com/FPTUDever](https://www.facebook.com/FPTUDever)
 - 🐙 **GitHub Organization**: [https://github.com/fudever-club](https://github.com/fudever-club)
 - ✉️ **Email liên hệ**: `club.dever@gmail.com`
