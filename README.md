@@ -1,6 +1,12 @@
-# ⚡ REACTOR RUSH — ENERGY CATCH
-
 <div align="center">
+
+<p align="center">
+  <a href="https://github.com/fudever-club" target="_blank" rel="noopener noreferrer">
+    <img src="https://avatars.githubusercontent.com/u/313457450?s=200&v=4" width="130" height="130" alt="FU-DEVER Club Official Logo" style="border-radius: 50%;" />
+  </a>
+</p>
+
+# ⚡ REACTOR RUSH — ENERGY CATCH ⚡
 
 [![FU-DEVER Club](https://img.shields.io/badge/DEVELOPED%20BY-FU--DEVER%20CLUB-FF5722?style=for-the-badge&logo=github&logoColor=white)](https://github.com/fudever-club)
 [![Phaser Engine](https://img.shields.io/badge/GAME%20ENGINE-PHASER%204.2-brightgreen?style=for-the-badge&logo=javascript)](https://phaser.io/)
@@ -10,6 +16,10 @@
 
 **Trò chơi tương tác 2D thời gian thực, tích hợp thị giác máy tính AI (Computer Vision) điều khiển bằng cử chỉ qua Webcam hoặc Bàn phím.**  
 *Một sản phẩm nghiên cứu & phát triển bởi **CLB Lập trình FU-DEVER** — Trường Đại học FPT Đà Nẵng.*
+
+<p align="center">
+  <img src="assets/concepts/robots/direction-a-action-pose-references.png" alt="Reactor Rush - P1 Cyan & P2 Pink Action Poses" width="800" />
+</p>
 
 [Trải nghiệm ngay](#-cài-đặt--khởi-chạy-dự-án) • [Cơ chế điều khiển](#-hướng-dẫn-điều-khiển) • [Luật chơi & Tính điểm](#-luật-chơi--cách-tính-điểm) • [Kiến trúc kỹ thuật](#-kiến-trúc-hệ-thống--công-nghệ) • [Về FU-DEVER](#-về-câu-lạc-bộ-lập-trình-fu-dever)
 
@@ -179,7 +189,11 @@ Reactor_Rush/
 
 ## 🐞 Về Câu Lạc Bộ Lập Trình FU-DEVER
 
-Dự án được khởi xướng và phát triển bởi các thành viên thuộc **CLB Lập Trình FU-DEVER** — Trường Đại học FPT Đà Nẵng, dưới sự đồng hành của linh vật **Bọ cánh cam Buggy** 🐞 cùng Biệt đội DEVER:
+<p align="left">
+  <img src="https://avatars.githubusercontent.com/u/313457450?s=200&v=4" width="75" height="75" alt="FU-DEVER Club Logo" style="border-radius: 50%; float: left; margin-right: 15px;" />
+  Dự án được khởi xướng và phát triển bởi các thành viên thuộc <strong>CLB Lập Trình FU-DEVER</strong> — Trường Đại học FPT Đà Nẵng, dưới sự đồng hành của linh vật <strong>Bọ cánh cam Buggy 🐞</strong> cùng Biệt đội DEVER.
+</p>
+<br clear="left"/>
 
 - 🌐 **Website chính thức**: [https://fu-dever-landingpage-v2.vercel.app/](https://fu-dever-landingpage-v2.vercel.app/)
 - 📘 **Fanpage chính thức**: [https://www.facebook.com/FPTUDever](https://www.facebook.com/FPTUDever)
