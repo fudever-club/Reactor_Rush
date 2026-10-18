@@ -8,7 +8,7 @@ export interface CameraMetrics {
   delegate: 'GPU' | 'CPU';
   inferenceMs: number;
   fps: number;
-  ambiguityReason?: 'hands-crossed' | 'too-close' | 'multiple-hands' | 'in-deadband';
+  ambiguityReason?: 'hands-crossed' | 'too-close' | 'multiple-hands' | 'in-deadband' | 'too-far';
 }
 
 export interface MediaPipeHandInputOptions {
@@ -27,7 +27,7 @@ export interface MediaPipeHandInputOptions {
   requestFrame?: (callback: FrameRequestCallback) => number;
   cancelFrame?: (handle: number) => void;
   soloMode?: boolean;
-  overlayCanvas?: HTMLCanvasElement;
+  overlayCanvas?: HTMLCanvasElement | HTMLCanvasElement[];
   wasmRoot?: string;
   modelPath?: string;
 }
@@ -120,13 +120,17 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private status: CameraInputStatus = 'idle';
   private startPromise?: Promise<void>;
   private readonly video: HTMLVideoElement;
-  private readonly overlayCanvas?: HTMLCanvasElement;
-  private readonly overlayContext?: CanvasRenderingContext2D | null;
+  private readonly overlayCanvases: HTMLCanvasElement[];
 
   constructor(video: HTMLVideoElement, options: MediaPipeHandInputOptions = {}) {
     this.video = video;
-    this.overlayCanvas = options.overlayCanvas;
-    this.overlayContext = options.overlayCanvas?.getContext('2d');
+    if (Array.isArray(options.overlayCanvas)) {
+      this.overlayCanvases = options.overlayCanvas;
+    } else if (options.overlayCanvas) {
+      this.overlayCanvases = [options.overlayCanvas];
+    } else {
+      this.overlayCanvases = [];
+    }
     this.soloMode = options.soloMode ?? false;
     this.mapper = new HandInputMapper({ soloMode: this.soloMode });
     this.wasmRoot = options.wasmRoot ?? WASM_ROOT;
@@ -160,6 +164,10 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
 
   getLatestHands(): readonly DetectedHand[] {
     return this.isDetectionFresh() ? this.latestHands : [];
+  }
+
+  getStream(): MediaStream | undefined {
+    return this.stream;
   }
 
   setSoloMode(solo: boolean): void {
@@ -433,8 +441,9 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     this.video.pause();
     this.video.srcObject = null;
     delete this.video.dataset.active;
-    if (this.overlayCanvas && this.overlayContext) {
-      this.overlayContext.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+    for (const canvas of this.overlayCanvases) {
+      const ctx = canvas.getContext('2d');
+      ctx?.clearRect(0, 0, canvas.width, canvas.height);
     }
     this.worker?.removeEventListener('message', this.handleWorkerMessage);
     this.worker?.removeEventListener('error', this.handleWorkerError);
@@ -461,14 +470,16 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
         if (right) visiblePlayers.push(PLAYER_ID.p2);
       }
     }
-    if (this.overlayCanvas && this.overlayContext) {
+    for (const canvas of this.overlayCanvases) {
+      const ctx = canvas.getContext('2d');
+      if (!ctx) continue;
       if (this.video.videoWidth && this.video.videoHeight) {
-        if (this.overlayCanvas.width !== this.video.videoWidth || this.overlayCanvas.height !== this.video.videoHeight) {
-          this.overlayCanvas.width = this.video.videoWidth;
-          this.overlayCanvas.height = this.video.videoHeight;
+        if (canvas.width !== this.video.videoWidth || canvas.height !== this.video.videoHeight) {
+          canvas.width = this.video.videoWidth;
+          canvas.height = this.video.videoHeight;
         }
       }
-      renderHandOverlay(this.overlayContext, this.overlayCanvas, fresh ? this.latestHands : [], this.soloMode);
+      renderHandOverlay(ctx, canvas, fresh ? this.latestHands : [], this.soloMode);
     }
     const metrics = this.getMetrics();
     this.onMetrics?.(metrics);

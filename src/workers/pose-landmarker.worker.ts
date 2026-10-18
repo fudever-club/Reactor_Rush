@@ -1,0 +1,136 @@
+import { FilesetResolver, PoseLandmarker } from '@mediapipe/tasks-vision';
+
+export interface NormalizedPoseLandmark {
+  x: number;
+  y: number;
+  z: number;
+  visibility?: number;
+  presence?: number;
+}
+
+export interface DetectedPoseResult {
+  landmarks: NormalizedPoseLandmark[];
+}
+
+interface InitMessage {
+  type: 'init';
+  wasmRoot: string;
+  modelPath: string;
+  numPoses?: number;
+}
+
+interface FrameMessage {
+  type: 'frame';
+  bitmap: ImageBitmap;
+  timestamp: number;
+}
+
+type WorkerRequest = InitMessage | FrameMessage | { type: 'close' };
+type WorkerResponse =
+  | { type: 'ready'; delegate: 'GPU' | 'CPU' }
+  | {
+      type: 'result';
+      timestamp: number;
+      poses: DetectedPoseResult[];
+      inferenceMs: number;
+      delegate: 'GPU' | 'CPU';
+    }
+  | { type: 'error'; message: string };
+
+const workerScope = self as unknown as {
+  onmessage: ((event: MessageEvent<WorkerRequest>) => void) | null;
+  postMessage(message: WorkerResponse): void;
+};
+
+let landmarker: PoseLandmarker | undefined;
+let lastTimestamp = -1;
+let activeDelegate: 'GPU' | 'CPU' = 'CPU';
+
+workerScope.onmessage = async (event) => {
+  const request = event.data;
+  if (request.type === 'close') {
+    landmarker?.close();
+    landmarker = undefined;
+    return;
+  }
+
+  if (request.type === 'init') {
+    try {
+      const wasmPath = typeof location !== 'undefined' && location.origin && request.wasmRoot.startsWith('/')
+        ? new URL(request.wasmRoot, location.origin).href
+        : request.wasmRoot;
+      const fileset = await FilesetResolver.forVisionTasks(wasmPath, true);
+      const modelAssetPath = typeof location !== 'undefined' && location.origin
+        ? new URL(request.modelPath, location.origin).href
+        : request.modelPath;
+      const options = {
+        runningMode: 'VIDEO' as const,
+        numPoses: request.numPoses ?? 2,
+        minPoseDetectionConfidence: 0.45,
+        minPosePresenceConfidence: 0.45,
+        minTrackingConfidence: 0.45
+      };
+
+      try {
+        landmarker = await PoseLandmarker.createFromOptions(fileset, {
+          ...options,
+          baseOptions: { modelAssetPath, delegate: 'GPU' }
+        });
+        activeDelegate = 'GPU';
+      } catch {
+        landmarker = await PoseLandmarker.createFromOptions(fileset, {
+          ...options,
+          baseOptions: { modelAssetPath, delegate: 'CPU' }
+        });
+        activeDelegate = 'CPU';
+      }
+
+      try {
+        if (typeof OffscreenCanvas !== 'undefined') {
+          const warmupCanvas = new OffscreenCanvas(64, 64);
+          const bitmap = await createImageBitmap(warmupCanvas);
+          try {
+            landmarker.detectForVideo(bitmap, 0);
+          } finally {
+            bitmap.close();
+          }
+        }
+      } catch {
+        // Non-fatal warmup failure
+      }
+
+      workerScope.postMessage({ type: 'ready', delegate: activeDelegate });
+    } catch (error) {
+      workerScope.postMessage({ type: 'error', message: error instanceof Error ? error.message : String(error) });
+    }
+    return;
+  }
+
+  if (!landmarker) {
+    request.bitmap.close();
+    workerScope.postMessage({ type: 'error', message: 'Pose Landmarker is not initialized.' });
+    return;
+  }
+
+  try {
+    const timestamp = Math.max(request.timestamp, lastTimestamp + 1);
+    lastTimestamp = timestamp;
+    const start = performance.now();
+    const result = landmarker.detectForVideo(request.bitmap, timestamp);
+    const inferenceMs = performance.now() - start;
+    const poses: DetectedPoseResult[] = result.landmarks.map((landmarks) => ({
+      landmarks: landmarks.map(({ x, y, z, visibility, presence }) => ({
+        x,
+        y,
+        z,
+        visibility: typeof visibility === 'number' ? visibility : undefined,
+        presence: typeof presence === 'number' ? presence : undefined
+      }))
+    }));
+    workerScope.postMessage({ type: 'result', timestamp, poses, inferenceMs, delegate: activeDelegate });
+  } catch (error) {
+    workerScope.postMessage({ type: 'error', message: error instanceof Error ? error.message : String(error) });
+  } finally {
+    request.bitmap.close();
+  }
+};

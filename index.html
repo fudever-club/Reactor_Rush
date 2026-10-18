@@ -69,6 +69,11 @@
                 <button id="camera-mode-solo" class="mode-btn active" type="button">1 PLAYER (SOLO)</button>
                 <button id="camera-mode-coop" class="mode-btn" type="button">2 PLAYERS (CO-OP)</button>
               </div>
+              <div class="camera-scheme-select-row" role="group" aria-label="Tracking Scheme">
+                <button id="scheme-hand" class="scheme-btn" type="button">HAND PINCH [H0]</button>
+                <button id="scheme-pose-both" class="scheme-btn active" type="button">POSE BOTH ARMS [P1]</button>
+                <button id="scheme-pose-one" class="scheme-btn" type="button">POSE ONE ARM [P2]</button>
+              </div>
               <p id="camera-instructions" class="camera-instructions">Move one hand left or right; pinch thumb and index finger to catch.</p>
               <p id="camera-calibration-instructions" class="camera-instructions camera-calibration-instructions">Hold one visible hand near the center of the camera, then calibrate.</p>
               <p id="camera-status" class="camera-status" role="status" aria-live="polite">Camera is off. It starts only after you choose Enable Camera.</p>
@@ -121,7 +126,18 @@
               </article>
 
           <div class="play-hint"><span class="hint-orb" aria-hidden="true"></span> ENERGY <b>+100</b><span class="hint-divider" aria-hidden="true"></span><span class="hint-hazard" aria-hidden="true">!</span> HAZARD <b>−50</b><span class="hint-divider" aria-hidden="true"></span> EVERY 5 ENERGY <b>+0.5×</b> <span>MAX 3×</span><span class="hint-divider" aria-hidden="true"></span><span id="hud-controls-hint">HOLD S / ↓ TO CATCH</span></div>
-          <button id="stop-camera" class="camera-stop-button" type="button" hidden>STOP CAMERA</button>
+          <div id="hud-camera-dock" class="hud-camera-dock" hidden>
+            <div class="hud-camera-preview-frame">
+              <video id="hud-camera-preview" muted playsinline aria-label="Mirrored in-game webcam preview"></video>
+              <canvas id="hud-skeleton-overlay" aria-hidden="true"></canvas>
+              <div id="hud-camera-badge" class="hud-camera-badge">TRACKING</div>
+              <div id="hud-camera-cue" class="hud-camera-cue">READY</div>
+            </div>
+            <div class="hud-camera-controls">
+              <button id="hud-camera-toggle" class="hud-camera-toggle" type="button" aria-label="Toggle camera dock (V)">MINIMIZE [V]</button>
+              <button id="stop-camera" class="camera-stop-button" type="button">STOP CAMERA</button>
+            </div>
+          </div>
             </section>
 
             <section id="results-screen" class="ui-screen results-screen" aria-labelledby="results-title" aria-live="polite" hidden>

@@ -9,6 +9,7 @@ import {
   type CameraInputStatus,
   type CameraMetrics
 } from './adapters/mediapipe-hand-input-adapter';
+import { MediaPipePoseInputAdapter } from './adapters/mediapipe-pose-input-adapter';
 import {
   advanceGameFrame,
   applyCatch,
@@ -108,16 +109,27 @@ interface RuntimeUi {
   cameraInstructions?: HTMLElement;
   cameraCalibrationInstructions?: HTMLElement;
   cameraPreviewLabel?: HTMLElement;
+  schemeHandButton?: HTMLButtonElement;
+  schemePoseBothButton?: HTMLButtonElement;
+  schemePoseOneButton?: HTMLButtonElement;
+  hudCameraDock: HTMLElement;
+  hudCameraVideo: HTMLVideoElement;
+  hudCameraCanvas?: HTMLCanvasElement;
+  hudCameraBadge: HTMLElement;
+  hudCameraCue: HTMLElement;
+  hudCameraToggle: HTMLButtonElement;
 }
 
 class EnergyCatchScene extends Phaser.Scene {
   private state: GameState = createGameState();
   private keyboardAdapter?: KeyboardInputAdapter;
   private inputAdapter?: InputAdapter;
-  private cameraAdapter?: MediaPipeHandInputAdapter;
+  private cameraAdapter?: MediaPipeHandInputAdapter | MediaPipePoseInputAdapter;
   private cameraMode = false;
   private isSoloMode = true;
+  private trackingScheme: 'H0' | 'P1' | 'P2' = 'P1';
   private cameraSetupVisible = false;
+  private hudCameraMinimized = false;
   private ui?: RuntimeUi;
   private reducedMotionQuery?: MediaQueryList;
   private cameraSetupWasVisible = false;
@@ -162,10 +174,14 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui.cameraBackButton.addEventListener('click', this.handleCameraBackRequested);
     this.ui.cameraStopButton.addEventListener('click', this.handleCameraStopRequested);
     this.ui.resultCameraStopButton.addEventListener('click', this.handleCameraStopRequested);
+    this.ui.hudCameraToggle.addEventListener('click', this.toggleHudCameraDock);
     this.ui.modeSoloButton?.addEventListener('click', () => this.setSoloMode(true));
     this.ui.modeCoopButton?.addEventListener('click', () => this.setSoloMode(false));
     this.ui.cameraModeSoloButton?.addEventListener('click', () => this.setSoloMode(true));
     this.ui.cameraModeCoopButton?.addEventListener('click', () => this.setSoloMode(false));
+    this.ui.schemeHandButton?.addEventListener('click', () => this.setTrackingScheme('H0'));
+    this.ui.schemePoseBothButton?.addEventListener('click', () => this.setTrackingScheme('P1'));
+    this.ui.schemePoseOneButton?.addEventListener('click', () => this.setTrackingScheme('P2'));
     const onWindowKeyDown = (event: KeyboardEvent) => {
       if (this.cameraSetupVisible) {
         if (event.code === 'Escape') {
@@ -197,6 +213,10 @@ class EnergyCatchScene extends Phaser.Scene {
       const targetUsesNativeKeyboard = target instanceof Element && Boolean(
         target.closest('button, input, select, textarea, a[href], [contenteditable="true"]')
       );
+      if (!targetUsesNativeKeyboard && event.code === 'KeyV' && this.cameraMode) {
+        event.preventDefault();
+        this.toggleHudCameraDock();
+      }
       if (!targetUsesNativeKeyboard && event.code === 'Enter' && (this.state.phase === 'menu' || this.state.phase === 'results')) {
         this.handleStartRequested();
       }
@@ -225,6 +245,7 @@ class EnergyCatchScene extends Phaser.Scene {
     this.updateHud();
     this.showPhase('menu');
     this.setSoloMode(true);
+    this.setTrackingScheme('P1');
     const harness = {
       ready: true,
       getState: () => ({
@@ -233,7 +254,13 @@ class EnergyCatchScene extends Phaser.Scene {
         players: this.state.players,
         playerX: { ...this.playerX },
         input: this.lastInput,
-        fallingItems: this.items.map(({ player, kind, x, y }) => ({ player, kind, x, y }))
+        fallingItems: this.items.map(({ player, kind, x, y }) => ({ player, kind, x, y })),
+        cameraMode: this.cameraMode,
+        trackingScheme: this.trackingScheme,
+        cameraAdapter: this.cameraAdapter,
+        hudCameraDockHidden: this.ui?.hudCameraDock?.hidden,
+        hudCameraBadge: this.ui?.hudCameraBadge?.textContent,
+        hudCameraMinimized: this.hudCameraMinimized
       })
     };
     (window as typeof window & { __RR_GAME_TEST__?: typeof harness }).__RR_GAME_TEST__ = harness;
@@ -250,6 +277,7 @@ class EnergyCatchScene extends Phaser.Scene {
       this.ui?.cameraBackButton.removeEventListener('click', this.handleCameraBackRequested);
       this.ui?.cameraStopButton.removeEventListener('click', this.handleCameraStopRequested);
       this.ui?.resultCameraStopButton.removeEventListener('click', this.handleCameraStopRequested);
+      this.ui?.hudCameraToggle.removeEventListener('click', this.toggleHudCameraDock);
       this.keyboardAdapter?.destroy();
       this.cameraAdapter?.stop();
       this.inputAdapter = undefined;
@@ -287,6 +315,10 @@ class EnergyCatchScene extends Phaser.Scene {
 
   private handleStartRequested = (): void => {
     if (this.state.phase === 'menu' && !this.cameraSetupVisible) {
+      if (this.ui?.hudCameraVideo) {
+        this.ui.hudCameraVideo.pause();
+        this.ui.hudCameraVideo.srcObject = null;
+      }
       this.cameraMode = false;
       this.inputAdapter = this.keyboardAdapter;
       this.cameraAdapter?.stop();
@@ -318,6 +350,10 @@ class EnergyCatchScene extends Phaser.Scene {
       this.cameraMode = false;
       this.inputAdapter = this.keyboardAdapter;
       adapter.stop();
+      if (this.ui.hudCameraVideo) {
+        this.ui.hudCameraVideo.pause();
+        this.ui.hudCameraVideo.srcObject = null;
+      }
       this.ui.cameraCalibrateButton.disabled = true;
       this.ui.cameraStartButton.disabled = true;
       this.setCameraHandsStatus(this.isSoloMode ? 'P1: waiting' : 'P1: waiting · P2: waiting');
@@ -337,16 +373,27 @@ class EnergyCatchScene extends Phaser.Scene {
     }
 
     this.cameraAdapter?.stop();
-    const adapter = new MediaPipeHandInputAdapter(this.ui.cameraVideo, {
+    const canvases = [this.ui.cameraCanvas, this.ui.hudCameraCanvas].filter((c): c is HTMLCanvasElement => Boolean(c));
+    const commonOptions = {
       soloMode: this.isSoloMode,
-      overlayCanvas: this.ui.cameraCanvas,
-      onStatus: (status, message) => this.updateCameraStatus(status, message),
-      onDetection: (players, canCalibrate, calibrated, metrics) => this.updateCameraDetection(players, canCalibrate, calibrated, metrics)
-    });
-    this.cameraAdapter = adapter;
+      overlayCanvas: canvases,
+      onStatus: (status: CameraInputStatus, message?: string) => this.updateCameraStatus(status, message),
+      onDetection: (players: readonly PlayerId[], canCalibrate: boolean, calibrated: boolean, metrics?: CameraMetrics) =>
+        this.updateCameraDetection(players, canCalibrate, calibrated, metrics)
+    };
+
+    if (this.trackingScheme === 'H0') {
+      this.cameraAdapter = new MediaPipeHandInputAdapter(this.ui.cameraVideo, commonOptions);
+    } else {
+      this.cameraAdapter = new MediaPipePoseInputAdapter(this.ui.cameraVideo, {
+        ...commonOptions,
+        scheme: this.trackingScheme === 'P1' ? 'P1' : 'P2'
+      });
+    }
+
     this.ui.cameraEnableButton.disabled = true;
     try {
-      await adapter.start();
+      await this.cameraAdapter.start();
     } catch {
       this.ui.cameraEnableButton.disabled = !this.ui.cameraConsent.checked;
       this.ui.cameraEnableButton.textContent = 'TRY CAMERA AGAIN';
@@ -358,9 +405,14 @@ class EnergyCatchScene extends Phaser.Scene {
     if (calibrated && this.ui) {
       const metrics = this.cameraAdapter?.getMetrics();
       const delegateTag = metrics?.delegate ? ` (${metrics.delegate} active)` : '';
+      const isHand = this.trackingScheme === 'H0';
+      const actionCue = isHand
+        ? 'pinch thumb to index to catch'
+        : (this.trackingScheme === 'P1' ? 'raise both arms to catch' : 'raise one arm to catch');
+      const subject = isHand ? 'hand position' : 'body position';
       this.ui.cameraStatus.textContent = this.isSoloMode
-        ? `Neutral hand position saved${delegateTag}. Move left/right and pinch thumb to index to catch.`
-        : `Neutral hand positions saved${delegateTag}. Move left/right and pinch thumb to index to catch.`;
+        ? `Neutral ${subject} saved${delegateTag}. Move left/right and ${actionCue}.`
+        : `Neutral ${subject}s saved${delegateTag}. Move left/right and ${actionCue}.`;
     }
   };
 
@@ -369,11 +421,19 @@ class EnergyCatchScene extends Phaser.Scene {
     this.cameraMode = true;
     this.inputAdapter = this.cameraAdapter;
     this.cameraSetupVisible = false;
+    if (this.ui?.hudCameraVideo && this.cameraAdapter) {
+      this.ui.hudCameraVideo.srcObject = this.cameraAdapter.getStream() ?? null;
+      this.ui.hudCameraVideo.play().catch(() => {});
+    }
     this.beginRun();
     this.updateInputModeUi();
   };
 
   private handleCameraBackRequested = (): void => {
+    if (this.ui?.hudCameraVideo) {
+      this.ui.hudCameraVideo.pause();
+      this.ui.hudCameraVideo.srcObject = null;
+    }
     this.cameraAdapter?.stop();
     this.cameraAdapter = undefined;
     this.cameraMode = false;
@@ -384,6 +444,10 @@ class EnergyCatchScene extends Phaser.Scene {
   };
 
   private handleCameraStopRequested = (): void => {
+    if (this.ui?.hudCameraVideo) {
+      this.ui.hudCameraVideo.pause();
+      this.ui.hudCameraVideo.srcObject = null;
+    }
     this.cameraAdapter?.stop();
     this.cameraAdapter = undefined;
     this.cameraMode = false;
@@ -391,6 +455,14 @@ class EnergyCatchScene extends Phaser.Scene {
     this.inputAdapter = this.keyboardAdapter;
     this.updateInputModeUi();
     this.showPhase(this.state.phase);
+  };
+
+  private toggleHudCameraDock = (): void => {
+    if (!this.ui) return;
+    this.hudCameraMinimized = !this.hudCameraMinimized;
+    this.ui.hudCameraDock.classList.toggle('is-minimized', this.hudCameraMinimized);
+    this.ui.hudCameraToggle.textContent = this.hudCameraMinimized ? 'EXPAND [V]' : 'MINIMIZE [V]';
+    this.ui.hudCameraToggle.setAttribute('aria-label', this.hudCameraMinimized ? 'Expand camera dock (V)' : 'Minimize camera dock (V)');
   };
 
   private setSoloMode(solo: boolean): void {
@@ -405,39 +477,103 @@ class EnergyCatchScene extends Phaser.Scene {
         : 'Two-player co-op <span aria-hidden="true">·</span> 60 seconds';
     }
     document.querySelector('.player-card-p2')?.classList.toggle('solo-inactive', solo);
-    if (this.ui?.cameraInstructions) {
-      this.ui.cameraInstructions.textContent = solo
-        ? 'Move one hand left or right; pinch thumb and index finger to catch.'
-        : 'Stand side by side. P1 stays camera-left, P2 camera-right. Move one hand left or right; pinch thumb and index finger to catch.';
-    }
-    if (this.ui?.cameraCalibrationInstructions) {
-      this.ui.cameraCalibrationInstructions.textContent = solo
-        ? 'Hold one visible hand near the center of the camera, then calibrate.'
-        : 'Hold one visible hand near the center of each half, then calibrate both players.';
-    }
-    if (this.ui?.cameraPreviewLabel) {
-      this.ui.cameraPreviewLabel.textContent = solo ? 'P1 (SOLO CONTROLS)' : 'P1 LEFT · P2 RIGHT';
-    }
-    if (this.ui?.cameraCalibrateButton) {
-      this.ui.cameraCalibrateButton.textContent = solo ? 'CALIBRATE HAND' : 'CALIBRATE BOTH HANDS';
-    }
+    this.updateInstructionsForScheme();
     this.cameraAdapter?.setSoloMode(solo);
     this.rigs.p2?.root.setVisible(!solo);
     this.updateHud();
     this.setCameraHandsStatus(solo ? 'P1: waiting' : 'P1: waiting · P2: waiting');
   }
 
+  private setTrackingScheme(scheme: 'H0' | 'P1' | 'P2'): void {
+    this.trackingScheme = scheme;
+    this.ui?.schemeHandButton?.classList.toggle('active', scheme === 'H0');
+    this.ui?.schemePoseBothButton?.classList.toggle('active', scheme === 'P1');
+    this.ui?.schemePoseOneButton?.classList.toggle('active', scheme === 'P2');
+    this.updateInstructionsForScheme();
+
+    if (this.cameraAdapter) {
+      this.cameraAdapter.stop();
+      this.cameraAdapter = undefined;
+      if (this.ui?.cameraConsent.checked) {
+        this.handleCameraEnableRequested();
+      }
+    }
+  }
+
+  private updateInstructionsForScheme(): void {
+    if (!this.ui) return;
+    const solo = this.isSoloMode;
+    const isHand = this.trackingScheme === 'H0';
+    const isBothArms = this.trackingScheme === 'P1';
+
+    if (this.ui.cameraInstructions) {
+      if (isHand) {
+        this.ui.cameraInstructions.textContent = solo
+          ? 'Move one hand left or right; pinch thumb and index finger to catch.'
+          : 'Stand side by side. P1 stays camera-left, P2 camera-right. Move one hand left or right; pinch thumb and index finger to catch.';
+      } else if (isBothArms) {
+        this.ui.cameraInstructions.textContent = solo
+          ? 'Lean upper body left or right; raise BOTH arms to catch.'
+          : 'Stand side by side. P1 camera-left, P2 camera-right. Lean upper body left or right; raise BOTH arms to catch.';
+      } else {
+        this.ui.cameraInstructions.textContent = solo
+          ? 'Lean upper body left or right; raise ONE arm to catch.'
+          : 'Stand side by side. P1 camera-left, P2 camera-right. Lean upper body left or right; raise ONE arm to catch.';
+      }
+    }
+
+    if (this.ui.cameraCalibrationInstructions) {
+      if (isHand) {
+        this.ui.cameraCalibrationInstructions.textContent = solo
+          ? 'Hold one visible hand near the center of the camera, then calibrate.'
+          : 'Hold one visible hand near the center of each half, then calibrate both players.';
+      } else {
+        this.ui.cameraCalibrationInstructions.textContent = solo
+          ? 'Stand centered in camera with arms relaxed, then calibrate.'
+          : 'Stand centered in each half with arms relaxed, then calibrate both players.';
+      }
+    }
+
+    if (this.ui.cameraPreviewLabel) {
+      this.ui.cameraPreviewLabel.textContent = solo ? 'P1 (SOLO CONTROLS)' : 'P1 LEFT · P2 RIGHT';
+    }
+
+    if (this.ui.cameraCalibrateButton) {
+      this.ui.cameraCalibrateButton.textContent = isHand
+        ? (solo ? 'CALIBRATE HAND' : 'CALIBRATE BOTH HANDS')
+        : (solo ? 'CALIBRATE POSE' : 'CALIBRATE BOTH POSES');
+    }
+
+    this.updateControlsHintText();
+  }
+
+  private updateControlsHintText(): void {
+    if (!this.ui) return;
+    if (!this.cameraMode) {
+      this.ui.controlsHint.textContent = 'HOLD S / ↓ TO CATCH';
+      return;
+    }
+    if (this.trackingScheme === 'H0') {
+      this.ui.controlsHint.textContent = 'MOVE HAND LEFT/RIGHT · PINCH TO CATCH';
+    } else if (this.trackingScheme === 'P1') {
+      this.ui.controlsHint.textContent = 'LEAN LEFT/RIGHT · RAISE BOTH ARMS TO CATCH';
+    } else {
+      this.ui.controlsHint.textContent = 'LEAN LEFT/RIGHT · RAISE ONE ARM TO CATCH';
+    }
+  }
+
   private updateCameraStatus(status: CameraInputStatus, message?: string): void {
     if (!this.ui) return;
     const metrics = this.cameraAdapter?.getMetrics();
     const delegateTag = metrics?.delegate ? ` (${metrics.delegate} active)` : '';
+    const modelNoun = this.trackingScheme === 'H0' ? 'hand' : 'pose';
     const fallbackMessages: Record<CameraInputStatus, string> = {
       idle: 'Camera is off. It starts only after you choose Enable Camera.',
       'requesting-camera': 'Waiting for camera permission…',
-      'loading-model': 'Camera connected. Loading the hand model…',
+      'loading-model': `Camera connected. Loading the ${modelNoun} model…`,
       ready: this.isSoloMode
-        ? `Camera ready${delegateTag}. Place one visible hand in front of the camera, then calibrate.`
-        : `Camera ready${delegateTag}. Place one visible hand in each half, then calibrate.`,
+        ? `Camera ready${delegateTag}. Place one visible person in front of the camera, then calibrate.`
+        : `Camera ready${delegateTag}. Place one visible person in each half, then calibrate.`,
       stopped: 'Camera stopped. Keyboard controls remain available.',
       error: 'Camera controls could not start. Keyboard controls remain available.'
     };
@@ -450,10 +586,15 @@ class EnergyCatchScene extends Phaser.Scene {
       if (status === 'error' || status === 'stopped') this.ui.cameraEnableButton.textContent = 'TRY CAMERA AGAIN';
     }
     if (status === 'error' && this.cameraMode) {
+      if (this.ui?.hudCameraVideo) {
+        this.ui.hudCameraVideo.pause();
+        this.ui.hudCameraVideo.srcObject = null;
+      }
       this.cameraMode = false;
       this.inputAdapter = this.keyboardAdapter;
       this.updateInputModeUi();
       this.ui.controlsHint.textContent = 'CAMERA LOST · KEYBOARD CONTROLS ACTIVE';
+      this.updateHudCameraStatus('is-fallback', 'KEYBOARD ACTIVE', 'CAMERA LOST · KEYBOARD ACTIVE');
     }
   }
 
@@ -471,26 +612,27 @@ class EnergyCatchScene extends Phaser.Scene {
       ? ` · ${metrics.delegate} (${metrics.inferenceMs}ms · ${metrics.fps}fps)`
       : metrics?.delegate ? ` · ${metrics.delegate}` : '';
 
+    const entity = this.trackingScheme === 'H0' ? 'hand' : 'pose';
     let handsStatus = '';
     if (this.isSoloMode) {
       if (ambiguity === 'multiple-hands') {
-        handsStatus = `P1: ambiguous (multiple hands)${metricsSuffix}`;
+        handsStatus = `P1: ambiguous (multiple ${entity}s)${metricsSuffix}`;
       } else if (hasP1) {
-        handsStatus = `P1: hand detected${metricsSuffix}`;
+        handsStatus = `P1: ${entity} detected${metricsSuffix}`;
       } else {
         handsStatus = 'P1: waiting';
       }
     } else {
       if (ambiguity === 'hands-crossed') {
-        handsStatus = `P1: ambiguous (hands crossed) · P2: ambiguous (hands crossed)${metricsSuffix}`;
+        handsStatus = `P1: ambiguous (${entity}s crossed) · P2: ambiguous (${entity}s crossed)${metricsSuffix}`;
       } else if (ambiguity === 'too-close') {
-        handsStatus = `P1/P2: ambiguous (hands too close)${metricsSuffix}`;
+        handsStatus = `P1/P2: ambiguous (${entity}s too close)${metricsSuffix}`;
       } else if (ambiguity === 'multiple-hands') {
-        handsStatus = `P1: ${hasP1 ? 'hand detected' : 'ambiguous (multiple hands)'} · P2: ${hasP2 ? 'hand detected' : 'ambiguous (multiple hands)'}${metricsSuffix}`;
+        handsStatus = `P1: ${hasP1 ? entity + ' detected' : 'ambiguous'} · P2: ${hasP2 ? entity + ' detected' : 'ambiguous'}${metricsSuffix}`;
       } else if (hasP1 && hasP2) {
-        handsStatus = `P1: hand detected · P2: hand detected${metricsSuffix}`;
+        handsStatus = `P1: ${entity} detected · P2: ${entity} detected${metricsSuffix}`;
       } else {
-        handsStatus = `P1: ${hasP1 ? 'hand detected' : 'waiting'} · P2: ${hasP2 ? 'hand detected' : 'waiting'}${metricsSuffix}`;
+        handsStatus = `P1: ${hasP1 ? entity + ' detected' : 'waiting'} · P2: ${hasP2 ? entity + ' detected' : 'waiting'}${metricsSuffix}`;
       }
     }
 
@@ -505,20 +647,55 @@ class EnergyCatchScene extends Phaser.Scene {
 
     if (this.cameraMode) {
       if (ambiguity === 'hands-crossed') {
-        this.ui.controlsHint.textContent = 'HANDS CROSSED · RETURN TO YOUR HALF';
+        this.ui.controlsHint.textContent = `${this.trackingScheme === 'H0' ? 'HANDS' : 'POSES'} CROSSED · RETURN TO YOUR HALF`;
+        this.updateHudCameraStatus('is-ambiguous', 'AMBIGUOUS', 'BODIES CROSSED · RETURN TO HALF');
       } else if (ambiguity === 'too-close') {
-        this.ui.controlsHint.textContent = 'HANDS TOO CLOSE · SEPARATE HANDS';
+        this.ui.controlsHint.textContent = `${this.trackingScheme === 'H0' ? 'HANDS' : 'BODIES'} TOO CLOSE · SEPARATE`;
+        this.updateHudCameraStatus('is-ambiguous', 'AMBIGUOUS', 'TOO CLOSE · SEPARATE');
+      } else if (ambiguity === 'multiple-hands') {
+        this.ui.controlsHint.textContent = `MULTIPLE ${this.trackingScheme === 'H0' ? 'HANDS' : 'PERSONS'} DETECTED`;
+        this.updateHudCameraStatus('is-ambiguous', 'AMBIGUOUS', 'MULTIPLE DETECTED');
+      } else if (!hasP1 && (!hasP2 || this.isSoloMode)) {
+        this.ui.controlsHint.textContent = `${this.trackingScheme === 'H0' ? 'HAND' : 'PLAYER'} LOST · STEP INTO CAMERA FRAME`;
+        this.updateHudCameraStatus('is-lost', 'LOST', 'LOST · STEP INTO FRAME');
+      } else if (!this.isSoloMode && (!hasP1 || !hasP2)) {
+        const missing = !hasP1 ? 'P1' : 'P2';
+        this.ui.controlsHint.textContent = `${missing} LOST · RETURN TO CAMERA`;
+        this.updateHudCameraStatus('is-lost', 'OUT OF FRAME', `${missing} OUT OF FRAME`);
       } else {
-        this.ui.controlsHint.textContent = 'MOVE HAND LEFT/RIGHT · PINCH TO CATCH';
+        const p1Input = this.lastInput.p1;
+        const p2Input = this.lastInput.p2;
+        const isCatching = p1Input.catch || (!this.isSoloMode && p2Input.catch);
+        const isMoving = p1Input.moveAxis !== 0 || (!this.isSoloMode && p2Input.moveAxis !== 0);
+        if (isCatching) {
+          const catchCue = this.trackingScheme === 'H0'
+            ? (this.isSoloMode ? 'P1 PINCH CATCH' : 'PINCH CATCH')
+            : (this.trackingScheme === 'P1' ? 'BOTH ARMS RAISED' : 'ARM RAISED');
+          this.updateHudCameraStatus('is-action', 'CATCH', catchCue);
+        } else if (isMoving) {
+          const moveDir = (p1Input.moveAxis < 0 || p2Input.moveAxis < 0) ? 'MOVE LEFT' : 'MOVE RIGHT';
+          this.updateHudCameraStatus('is-action', moveDir, this.isSoloMode ? `P1: ${moveDir}` : 'MOVING');
+        } else {
+          this.updateHudCameraStatus('is-tracking', 'TRACKING', this.isSoloMode ? 'P1: READY' : 'P1 & P2: READY');
+        }
       }
     }
   }
 
+  private updateHudCameraStatus(stateClass: string, badgeText: string, cueText: string): void {
+    if (!this.ui) return;
+    this.ui.hudCameraDock.className = `hud-camera-dock ${stateClass}${this.hudCameraMinimized ? ' is-minimized' : ''}`;
+    this.ui.hudCameraBadge.textContent = badgeText;
+    this.ui.hudCameraCue.textContent = cueText;
+  }
+
   private updateInputModeUi(): void {
     if (!this.ui) return;
+    const isPlaying = this.state.phase === 'playing';
     this.ui.controlsHint.textContent = this.cameraMode ? 'MOVE HAND LEFT/RIGHT · PINCH TO CATCH' : 'HOLD S / ↓ TO CATCH';
     this.ui.cameraStopButton.hidden = !this.cameraMode;
     this.ui.resultCameraStopButton.hidden = !this.cameraMode;
+    this.ui.hudCameraDock.hidden = !this.cameraMode || !isPlaying;
   }
 
   private handleRestartRequested = (): void => {
@@ -767,7 +944,16 @@ class EnergyCatchScene extends Phaser.Scene {
       menuSubtitle: document.getElementById('menu-subtitle') || undefined,
       cameraInstructions: document.getElementById('camera-instructions') || undefined,
       cameraCalibrationInstructions: document.getElementById('camera-calibration-instructions') || undefined,
-      cameraPreviewLabel: document.getElementById('camera-preview-label') || undefined
+      cameraPreviewLabel: document.getElementById('camera-preview-label') || undefined,
+      schemeHandButton: (document.getElementById('scheme-hand') as HTMLButtonElement) || undefined,
+      schemePoseBothButton: (document.getElementById('scheme-pose-both') as HTMLButtonElement) || undefined,
+      schemePoseOneButton: (document.getElementById('scheme-pose-one') as HTMLButtonElement) || undefined,
+      hudCameraDock: get('hud-camera-dock'),
+      hudCameraVideo: get<HTMLVideoElement>('hud-camera-preview'),
+      hudCameraCanvas: (document.getElementById('hud-skeleton-overlay') as HTMLCanvasElement) || undefined,
+      hudCameraBadge: get('hud-camera-badge'),
+      hudCameraCue: get('hud-camera-cue'),
+      hudCameraToggle: get<HTMLButtonElement>('hud-camera-toggle')
     };
   }
 

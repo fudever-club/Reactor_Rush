@@ -148,6 +148,24 @@ kbd { display: inline-grid; min-width: 2em; height: 2em; padding: 0 .4em; place-
 .camera-stop-button:hover { background: #572637; }
 .result-camera-stop { display: block; margin: .7em auto 0; color: #aeb7d2; font-size: clamp(9px, .78cqw, 11px); }
 
+.hud-camera-dock { position: absolute; top: 16%; left: 50%; transform: translateX(-50%); width: clamp(160px, 15.5cqw, 205px); display: flex; flex-direction: column; align-items: center; gap: 5px; z-index: 10; pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
+.hud-camera-dock[hidden] { display: none !important; }
+.hud-camera-preview-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid #505a7b; border-radius: 8px; background: #090d1df0; box-shadow: 0 6px 20px #05081799, inset 0 1px #ffffff0a; }
+.hud-camera-preview-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); background: #090d1d; }
+.hud-camera-preview-frame canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); pointer-events: none; }
+.hud-camera-badge { position: absolute; top: 4px; left: 4px; padding: 2px 6px; border-radius: 4px; font-size: clamp(7.5px, .68cqw, 9.5px); font-weight: 850; letter-spacing: .08em; text-transform: uppercase; background: #11172fe6; color: #55dfff; border: 1px solid #55dfff66; pointer-events: none; transition: background .2s ease, color .2s ease, border-color .2s ease; }
+.hud-camera-dock.is-tracking .hud-camera-badge { background: #0d4239e8; color: #4ef2bb; border-color: #4ef2bb88; }
+.hud-camera-dock.is-action .hud-camera-badge { background: #4a380ce8; color: #fcd34d; border-color: #fcd34d99; }
+.hud-camera-dock.is-ambiguous .hud-camera-badge { background: #4a1924e8; color: #ff8b83; border-color: #ff596888; }
+.hud-camera-dock.is-lost .hud-camera-badge { background: #321c30e8; color: #f87171; border-color: #f8717188; }
+.hud-camera-dock.is-fallback .hud-camera-badge { background: #252e4fe8; color: #f6d55c; border-color: #f6d55c88; }
+.hud-camera-cue { position: absolute; bottom: 3px; left: 4px; right: 4px; padding: 2px 4px; border-radius: 4px; font-size: clamp(6.5px, .58cqw, 8.5px); font-weight: 750; letter-spacing: .03em; text-align: center; background: #090d1dee; color: #c0c9e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.hud-camera-controls { display: flex; gap: 6px; pointer-events: auto; }
+.hud-camera-toggle { padding: .35em .75em; border: 1px solid #505a7b; border-radius: 6px; background: #11172fe8; color: #8893b3; font: inherit; font-size: clamp(7.5px, .68cqw, 9.5px); font-weight: 750; letter-spacing: .06em; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.hud-camera-toggle:hover { background: #202b4c; color: #f4f3ee; }
+.hud-camera-dock .camera-stop-button { position: static; transform: none; padding: .35em .75em; font-size: clamp(7.5px, .68cqw, 9.5px); }
+.hud-camera-dock.is-minimized .hud-camera-preview-frame { display: none; }
+
 .transition-screen, .results-screen { display: grid; place-items: center; padding: 5%; background: #090d20b8; backdrop-filter: blur(2px); }
 .transition-card, .results-card { width: min(72%, 760px); border: 1px solid #505a7b; border-radius: 18px; background: linear-gradient(150deg, #191f3bf5, #11172ff5); box-shadow: 0 24px 80px #05081799, inset 0 1px #ffffff0b; text-align: center; }
 .ready-card { padding: 3.1cqw 4cqw; }
@@ -262,6 +280,40 @@ kbd { display: inline-grid; min-width: 2em; height: 2em; padding: 0 .4em; place-
   color: #55dfff;
   border-color: #55dfff;
   box-shadow: 0 0 12px #55dfff44;
+}
+
+.camera-scheme-select-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5em;
+  margin-top: 0.6em;
+  pointer-events: auto;
+}
+
+.scheme-btn {
+  background: #18203d;
+  color: #aeb7d2;
+  border: 1px solid #45527a;
+  border-radius: 6px;
+  padding: 0.4em 0.8em;
+  font-size: clamp(9px, 0.8cqw, 11px);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scheme-btn:hover {
+  background: #25315e;
+  color: #ffffff;
+  border-color: #697cae;
+}
+
+.scheme-btn.active {
+  background: linear-gradient(135deg, #106352, #12826a);
+  color: #4ef2bb;
+  border-color: #4ef2bb;
+  box-shadow: 0 0 12px #4ef2bb44;
 }
 
 .player-card.solo-inactive, .hud-player.solo-inactive, .result-player.solo-inactive {
