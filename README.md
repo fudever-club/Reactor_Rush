@@ -32,7 +32,7 @@
 **Reactor Rush — Energy Catch** là dự án game web tương tác tốc độ cao, được phát triển nhằm thử nghiệm và tối ưu hóa việc kết hợp giữa **Game Engine 2D (Phaser)** và **Mô hình thị giác máy tính (Google MediaPipe Hand Landmarker)** chạy trực tiếp trên trình duyệt.
 
 Game mang đến trải nghiệm điều khiển đa phương thức đột phá:
-- **Motion Control (Cử chỉ bàn tay)**: Nhận diện cử chỉ qua webcam với tăng tốc phần cứng GPU (WebGL), độ trễ cực thấp (~30ms), phản hồi 60 FPS mượt mà.
+- **Motion Control (Cử chỉ bàn tay)**: Ba scheme webcam thử nghiệm: Hand Pinch H0, Pose Both Arms P1 và Pose One Arm P2. Có GPU delegate và CPU fallback; độ trễ, FPS và khoảng cách sử dụng trên laptop booth chưa được đo.
 - **Keyboard Control (Bàn phím truyền thống)**: Mượt mà, nhạy bén và là phương án dự phòng chuẩn chỉ.
 
 ---
@@ -43,8 +43,8 @@ Game mang đến trải nghiệm điều khiển đa phương thức đột phá
   - **1 Player (Solo)**: Thử thách phản xạ cá nhân với nhân vật P1 (Cyan).
   - **2 Players (Co-op)**: Hai người chơi cùng đứng trước camera hoặc cùng bàn phím phối hợp bắt năng lượng chia làn đối xứng.
 - 🖐️ **AI Hand Tracking tối ưu hóa sâu**:
-  - Pipeline chạy đa luồng trong **Web Worker**, hoàn toàn không gây nghẽn UI/Game loop.
-  - **GPU Acceleration (WebGL)** kèm kỹ thuật **Shader Pre-warmup**, tăng tốc gấp 18 lần so với CPU delegate thông thường.
+  - Inference chạy trong **Web Worker**; chi phí CPU/GPU và ảnh hưởng tới vòng game vẫn cần đo trên thiết bị đích.
+  - **GPU Acceleration (WebGL)** và CPU fallback một lần khi inference GPU quá hạn. Cần hiệu chuẩn lại sau khôi phục; hiệu năng thực tế chưa được nghiệm thu.
   - **Visual Landmark Skeleton Overlay**: Hiển thị khung xương và 21 khớp bàn tay thời gian thực với mã màu trực quan (Cyan cho P1, Pink cho P2).
   - **Pinch-to-Catch**: Nhận diện chuẩn xác cử chỉ chụm ngón cái và ngón trỏ với hiệu ứng phát sáng phản hồi tức thì.
   - Cơ chế **Hiệu chuẩn (Calibration)** thông minh lưu trữ tọa độ trung tính của người chơi trước khi bắt đầu.
@@ -124,7 +124,7 @@ flowchart LR
 ## 🚀 Cài đặt & Khởi chạy dự án
 
 ### Yêu cầu tiên quyết
-- [Node.js](https://nodejs.org/) (phiên bản 18 trở lên).
+- [Node.js](https://nodejs.org/) (22.18 trở lên; khuyến nghị Node 24 LTS). Bộ test dùng hỗ trợ TypeScript tích hợp của Node. Lượt kiểm tra ngày 19/10/2026 chạy trên Node 25.9.0 / npm 11.12.1; chưa kiểm chứng riêng Node 24 trong lượt này.
 - Trình duyệt hỗ trợ WebGL và WebCam (Google Chrome, Microsoft Edge, Brave,...).
 
 ### Cài đặt từng bước
@@ -148,7 +148,7 @@ Truy cập trên trình duyệt: `http://127.0.0.1:5173/`
 | Lệnh | Chức năng |
 |---|---|
 | `npm run dev` | Khởi chạy Vite dev server tại cổng mặc định `5173`. |
-| `npm test` | Chạy bộ **45 bài unit tests** tự động toàn diện. |
+| `npm test` | Chạy bộ kiểm thử tự động; xem kết quả và giới hạn bằng chứng trong báo cáo STAB-01. |
 | `npm run typecheck` | Kiểm tra tính toàn vẹn kiểu dữ liệu TypeScript (`tsc --noEmit`). |
 | `npm run build` | Đóng gói phiên bản production tối ưu hóa vào thư mục `dist/`. |
 | `npm run preview` | Xem thử bản build production tại local. |
@@ -179,7 +179,7 @@ Reactor_Rush/
 │   ├── workers/                # Web Worker chạy MediaPipe inference với GPU WebGL
 │   ├── main.ts                 # Điểm khởi chạy chính & Phaser Scene
 │   └── game-style.css          # Giao diện HUD & màn hình cài đặt camera
-├── tests/                      # Bộ kiểm thử tự động toàn diện (45 test cases)
+├── tests/                      # Kiểm thử tự động và browser fixture (xem báo cáo STAB-01)
 ├── index.html                  # Giao diện web chính của game
 ├── animation-test.html         # Công cụ preview 2D Cutout Rig
 └── package.json                # Cấu hình dự án & dependencies
@@ -206,3 +206,7 @@ Reactor_Rush/
 ## 📄 Bản quyền & Giấy phép
 
 Phát triển với tinh thần mã nguồn mở và chia sẻ học thuật bởi **FU-DEVER Club**. Mọi đóng góp, báo lỗi (issue) và pull request đều được trân trọng và hoan nghênh!
+
+## Master plan v3 — tiến độ 19/10/2026
+
+[Báo cáo phase và gate](docs/reports/master-v3-2026-10-19/REPORT.md) · [Hướng dẫn thử FIELD-01](docs/reports/master-v3-2026-10-19/FIELD-01.md). Camera P1 là lựa chọn thử nghiệm, chưa phải default booth được chấp thuận. Mất liên tục tracking Pose cần bấm CALIBRATE; STOP CAMERA đưa về bàn phím. Chưa có nghiệm thu phần cứng hoặc release.

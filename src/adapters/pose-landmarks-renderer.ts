@@ -1,7 +1,8 @@
 import type { NormalizedPoseLandmark } from '../workers/pose-landmarker.worker.ts';
 
 export interface RenderedPlayerPose {
-  player: 'p1' | 'p2';
+  player?: 'p1' | 'p2';
+  candidate?: boolean;
   landmarks: NormalizedPoseLandmark[];
   catching?: boolean;
 }
@@ -22,6 +23,11 @@ export const POSE_CONNECTIONS: ReadonlyArray<readonly [number, number]> = [
 ];
 
 const VISIBILITY_THRESHOLD = 0.35;
+
+function isVisiblePoint(point: NormalizedPoseLandmark | undefined): point is NormalizedPoseLandmark {
+  return !!point && Number.isFinite(point.x) && Number.isFinite(point.y) &&
+    [point.visibility, point.presence].every(value => value === undefined || (Number.isFinite(value) && value >= VISIBILITY_THRESHOLD));
+}
 
 export function renderPoseOverlay(
   ctx: CanvasRenderingContext2D | null | undefined,
@@ -48,11 +54,12 @@ export function renderPoseOverlay(
 
   if (!poses || poses.length === 0) return;
 
-  for (const { player, landmarks, catching } of poses) {
+  for (const { player, candidate, landmarks, catching } of poses) {
     if (!landmarks || landmarks.length < 25) continue;
+    const preview = candidate || player === undefined;
     const isP1 = player === 'p1';
-    const strokeColor = isP1 ? 'rgba(85, 223, 255, 0.88)' : 'rgba(255, 112, 178, 0.88)';
-    const jointColor = isP1 ? '#a4efff' : '#ffc2dd';
+    const strokeColor = preview ? 'rgba(255, 204, 102, 0.88)' : isP1 ? 'rgba(85, 223, 255, 0.88)' : 'rgba(255, 112, 178, 0.88)';
+    const jointColor = preview ? '#ffcc66' : isP1 ? '#a4efff' : '#ffc2dd';
 
     // Draw skeleton bones
     ctx.lineWidth = 3;
@@ -60,9 +67,7 @@ export function renderPoseOverlay(
     for (const [startIdx, endIdx] of POSE_CONNECTIONS) {
       const p1 = landmarks[startIdx];
       const p2 = landmarks[endIdx];
-      if (!p1 || !p2) continue;
-      if (typeof p1.visibility === 'number' && p1.visibility < VISIBILITY_THRESHOLD) continue;
-      if (typeof p2.visibility === 'number' && p2.visibility < VISIBILITY_THRESHOLD) continue;
+      if (!isVisiblePoint(p1) || !isVisiblePoint(p2)) continue;
 
       ctx.beginPath();
       ctx.moveTo(p1.x * width, p1.y * height);
@@ -73,8 +78,7 @@ export function renderPoseOverlay(
     // Draw joints
     for (let i = 0; i < landmarks.length; i++) {
       const p = landmarks[i];
-      if (!p) continue;
-      if (typeof p.visibility === 'number' && p.visibility < VISIBILITY_THRESHOLD) continue;
+      if (!isVisiblePoint(p)) continue;
 
       // Wrists, elbows, shoulders are prominent
       const isKeyJoint = i === 11 || i === 12 || i === 13 || i === 14 || i === 15 || i === 16;
@@ -82,7 +86,7 @@ export function renderPoseOverlay(
 
       ctx.beginPath();
       ctx.arc(p.x * width, p.y * height, radius, 0, Math.PI * 2);
-      ctx.fillStyle = isKeyJoint ? '#ffffff' : jointColor;
+      ctx.fillStyle = isKeyJoint && !preview ? '#ffffff' : jointColor;
       ctx.fill();
       ctx.strokeStyle = strokeColor;
       ctx.lineWidth = 1.5;
@@ -90,11 +94,11 @@ export function renderPoseOverlay(
     }
 
     // Catch action cue (wrists glow gold)
-    if (catching) {
+    if (catching && !preview) {
       const leftWrist = landmarks[15];
       const rightWrist = landmarks[16];
       for (const wrist of [leftWrist, rightWrist]) {
-        if (!wrist) continue;
+        if (!isVisiblePoint(wrist)) continue;
         ctx.beginPath();
         ctx.arc(wrist.x * width, wrist.y * height, 14, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(246, 213, 92, 0.45)';

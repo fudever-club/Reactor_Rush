@@ -89,7 +89,7 @@ function createAdapter(overrides = {}) {
       if (overrides.getUserMedia) return overrides.getUserMedia(stream);
       return stream;
     },
-    createWorker: () => { calls.worker += 1; return worker; },
+    createWorker: () => { calls.worker += 1; return overrides.createWorker?.() ?? worker; },
     createBitmap: overrides.createBitmap,
     onStatus: overrides.onStatus,
     onMetrics: overrides.onMetrics,
@@ -408,3 +408,119 @@ test('adapter metrics reflect ambiguity reason when hands conflict', async () =>
   adapter.stop();
 });
 
+
+
+const flushHandTasks = () => new Promise(resolve => setImmediate(resolve));
+
+test('Hand retries a stalled GPU once on CPU using the consented stream and clears calibration', async () => {
+  const gpu = new FakeWorker(true, 'GPU'); const cpu = new FakeWorker(true, 'CPU');
+  const workers = [gpu, cpu];
+  const {adapter, video, calls, clock, track} = createAdapter({createWorker:()=>workers.shift(), createBitmap:async()=>({close(){}})});
+  await adapter.start();
+  gpu.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.78),makeLandmarks(.22)]}});
+  assert.equal(adapter.calibrate(),true);
+  video.readyState=2; video.currentTime=1; clock.now=100; calls.frameCallback(0); await flushHandTasks();
+  clock.now=2201; calls.frameCallback(0); await flushHandTasks();
+  assert.equal(gpu.terminated,true); assert.equal(calls.worker,2); assert.equal(calls.camera,1); assert.equal(track.stopped,false);
+  assert.equal(cpu.messages[0].delegate,'CPU'); assert.equal(adapter.currentStatus,'ready'); assert.equal(adapter.isCalibrated,false);
+  assert.equal(adapter.getMetrics().recalibrationRequired,true);
+  cpu.emit('message',{data:{type:'result',timestamp:2201,hands:[makeLandmarks(.78),makeLandmarks(.22)]}});
+  assert.equal(adapter.calibrate(),true);assert.equal(adapter.getMetrics().recalibrationRequired,false);assert.equal(adapter.canStart(),true);
+  assert.deepEqual(adapter.read(),{p1:{moveAxis:0,catch:false},p2:{moveAxis:0,catch:false}});
+  video.currentTime=2; clock.now=2300; calls.frameCallback(0); await flushHandTasks();
+  assert.equal(cpu.messages.at(-1).type,'frame');
+  clock.now=4401; calls.frameCallback(0);
+  assert.equal(adapter.currentStatus,'error'); assert.equal(calls.worker,2); assert.equal(track.stopped,true); assert.equal(cpu.terminated,true);
+});
+
+test('stopping Hand while CPU recovery loads prevents camera resurrection', async () => {
+  const gpu=new FakeWorker(true,'GPU'); const cpu=new FakeWorker(false); const workers=[gpu,cpu];
+  const {adapter,video,calls,clock,track}=createAdapter({createWorker:()=>workers.shift(),createBitmap:async()=>({close(){}})});
+  await adapter.start(); video.readyState=2; video.currentTime=1; clock.now=100; calls.frameCallback(0); await flushHandTasks();
+  clock.now=2201; calls.frameCallback(0); assert.equal(adapter.currentStatus,'loading-model');
+  adapter.stop(); cpu.emit('message',{data:{type:'ready',delegate:'CPU'}}); await flushHandTasks();
+  assert.equal(adapter.currentStatus,'stopped'); assert.equal(track.stopped,true); assert.equal(cpu.terminated,true);
+});
+
+test('a late Hand bitmap from the terminated GPU cannot enter the replacement CPU worker', async () => {
+  const gpu=new FakeWorker(true,'GPU'); const cpu=new FakeWorker(true,'CPU'); const workers=[gpu,cpu];
+  let resolveOld; let captures=0; let closed=false;
+  const {adapter,video,calls,clock}=createAdapter({createWorker:()=>workers.shift(),createBitmap:()=>++captures===1?new Promise(r=>{resolveOld=r}):Promise.resolve({close(){}})});
+  await adapter.start(); video.readyState=2; video.currentTime=1; clock.now=100; calls.frameCallback(0); await flushHandTasks();
+  clock.now=2201; calls.frameCallback(0); await flushHandTasks();
+  resolveOld({close(){closed=true}}); await flushHandTasks();
+  assert.equal(closed,true); assert.equal(cpu.messages.filter(m=>m.type==='frame').length,0);
+  video.currentTime=2; clock.now=2300; calls.frameCallback(0); await flushHandTasks();
+  assert.equal(cpu.messages.filter(m=>m.type==='frame').length,1); adapter.stop();
+});
+
+
+test('Hand calibration request waits for the next valid hand instead of losing the click',async()=>{
+ const {adapter,worker}=createAdapter();await adapter.start();let done=false;
+ const pending=adapter.requestCalibration().then(v=>{done=true;return v});
+ assert.equal(adapter.getMetrics().waitingForHand,true);assert.equal(done,false);
+ worker.emit('message',{data:{type:'result',timestamp:10,hands:[]}});await flushHandTasks();assert.equal(done,false);
+ worker.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.78),makeLandmarks(.22)]}});
+ assert.equal(await pending,true);assert.equal(adapter.isCalibrated,true);assert.equal(adapter.getMetrics().waitingForHand,false);adapter.stop();
+});
+
+test('Hand start request waits for fresh detection after a calibrated sample expires',async()=>{
+ const {adapter,worker,clock}=createAdapter();await adapter.start();
+ worker.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.78),makeLandmarks(.22)]}});adapter.calibrate();
+ clock.now=500;assert.equal(adapter.canStart(),false);const pending=adapter.requestStartReadiness();
+ worker.emit('message',{data:{type:'result',timestamp:500,hands:[makeLandmarks(.78),makeLandmarks(.22)]}});
+ assert.equal(await pending,true);assert.equal(adapter.canStart(),true);adapter.stop();
+});
+
+test('Hand pending calibration is cancelled on stop and cannot calibrate a stopped session',async()=>{
+ const {adapter,worker}=createAdapter();await adapter.start();const pending=adapter.requestCalibration();adapter.stop();
+ assert.equal(await pending,false);worker.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.78),makeLandmarks(.22)]}});
+ assert.equal(adapter.isCalibrated,false);assert.equal(adapter.getMetrics().waitingForHand,false);
+});
+
+test('Hand pending calibration times out without bypassing missing-hand checks',async(t)=>{
+ const {adapter}=createAdapter();await adapter.start();t.mock.timers.enable({apis:['setTimeout']});
+ const pending=adapter.requestCalibration();t.mock.timers.tick(3001);assert.equal(await pending,false);assert.equal(adapter.isCalibrated,false);assert.equal(adapter.getMetrics().waitingForHand,false);adapter.stop();
+});
+
+
+test('CPU Hand capture sends a detached pixel copy, preserving aspect ratio',async()=>{
+ const oldBitmap=globalThis.createImageBitmap;const oldDocument=globalThis.document;
+ const pixels={width:320,height:180,data:new Uint8ClampedArray([7,8,9,255])};let received;let size;let drawSize;
+ const canvas={width:0,height:0,getContext(type,options){assert.equal(type,'2d');assert.equal(options.willReadFrequently,true);return {drawImage(source,x,y,w,h){drawSize=[w,h]},getImageData(x,y,w,h){size=[w,h];return pixels}}}};
+ globalThis.document={createElement(tag){assert.equal(tag,'canvas');return canvas}};
+ globalThis.createImageBitmap=async source=>{received=source;return {close(){}}};
+ const {adapter,video,calls,clock}=createAdapter({delegate:'CPU'});
+ try{await adapter.start();video.videoWidth=640;video.videoHeight=360;video.readyState=2;video.currentTime=1;clock.now=100;calls.frameCallback(0);await flushHandTasks();
+ assert.equal(received,pixels);assert.deepEqual(size,[320,180]);assert.deepEqual(drawSize,[320,180]);}finally{adapter.stop();globalThis.createImageBitmap=oldBitmap;globalThis.document=oldDocument;}
+});
+
+
+test('changing player count cancels an old calibration request',async()=>{
+ const {adapter,worker}=createAdapter();await adapter.start();const pending=adapter.requestCalibration();adapter.setSoloMode(true);
+ worker.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.5)]}});assert.equal(await pending,false);assert.equal(adapter.isCalibrated,false);adapter.stop();
+});
+
+
+test('Hand movement tuning cancels queued calibration, exposes zones and requires recentering',async()=>{
+ const {adapter,worker}=createAdapter();adapter.setSoloMode(true);await adapter.start();const pending=adapter.requestCalibration();
+ adapter.setMoveThreshold(.03);assert.equal(await pending,false);assert.equal(adapter.isCalibrated,false);assert.equal(adapter.getMetrics().moveThreshold,.03);
+ worker.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.5)]}});adapter.calibrate();
+ assert.equal(adapter.getMetrics().handMovementZones.length,1);assert.equal(adapter.getMetrics().handMovementZones[0].neutralX,.5);
+ worker.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.45)]}});assert.equal(adapter.read().p1.moveAxis,1);
+ adapter.setMoveThreshold(.15);assert.equal(adapter.isCalibrated,false);assert.equal(adapter.getMetrics().recalibrationRequired,true);assert.equal(adapter.read().p1.moveAxis,0);adapter.stop();
+});
+
+test('Hand movement overlay labels are readable after the existing mirrored canvas transform',()=>{
+ const calls=[];const ctx=new Proxy({}, {get(t,k){if(k in t)return t[k];return (...args)=>calls.push([k,...args])},set(t,k,v){t[k]=v;return true}});
+ renderHandOverlay(ctx,{width:640,height:360},[],true,[{player:'p1',neutralX:.5,currentX:.6,slotLeft:0,slotRight:1,leftTrigger:.42,rightTrigger:.58,stopLeft:.456,stopRight:.544,moveAxis:1,catch:false}]);
+ assert.deepEqual(calls.filter(c=>c[0]==='fillText').slice(0,3).map(c=>c[1]),['LEFT','STOP','RIGHT']);
+ const xs=calls.filter(c=>c[0]==='translate').map(c=>c[1]);assert.ok(xs[0]>xs[2]);assert.ok(calls.some(c=>c[0]==='scale'&&c[1]===-1));
+ assert.ok(calls.some(c=>c[0]==='moveTo'&&Math.abs(c[1]-320)<1e-6));
+});
+
+
+test('a calibrated Hand may start while moving near the edge; only recentering requires middle space',async()=>{
+ const {adapter,worker}=createAdapter();adapter.setSoloMode(true);await adapter.start();worker.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.5)]}});adapter.calibrate();
+ worker.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.08)]}});assert.equal(adapter.canCalibrate(),false);assert.equal(adapter.canStart(),true);assert.equal(adapter.read().p1.moveAxis,1);adapter.stop();
+});

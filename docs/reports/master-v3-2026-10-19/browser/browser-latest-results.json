@@ -1,0 +1,97 @@
+{
+  "browser": "151.0.7922.34",
+  "results": [
+    {
+      "id": "H0-1280",
+      "status": "PASS",
+      "geometry": {
+        "dock": {
+          "left": 576,
+          "right": 704,
+          "top": 115.18925348072483,
+          "bottom": 270.40929126145664
+        },
+        "clock": {
+          "left": 576,
+          "right": 704,
+          "top": 18.705660113342194,
+          "bottom": 94.35108094871616
+        },
+        "stop": {
+          "left": 576,
+          "right": 704,
+          "top": 250.36031623871824,
+          "bottom": 270.40929126145664
+        },
+        "cue": {
+          "left": 576,
+          "right": 704,
+          "top": 192.64814944378367,
+          "bottom": 220.63947386832714
+        },
+        "video": {
+          "left": 577.0732346390672,
+          "right": 702.9267653609328,
+          "top": 116.2639054082418,
+          "bottom": 186.20023787868186
+        },
+        "overlay": {
+          "left": 577.0732346390672,
+          "right": 702.9267653609328,
+          "top": 116.2639054082418,
+          "bottom": 186.20023787868186
+        }
+      },
+      "fixture": "synthetic stream + fake worker; no actual inference or field evidence",
+      "errors": []
+    },
+    {
+      "id": "P1-1280",
+      "status": "PASS",
+      "geometry": {
+        "dock": {
+          "left": 576,
+          "right": 704,
+          "top": 115.18925348072483,
+          "bottom": 276.8068285174561
+        },
+        "clock": {
+          "left": 576,
+          "right": 704,
+          "top": 18.705660113342194,
+          "bottom": 94.35108094871616
+        },
+        "stop": {
+          "left": 576,
+          "right": 704,
+          "top": 256.7578534947177,
+          "bottom": 276.8068285174561
+        },
+        "cue": {
+          "left": 576,
+          "right": 704,
+          "top": 192.64814944378367,
+          "bottom": 227.0370111243266
+        },
+        "video": {
+          "left": 577.0732346390672,
+          "right": 702.9267653609328,
+          "top": 116.2639054082418,
+          "bottom": 186.20023787868186
+        },
+        "overlay": {
+          "left": 577.0732346390672,
+          "right": 702.9267653609328,
+          "top": 116.2639054082418,
+          "bottom": 186.20023787868186
+        }
+      },
+      "fixture": "synthetic stream + fake worker; no actual inference or field evidence",
+      "errors": []
+    },
+    {
+      "status": "FAIL",
+      "message": "page.waitForFunction: Timeout 30000ms exceeded.\n    at C:\\Users\\qnhat\\_Project\\Reactor Rush\\tests\\browser\\camera-smoke.mjs:70:20"
+    }
+  ]
+}

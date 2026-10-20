@@ -145,3 +145,9 @@ When physical testing on the target Dell laptop is complete, compile the compara
 **Final Booth Default Selected:** [ H0 | P1 | P2 ]
 **Approved By:** _________________________  **Date:** ____________
 ```
+
+## STAB-01 amendment — 2026-10-19
+
+The earlier protocol above is retained as historical planning material; its equations and automatic recovery description do not override the implemented mapping. Current Pose thresholds are enter 0.22/release 0.12, wrist raise margin 0.2 shoulder width, and neutral input at capture age >=250ms. Lost continuity requires explicit CALIBRATE; returning to a half alone does not restore a slot. See [current input contract](camera-input-integration.md) and [FIELD-01 execution forms](../reports/master-v3-2026-10-19/FIELD-01.md).
+
+The 16GB/Windows Home target description conflicts with older DESIGN.md 32GB and the current development host Windows Pro. Record actual booth hardware; do not substitute this development host as the Dell benchmark. The scorecard's hard-coded zero swap values are targets, not observations. Keep unmeasured cells empty/NOT RUN. Master v3 FT IDs differ from this older protocol; namespace new evidence as MASTER-V3/FT-xx. Its G3/G4 correspond to physical testing/scheme choice; the legacy CV-02 G6 label refers to that older plan.

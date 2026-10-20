@@ -1,126 +1,66 @@
 # Reactor Rush — Camera Input Integration
 
-**Status:** CV-02 Live Observability & Multi-Modal Pose Integration; keyboard remains the default fail-safe input.
+**Status (2026-10-19):** CV-02 code present; STAB-01 reliability changes implemented locally. Automated/browser evidence and field acceptance are separate. Keyboard is the initial input and fallback. See [phase report](../reports/master-v3-2026-10-19/REPORT.md).
 
----
+## Setup and recovery
 
-## 1. User Flow & Setup Experience
+1. Serve on localhost or HTTPS. Select Set up webcam controls; opening the app alone does not request a camera.
+2. Select Solo or Co-op and a provisional scheme: H0 moves a hand and pinches to Catch; P1 leans the torso and raises BOTH arms; P2 leans and raises EITHER arm. Scheme P1 is distinct from player P1 Cyan. No final booth scheme has been selected.
+3. Read the camera/SDK notice, consent, then Enable Camera. Audio is not requested. Raw frames are processed locally and the app does not record or upload them. The consent notice retains the SDK usage/performance-metrics disclosure; offline/telemetry behavior is not certified from source inspection.
+4. In Co-op, player P1 Cyan stands in the left half of the mirrored preview and P2 Pink in the right. Calibrate while centered in each slot; start when ready.
+5. Pose HUD states distinguish detected-but-not-calibrated, accepted idle/movement/Catch, lost continuity and recalibration. Cyan/Pink skeletons and Catch rings use the same accepted Pose association as input. Before calibration or when no association remains accepted, fresh detections are shown as amber candidate skeletons with no player assignment or Catch signal. H0 shows accepted LEFT/STOP/RIGHT and Catch per player, using the same mapper state as its movement overlay.
+6. Lost Pose continuity, proximity/crossing, a third detected person, ambiguous association or implausible displacement neutralizes unsafe input. The camera/worker continue detecting while continuity is lost. Returning people reappear as amber preview skeletons when fresh results arrive; BODY FOUND / CALIBRATE means they are visible but not controlling a lost slot. Returning into frame never silently recovers a lost slot. Return to the correct slots and explicitly press CALIBRATE (setup or in-game dock). If one player disappears, only the other continuously and uniquely matched player may keep operating.
+7. Minimize/restore with V or the button. The camera status and STOP CAMERA remain available when minimized. STOP CAMERA, consent withdrawal, permission failure or disconnect returns to keyboard. P1 A/D + hold S; P2 Left/Right + hold Down.
 
-1. **Origin Requirements:** Start the app from `http://127.0.0.1:5173` or another HTTPS origin. Camera APIs are blocked by browser security on insecure network origins.
-2. **Setup Trigger:** Choose **Set up webcam controls**. The application never requests camera permissions on initial page load.
-3. **Tracking Scheme Selection:** Players choose their desired tracking mode:
-   - **`HAND PINCH [H0]`**: Finger pinch catch; best for near desk-play (< 1.5m).
-   - **`POSE BOTH ARMS [P1]` (Default)**: Torso lean movement + both arms raised catch; highly distinct, zero false catches at 2.0m–3.0m booth distance.
-   - **`POSE ONE ARM [P2]`**: Torso lean movement + either arm raised catch; single-arm accessible, low physical exertion.
-4. **Player Mode:** Select **1 PLAYER (SOLO)** or **2 PLAYERS (CO-OP)**.
-5. **Consent & Privacy Notice:** Read and accept the camera notice. Click **Enable Camera & Load Model**. The browser requests video permissions only; microphone is never accessed.
-6. **Calibration:**
-   - **Hand Mode (`H0`)**: Hold hands near center of designated half. Click **Calibrate Both Hands**.
-   - **Pose Mode (`P1`/`P2`)**: Stand side-by-side in camera framing: P1 Cyan on the left, P2 Pink on the right. System verifies both upper-body skeletons (shoulders, elbows, wrists, hips). Click **Calibrate Both Players**.
-7. **In-Game Live Observability (HUD Dock):**
-   - Active gameplay features a mirrored Picture-in-Picture (PiP) dock centered between player cards (`top: 16%`, `left: 50%`, `transform: translateX(-50%)`).
-   - Real-time skeleton overlay with 33 landmarks, bone connections, and golden Catch trigger rings.
-   - Dual status badges (e.g. `P1 TRACKING · CATCH`, `P2 MOVE LEFT`, `TOO CLOSE`, `CROSSING`, `P1 OUT OF FRAME`).
-   - Minimize toggle (`V` keyboard shortcut or click) to collapse dock for full playfield visibility.
-8. **Emergency Fallback & Teardown:** Stop camera input from the HUD dock or results screen to immediately resume keyboard controls (`A/D/S` for P1, `Left/Right/Down` for P2). Unchecking consent or encountering a camera error cleanly releases video tracks and Web Workers.
+## Actual mapping and continuity contract
 
----
+- InputFrame stays p1/p2.moveAxis and catch; scoring, the 60-second timer and collision rules are unchanged.
+- Pose movement: mirrored torso center minus calibrated neutral center, divided by current shoulder width. Enter ratio 0.22; release ratio 0.12. Minimum shoulder width 0.04.
+- Catch: each required wrist must be valid and above its shoulder by more than 0.2 times shoulder width. P1 uses both wrists; P2 uses either. Catch remains a held action, with no new cooldown or scoring change.
+- Visibility and presence, when supplied, must be finite and at least 0.35. Invalid shoulders reject the pose; an invalid wrist cannot activate its arm gesture.
+- Calibration needs exactly one pose in Solo or two separated poses in Co-op (opposite halves outside the 0.035 center band; separation at least 0.18). The worker requests up to three poses so a detected extra person can invalidate calibration. A person the model does not detect cannot be guaranteed visible to this policy.
+- Temporary slot tokens track only uninterrupted anonymous torso observations using capture-to-capture continuity. Unique matching uses last center/time and a distance gate min(0.14, 0.06 + 0.0004 * elapsed_ms), width ratio 0.6–1.75, and the slot boundary. Detector array order is irrelevant. Torso distance below 0.15, boundary ambiguity, failed matching or loss requires explicit recalibration.
+- **Limitation:** anonymous skeletons cannot establish personal identity. A substitution at the same position with no observable discontinuity cannot be proved or ruled out. Do not claim biometric identity, guaranteed detection of occlusion, or guaranteed prevention of all swaps.
+- Pose production freshness is strictly less than 250 ms **from capture timestamp**, not worker arrival. At age >=250 ms, both movement and Catch are neutral and held state is cleared. A delivery-time expiry alone now shows WAITING_FOR_FRAME and retains track history; a later result can continue the association only if its capture timestamp is newer, its own age is below250ms, the capture-to-capture gap is below250ms and the existing spatial/confidence checks pass. An actual capture gap >=250ms, empty-body observation, lost slot or ambiguity still latches explicit recalibration. No calibration is repeated automatically and timestamps are never refreshed on arrival. Delayed/stale/out-of-order results cannot refresh controls. Rendering and polling cadence affect wall-clock observation; <=250ms on target hardware remains a measurement gate. Hand retains its separate receipt-based freshness and Co-op association policy; it does not inherit this Pose capture-time contract. Solo Hand now requires exactly one detected hand.
 
-## 2. Runtime Architecture & Modularity
+## One-click Pose calibration (2026-10-20)
 
-```mermaid
-graph TD
-    subgraph UI ["User Interface & Canvas"]
-        HUD["In-Game HUD Dock<br/>#hud-camera-dock"]
-        Skeleton["Skeleton Overlay Canvas<br/>#hud-skeleton-overlay"]
-        Phaser["Phaser Game Scene<br/>Canvas (1280x720)"]
-    end
+- Once camera/model is ready, CALIBRATE is requestable even without a valid current pose. Click once; the explicit request waits up to8seconds for3stable fresh accepted samples. The checklist shows camera, selected player count, clear shoulders, correct slots, fresh samples and progress0/3→3/3. No full-body or raised-arm condition was added.
+- Stability uses mirrored shoulder center within0.025of full preview width and shoulder-width variation within15% of the anchor, with the3samples within1.5seconds of that anchor. Invalid, stale, missing/extra or unstable observations reset progress. Final calibration uses the latest accepted sample; the250ms capture-age limit remains unchanged.
+- Press CANCEL CALIBRATION (or live CANCEL) to stop collecting. Stop/error, consent withdrawal, mode/scheme changes or worker retry cancel obsolete intent. Timeout/failure gives a retry and the unmet condition. Input is neutral while collecting.
+- After saving, the checklist label Samples verified denotes historical calibration validation, not the freshness of the current live frame. Saved START stays requestable during a delivery wait; its explicit request waits up to3seconds for fresh already-calibrated tracking. Actual tracking loss cannot be automatically recalibrated by START.
+- Pose buttons are at least44px high; keyboard focus and in-game CALIBRATING n/3 progress are visible. Hand mapping and its existing3second intent are unchanged. Details: [calibration UX report](../reports/master-v3-2026-10-19/POSE-CALIBRATION-UX-2026-10-20.md).
 
-    subgraph Adapters ["Input Adapters (Polymorphic)"]
-        KbdAdapter["KeyboardInputAdapter"]
-        HandAdapter["MediaPipeHandInputAdapter"]
-        PoseAdapter["MediaPipePoseInputAdapter"]
-    end
+## Pose preview and recovery
 
-    subgraph Mappers ["Domain Classification Mappers"]
-        HandMapper["HandInputMapper<br/>Wrist X + Pinch Ratio"]
-        PoseMapper["PoseInputMapper<br/>Scale-Invariant Torso Lean<br/>Arm-Raise Catch Gate"]
-    end
+The preview no longer disappears solely because accepted tracking was lost. Initial and returned fresh detections appear amber; accepted tracking uses Cyan/Pink. SEARCHING FOR BODY means there is no fresh candidate preview, and BODY FOUND · CALIBRATE means a valid returned detection can be explicitly calibrated. BODY FOUND · CHECK SETUP indicates detected bodies still fail player-count, confidence or slot requirements. SLOW FRAMES remains a separate processing limit. During partial Co-op loss, the continuously accepted player keeps the accepted overlay/control; returned unmatched observations still follow explicit recalibration rules.
 
-    subgraph Workers ["Dedicated Web Workers (Off-Thread)"]
-        HandWorker["hand-landmarker.worker.ts<br/>hand_landmarker.task (v1)"]
-        PoseWorker["pose-landmarker.worker.ts<br/>pose_landmarker_lite.task"]
-    end
+WAITING FOR FRAME distinguishes a delivery wait from proven body loss. Controls pause at the input deadline; retained calibration may resume from continuously captured valid observations. Candidate preview does not assign identity, enable Catch or relax the capture-age limit. Preview clears at age250ms, on stop and on errors. This fixes a rendering/recovery-state bug; it does not certify recovery from real SDK/CPU stalls. See [Pose recovery evidence](../reports/master-v3-2026-10-19/POSE-RECOVERY-FIX.md). Synthetic reproduction: node tests/browser/pose-recovery-smoke.mjs EVIDENCE_DIR BASE_URL PLAYWRIGHT_NODE_MODULES.
 
-    PoseWorker -->|33 Landmarks + Delegate| PoseAdapter
-    HandWorker -->|21 Landmarks + Delegate| HandAdapter
-    PoseAdapter --> PoseMapper
-    HandAdapter --> HandMapper
-    PoseMapper -->|InputFrame| Phaser
-    HandMapper -->|InputFrame| Phaser
-    KbdAdapter -->|InputFrame| Phaser
-    PoseAdapter -->|Render Skeleton| Skeleton
-```
+## Hand movement tuning
 
-### 2.1. Scale-Invariant Torso Lean Mathematics (`PoseInputMapper`)
-Unlike pixel-dependent tracking, the Pose mapper uses the player's own shoulder width to normalize movement, ensuring identical responsiveness regardless of player height or distance:
+- H0 starts at MOVE DISTANCE 8% of the full preview width. The setup slider accepts 3–15%; smaller means less hand travel before movement begins, not faster robot movement. The value persists while changing schemes in the current page session; a reload restores 8%. Changing it clears calibration and cancels pending actions, so calibrate again.
+- Keep one open hand near the middle of the mirrored preview in Solo. Co-op keeps the existing left/right slot assignments; center each hand in its own slot. Calibration needs space for the chosen movement distance plus a 2% preview-width margin on both sides of that slot. A hand too close to an edge is rejected with guidance instead of saving an unreachable direction. Solo with multiple detected hands rejects calibration and neutralizes input until only one remains visible. This policy only covers hands actually detected by the model.
+- Cross the outer LEFT or RIGHT line to move. Return inside the smaller STOP box to stop. The release distance is 55% of the chosen entry distance (default 4.4%); the gap retains the last direction to prevent jitter. Overlay lines, accepted cursor and per-player text all use mirrored screen coordinates from the same mapper.
+- CALIBRATE remains available in the live H0 dock. Hold the hand at the new neutral position, then press it; input stays neutral while calibration is pending. An invalid or missing sample gives guidance. Sensitivity is adjusted from setup; live calibration recenters the existing distance.
+- Regression evidence and exact limits: [Hand movement fix](../reports/master-v3-2026-10-19/HAND-MOVEMENT-FIX.md). Run the synthetic movement check with node tests/browser/hand-movement-smoke.mjs EVIDENCE_DIR BASE_URL PLAYWRIGHT_NODE_MODULES. It checks actual robot displacement with synthetic video/fake worker; it does not measure webcam/model accuracy or physical latency.
 
-$$\text{leanNormalized} = \frac{\text{torsoX} - \text{neutralX}}{\text{shoulderWidth}}$$
+## Runtime and layout
 
-Where:
-- $\text{torsoX} = \frac{x_{\text{leftShoulder}} + x_{\text{rightShoulder}}}{2}$
-- $\text{shoulderWidth} = |x_{\text{leftShoulder}} - x_{\text{rightShoulder}}|$
-- **Enter Threshold:** $|\text{leanNormalized}| \ge 0.28 \implies \text{moveAxis} = \pm 1$
-- **Release Threshold:** $|\text{leanNormalized}| \le 0.16 \implies \text{moveAxis} = 0$ (Hysteresis prevents jitter)
+Pose and Hand adapters implement the existing shared input contract; each model runs in its own worker. Models/WASM are local under public/mediapipe; no model files were changed by STAB-01. Both workers try CPU after GPU initialization failure. A runtime GPU inference timeout now permits one fresh CPU worker using the already consented stream. Input is neutral and calibration is cleared; explicitly calibrate again from setup or the live HUD. A CPU timeout stops camera controls. Cancellation cannot restart the camera or transfer an old bitmap to the replacement worker.
 
-### 2.2. Catch Gesture Classification
-- **Candidate P1 (`both_arms`):** Requires **both** wrists above shoulder level:
-  $$y_{\text{leftWrist}} < y_{\text{leftShoulder}} - 0.05 \cdot h_{\text{torso}} \quad \text{AND} \quad y_{\text{rightWrist}} < y_{\text{rightShoulder}} - 0.05 \cdot h_{\text{torso}}$$
-  - Release threshold: Either wrist falls below shoulder line ($y_{\text{wrist}} > y_{\text{shoulder}}$).
-  - Eliminates accidental catches during lateral reaching or walking.
-- **Candidate P2 (`one_arm`):** Requires **either** wrist above shoulder level:
-  $$y_{\text{leftWrist}} < y_{\text{leftShoulder}} - 0.05 \cdot h_{\text{torso}} \quad \text{OR} \quad y_{\text{rightWrist}} < y_{\text{rightShoulder}} - 0.05 \cdot h_{\text{torso}}$$
-  - Release threshold: Both wrists drop below shoulder line.
+Pose CPU capture resizes the longest edge to at most 320 pixels while preserving aspect ratio and normalized coordinates; GPU capture stays native. The user recording shows intermittent Pose readiness and an H0 timeout. Standalone real-SDK replay can calibrate, but full-game headless replay still has CPU cold-start/slow-frame failures. These changes are not a camera performance certification; G2 remains BLOCKED/REVISE.
 
-### 2.3. Anti-Silent-Swap Boundary Lock & Fail-Neutral Policy
-- **Proximity Guard:** If two player torsos are closer than $0.15$ normalized screen distance, both are flagged with `'too-close'`, and inputs are immediately neutralized (`moveAxis=0`, `catch=false`).
-- **Boundary Crossing Lock:** P1's torso center is strictly forbidden from crossing into the right half ($X > 0.52$), and P2 cannot cross into the left half ($X < 0.48$). Crossing triggers `'crossing'`, locks previous associations, and neutralizes controls until players return to their respective sides.
-- **Stale Tracking Timeout:** If inference frames cease for $> 250\text{ ms}$, controls immediately return to neutral.
-- **Calibration Recovery:** Temporary dropouts (e.g. participant stepping behind another person) preserve calibrated neutral points upon re-entry rather than requiring re-calibration.
+The Phaser logical canvas is 1280x720. PiP and every control occupy logical x=576..704, below the clock and above the catch band. Falling-item centers remain in x=117..543 and x=737..1163; the largest item radius is 28. Video and skeleton use the same contain geometry. Two browser viewport sizes (1280x720 and 1920x1080) are checked independently from actual TV legibility.
 
----
+HUD inference milliseconds and update Hz describe worker results. They do not measure Phaser render FPS or body-to-screen latency. No 30ms, 60FPS, 18x speedup, 2–3m reliability or zero-false-Catch claim is certified.
 
-## 3. Offline Booth Readiness & Provenance
+H0 calibration/start clicks now retain explicit user intent for up to3seconds while waiting for accepted hand data. Missing-hand timeout, stop/error/retry or player-mode changes cancel the request; a later camera session cannot complete it. Calibration is requestable once H0 is ready, and startup clears stale enabled controls. CPU Hand capture uses a detached local pixel copy at a maximum long edge of320pixels; physical GPU success does not certify CPU performance. See [Hand fix acceptance](../reports/master-v3-2026-10-19/HAND-FREEZE-FIX.md).
 
-- **100% Local Inference:** All vision bundles are hosted locally inside the application bundle:
-  - Model 1: `public/mediapipe/hand_landmarker.task` (MediaPipe Hand Landmarker v1 float16).
-  - Model 2: `public/mediapipe/pose_landmarker_lite.task` (MediaPipe Pose Landmarker Lite float16, 5,777,746 bytes; SHA-256: `59929E1D1EE95287735DDD833B19CF4AC46D29BC7AFDDBBF6753C459690D574A`).
-  - WASM Engine: `@mediapipe/tasks-vision` WASM binaries located in `public/mediapipe/wasm/` (`vision_wasm_internal.*`, `vision_wasm_module_internal.*`, `vision_wasm_nosimd_internal.*`).
-- **Zero External Requests:** Camera mode operates fully in Airplane Mode without external CDN, font, or telemetry requests.
-- **Hardware Acceleration:** WebGL GPU delegate initialized with `OffscreenCanvas` warmup; automatically falls back to CPU if WebGL context is unavailable, reporting exact delegate state in telemetry.
+## Verification and open gates
 
----
-
-## 4. Verification Suite & Evidence Hierarchy
-
-1. **Automated Verification:**
-   - 67 deterministic unit tests (`node --test tests/*.test.mjs`) pass with 0 failures:
-     - `tests/item-cue.test.mjs` (4 tests)
-     - `tests/round-scoring.test.mjs` (2 tests)
-     - `tests/round-timer.test.mjs` (5 tests)
-     - `tests/simulation.test.mjs` (8 tests)
-     - `tests/keyboard-input-mapper.test.mjs` (1 test)
-     - `tests/hand-input-mapper.test.mjs` (9 tests)
-     - `tests/keyboard-input-adapter.test.mjs` (2 tests)
-     - `tests/mediapipe-hand-input-adapter.test.mjs` (12 tests)
-     - `tests/mediapipe-pose-input-adapter.test.mjs` (7 tests)
-     - `tests/pose-input-mapper.test.mjs` (10 tests)
-     - `tests/asset-manifest.test.mjs` (7 tests)
-2. **Automated Build & Typecheck:**
-   - `npm run typecheck` passes cleanly with 0 TypeScript errors.
-   - `npm run build` compiles production assets in under 1.1 seconds.
-3. **Chrome DevTools MCP Visual Inspection:**
-   - 1280x720 and 1920x1080 viewport layouts verified with 0 overlapping controls.
-   - Live camera dock placement verified with 18px clearance below round clock and 166px lateral clearance from player cards.
-4. **Physical Benchmark Execution:**
-   - On-site hardware tests on the Dell Vostro 15 5510 are conducted per [`cv-02-physical-benchmark-procedure.md`](./cv-02-physical-benchmark-procedure.md).
+- Baseline: npm ci, 67/67 tests, typecheck and build executed on Windows 11 / Node 25.9.0.
+- Current commands/results, final test count, regression RED/GREEN logs, browser version and captures: [phase report](../reports/master-v3-2026-10-19/REPORT.md).
+- Reproduce synthetic browser checks with node tests/browser/camera-smoke.mjs EVIDENCE_DIR BASE_URL PLAYWRIGHT_NODE_MODULES. Playwright is supplied externally; it was not added to project dependencies. The script overrides camera I/O and workers: it does not validate actual inference or people.
+- Physical testing: one actual Edge/Solo/GPU Hand flow was operated and observed by the agent; user confirmed movement and Catch, and a round completed. Co-op and controlled physical benchmarks remain NOT RUN. Follow [FIELD-01 runbook](../reports/master-v3-2026-10-19/FIELD-01.md); no field PASS until observations and measurements are recorded.
+- Final booth scheme, vertical slice, art acceptance and release remain human decisions. Historical CV-02 plan approval discrepancy is preserved in the report; present execution is not retroactive approval.

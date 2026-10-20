@@ -141,3 +141,38 @@ test('calibration recovery preserves player neutral point after temporary tracki
   assert.equal(recoveredP1.p2.moveAxis, 0);
 });
 
+
+
+test('rejects an edge calibration whose movement thresholds cannot fit the player slot',()=>{
+ const m=new HandInputMapper({soloMode:true});for(const x of [.02,.08,.92,.98])assert.equal(m.calibrate([makeHand(1-x)],0),false);
+ assert.equal(m.getCalibrationIssue([makeHand(.08)]),'CENTER_HAND');assert.equal(m.calibrate([makeHand(.5)],0),true);
+ assert.equal(m.update([makeHand(.65)],20).p1.moveAxis,-1);assert.equal(m.update([makeHand(.35)],40).p1.moveAxis,1);
+});
+
+test('Solo requires one control hand and neutralizes two detected hands',()=>{
+ const m=new HandInputMapper({soloMode:true});assert.equal(m.canCalibrate([makeHand(.3),makeHand(.7)]),false);
+ assert.equal(m.getCalibrationIssue([makeHand(.3),makeHand(.7)]),'ONE_HAND_ONLY');m.calibrate([makeHand(.5)],0);
+ m.update([makeHand(.65)],10);assert.deepEqual(m.update([makeHand(.65),makeHand(.35)],20).p1,{moveAxis:0,catch:false});
+});
+
+test('movement distance tuning is symmetric and resets the old calibration',()=>{
+ const m=new HandInputMapper({soloMode:true});m.setMoveThreshold(.03);m.calibrate([makeHand(.5)],0);
+ assert.equal(m.update([makeHand(.45)],20).p1.moveAxis,1);assert.equal(m.update([makeHand(.55)],40).p1.moveAxis,-1);
+ m.setMoveThreshold(.15);assert.deepEqual(m.read(50).p1,{moveAxis:0,catch:false});m.calibrate([makeHand(.5)],60);
+ assert.equal(m.update([makeHand(.45)],80).p1.moveAxis,0);assert.equal(m.update([makeHand(.55)],100).p1.moveAxis,0);
+ assert.throws(()=>m.setMoveThreshold(NaN),RangeError);assert.throws(()=>m.setMoveThreshold(.2),RangeError);
+});
+
+test('movement zones use mirrored screen coordinates and accepted action, and hide stale cursor',()=>{
+ const m=new HandInputMapper({soloMode:true,moveEnterThreshold:.08});m.calibrate([makeHand(.5)],0);m.update([makeHand(.4)],20);
+ const z=m.getMovementZones(20)[0];assert.equal(z.player,'p1');assert.equal(z.neutralX,.5);assert.equal(z.currentX,.6);assert.equal(z.moveAxis,1);
+ assert.ok(Math.abs(z.leftTrigger-.42)<1e-8);assert.ok(Math.abs(z.rightTrigger-.58)<1e-8);
+ assert.equal(m.getMovementZones(300)[0].currentX,undefined);assert.equal(m.getMovementZones(300)[0].moveAxis,0);
+});
+
+test('entry boundaries and the inner stop box work equally in both directions',()=>{
+ const m=new HandInputMapper({soloMode:true,moveEnterThreshold:.08,moveReleaseThreshold:.044});m.calibrate([makeHand(.5)],0);
+ assert.equal(m.update([makeHand(.42)],10).p1.moveAxis,1);assert.equal(m.update([makeHand(.45)],20).p1.moveAxis,1);
+ assert.equal(m.update([makeHand(.46)],30).p1.moveAxis,0);assert.equal(m.update([makeHand(.58)],40).p1.moveAxis,-1);
+ assert.equal(m.update([makeHand(.55)],50).p1.moveAxis,-1);assert.equal(m.update([makeHand(.54)],60).p1.moveAxis,0);
+});

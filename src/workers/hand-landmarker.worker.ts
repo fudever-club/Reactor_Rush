@@ -4,6 +4,7 @@ interface InitMessage {
   type: 'init';
   wasmRoot: string;
   modelPath: string;
+  delegate?: 'GPU' | 'CPU';
 }
 
 interface FrameMessage {
@@ -58,6 +59,7 @@ workerScope.onmessage = async (event) => {
         minTrackingConfidence: 0.45
       };
       try {
+        if (request.delegate === 'CPU') throw new Error('CPU delegate requested after GPU failure.');
         landmarker = await HandLandmarker.createFromOptions(fileset, {
           ...options,
           baseOptions: { modelAssetPath, delegate: 'GPU' }
@@ -70,19 +72,7 @@ workerScope.onmessage = async (event) => {
         });
         activeDelegate = 'CPU';
       }
-      try {
-        if (typeof OffscreenCanvas !== 'undefined') {
-          const warmupCanvas = new OffscreenCanvas(64, 64);
-          const bitmap = await createImageBitmap(warmupCanvas);
-          try {
-            landmarker.detectForVideo(bitmap, 0);
-          } finally {
-            bitmap.close();
-          }
-        }
-      } catch {
-        // Non-fatal warmup failure
-      }
+      // Parent watchdog retries stalled GPU inference in a fresh CPU worker.
       workerScope.postMessage({ type: 'ready', delegate: activeDelegate });
     } catch (error) {
       workerScope.postMessage({ type: 'error', message: error instanceof Error ? error.message : String(error) });

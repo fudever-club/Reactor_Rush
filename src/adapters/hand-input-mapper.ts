@@ -20,6 +20,22 @@ export interface HandInputMapperOptions {
   soloMode?: boolean;
 }
 
+export const DEFAULT_HAND_MOVE_THRESHOLD = 0.08;
+export type HandCalibrationIssue = 'CENTER_HAND' | 'ONE_HAND_ONLY';
+export interface HandMovementZone {
+  player: PlayerId;
+  neutralX: number;
+  currentX?: number;
+  slotLeft: number;
+  slotRight: number;
+  leftTrigger: number;
+  rightTrigger: number;
+  stopLeft: number;
+  stopRight: number;
+  moveAxis: -1 | 0 | 1;
+  catch: boolean;
+}
+
 const NEUTRAL_PLAYER: PlayerInput = { moveAxis: 0, catch: false };
 const NEUTRAL_FRAME: InputFrame = {
   p1: { ...NEUTRAL_PLAYER },
@@ -32,6 +48,7 @@ export type AmbiguityReason = 'hands-crossed' | 'too-close' | 'multiple-hands' |
 
 interface PlayerControl {
   neutralX: number;
+  currentX?: number;
   moveAxis: -1 | 0 | 1;
   catch: boolean;
 }
@@ -79,8 +96,8 @@ function cloneFrame(frame: InputFrame): InputFrame {
 }
 
 export class HandInputMapper {
-  private readonly moveEnterThreshold: number;
-  private readonly moveReleaseThreshold: number;
+  private moveEnterThreshold: number;
+  private moveReleaseThreshold: number;
   private readonly pinchEnterRatio: number;
   private readonly pinchReleaseRatio: number;
   private readonly staleAfterMs: number;
@@ -93,13 +110,57 @@ export class HandInputMapper {
   private frame: InputFrame = cloneFrame(NEUTRAL_FRAME);
 
   constructor(options: HandInputMapperOptions = {}) {
-    this.moveEnterThreshold = options.moveEnterThreshold ?? 0.1;
-    this.moveReleaseThreshold = options.moveReleaseThreshold ?? 0.055;
+    this.moveEnterThreshold = options.moveEnterThreshold ?? DEFAULT_HAND_MOVE_THRESHOLD;
+    this.moveReleaseThreshold = options.moveReleaseThreshold ?? this.moveEnterThreshold * 0.55;
     this.pinchEnterRatio = options.pinchEnterRatio ?? 0.3;
     this.pinchReleaseRatio = options.pinchReleaseRatio ?? 0.43;
     this.staleAfterMs = options.staleAfterMs ?? HAND_TRACKING_STALE_MS;
     this.centerDeadBand = options.centerDeadBand ?? 0.035;
     this.soloMode = options.soloMode ?? false;
+  }
+
+  getMoveThreshold(): number { return this.moveEnterThreshold; }
+
+  setMoveThreshold(threshold: number): void {
+    if (!Number.isFinite(threshold) || threshold < 0.03 || threshold > 0.15) throw new RangeError('Movement distance must be between 3% and 15%.');
+    if (threshold === this.moveEnterThreshold) return;
+    this.moveEnterThreshold = threshold;
+    this.moveReleaseThreshold = threshold * 0.55;
+    this.reset();
+  }
+
+  private slotBounds(player: PlayerId): [number, number] {
+    return this.soloMode ? [0, 1] : player === 'p1' ? [0, 0.5 - this.centerDeadBand] : [0.5 + this.centerDeadBand, 1];
+  }
+
+  private fitsMovementRange(player: PlayerId, x: number): boolean {
+    const [left, right] = this.slotBounds(player);
+    return x >= left + this.moveEnterThreshold + 0.02 && x <= right - this.moveEnterThreshold - 0.02;
+  }
+
+  getCalibrationIssue(hands: readonly DetectedHand[]): HandCalibrationIssue | undefined {
+    if (this.soloMode && hands.length > 1) return 'ONE_HAND_ONLY';
+    const assignments = this.assign(hands);
+    for (const player of PLAYER_IDS) {
+      const hand = assignments?.[player];
+      if (hand && !this.fitsMovementRange(player, hand.x)) return 'CENTER_HAND';
+    }
+    return undefined;
+  }
+
+  getMovementZones(nowMs = this.lastUpdateAt): HandMovementZone[] {
+    if (!this.controls) return [];
+    const frame = this.read(nowMs);
+    const fresh = nowMs - this.lastUpdateAt <= this.staleAfterMs;
+    return (this.soloMode ? ['p1'] as const : PLAYER_IDS).map(player => {
+      const control = this.controls![player];
+      const [slotLeft, slotRight] = this.slotBounds(player);
+      return {player, neutralX: control.neutralX, currentX: fresh ? control.currentX : undefined,
+        slotLeft, slotRight, leftTrigger: control.neutralX - this.moveEnterThreshold,
+        rightTrigger: control.neutralX + this.moveEnterThreshold,
+        stopLeft: control.neutralX - this.moveReleaseThreshold, stopRight: control.neutralX + this.moveReleaseThreshold,
+        moveAxis: frame[player].moveAxis, catch: frame[player].catch};
+    });
   }
 
   getLastAmbiguityReason(): AmbiguityReason | undefined {
@@ -118,13 +179,13 @@ export class HandInputMapper {
 
   calibrate(hands: readonly DetectedHand[], nowMs: number): boolean {
     const assignments = this.assign(hands);
-    if (!assignments || !assignments.p1) return false;
+    if (!assignments || !assignments.p1 || this.getCalibrationIssue(hands)) return false;
     if (!this.soloMode && !assignments.p2) return false;
 
     this.controls = {
-      p1: { neutralX: assignments.p1.x, moveAxis: 0, catch: false },
+      p1: { neutralX: assignments.p1.x, currentX: assignments.p1.x, moveAxis: 0, catch: false },
       p2: assignments.p2
-        ? { neutralX: assignments.p2.x, moveAxis: 0, catch: false }
+        ? { neutralX: assignments.p2.x, currentX: assignments.p2.x, moveAxis: 0, catch: false }
         : { neutralX: 0.75, moveAxis: 0, catch: false }
     };
     this.lastKnownX = {
@@ -136,9 +197,14 @@ export class HandInputMapper {
     return true;
   }
 
+  canTrack(hands: readonly DetectedHand[]): boolean {
+    const assignments = this.assign(hands);
+    return Boolean(assignments?.p1 && (this.soloMode || assignments.p2));
+  }
+
   canCalibrate(hands: readonly DetectedHand[]): boolean {
     const assignments = this.assign(hands);
-    if (!assignments?.p1) return false;
+    if (!assignments?.p1 || this.getCalibrationIssue(hands)) return false;
     return this.soloMode ? true : Boolean(assignments.p2);
   }
 
@@ -151,6 +217,7 @@ export class HandInputMapper {
       const hand = assignments[player];
       const control = this.controls[player];
       if (!hand) {
+        control.currentX = undefined;
         control.moveAxis = 0;
         control.catch = false;
         continue;
@@ -159,6 +226,7 @@ export class HandInputMapper {
       if (this.lastKnownX) {
         this.lastKnownX[player] = hand.x;
       }
+      control.currentX = hand.x;
       const delta = hand.x - control.neutralX;
       control.moveAxis = this.resolveAxis(control.moveAxis, delta);
       const pinch = pinchRatio(hand.hand);
@@ -215,26 +283,12 @@ export class HandInputMapper {
     }
 
     if (this.soloMode) {
-      if (validHands.length > 2) {
+      if (hands.length !== 1) {
         this.lastAmbiguityReason = 'multiple-hands';
-      } else {
-        this.lastAmbiguityReason = undefined;
-      }
-      if (validHands.length === 1) {
-        assignments.p1 = validHands[0];
         return assignments;
       }
-      const targetX = this.lastKnownX?.p1 ?? this.controls?.p1.neutralX ?? 0.5;
-      let bestHand = validHands[0];
-      let bestDist = Math.abs(bestHand.x - targetX);
-      for (let i = 1; i < validHands.length; i++) {
-        const dist = Math.abs(validHands[i].x - targetX);
-        if (dist < bestDist) {
-          bestDist = dist;
-          bestHand = validHands[i];
-        }
-      }
-      assignments.p1 = bestHand;
+      this.lastAmbiguityReason = undefined;
+      if (validHands.length === 1) assignments.p1 = validHands[0];
       return assignments;
     }
 
@@ -305,8 +359,8 @@ export class HandInputMapper {
   private resolveAxis(current: -1 | 0 | 1, delta: number): -1 | 0 | 1 {
     if (current < 0 && delta <= -this.moveReleaseThreshold) return -1;
     if (current > 0 && delta >= this.moveReleaseThreshold) return 1;
-    if (delta <= -this.moveEnterThreshold) return -1;
-    if (delta >= this.moveEnterThreshold) return 1;
+    if (delta <= -this.moveEnterThreshold + 1e-9) return -1;
+    if (delta >= this.moveEnterThreshold - 1e-9) return 1;
     return 0;
   }
 }

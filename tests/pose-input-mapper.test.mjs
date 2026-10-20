@@ -182,7 +182,7 @@ test('stale tracking and malformed landmarks return neutral inputs', () => {
   assert.deepEqual(staleFrame.p2, { moveAxis: 0, catch: false });
 });
 
-test('calibration recovery preserves player neutral point after temporary tracking drop', () => {
+test('explicit calibration restores control after temporary tracking drop', () => {
   const mapper = new PoseInputMapper();
   mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
 
@@ -198,7 +198,133 @@ test('calibration recovery preserves player neutral point after temporary tracki
   assert.equal(recovered.p1.moveAxis, 0);
   assert.equal(recovered.p2.moveAxis, 0);
 
-  // Player then leans left -> immediately detects motion accurately
+  assert.equal(mapper.calibrate([makePose(0.75), makePose(0.25)], 210), true);
+
+  // Explicit calibration restores movement from a new trusted slot assignment
   const moveAfterRecovery = mapper.update([makePose(0.80), makePose(0.25)], 250);
   assert.equal(moveAfterRecovery.p1.moveAxis, -1);
+});
+
+const neutralFrame = { p1: { moveAxis: 0, catch: false }, p2: { moveAxis: 0, catch: false } };
+const raised = { leftArmRaised: true, rightArmRaised: true };
+
+// SAF-06 catches a stale production default, including equality at the cutoff.
+test('SAF-06 default releases movement and Catch at 250ms from last observation', () => {
+  for (const elapsed of [249, 250, 251, 299, 301]) {
+    const mapper = new PoseInputMapper();
+    mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+    mapper.update([makePose(0.79, raised), makePose(0.25)], 20);
+    if (elapsed === 249) assert.equal(mapper.read(20 + elapsed).p1.catch, true);
+    else assert.deepEqual(mapper.read(20 + elapsed), neutralFrame, 'elapsed=' + elapsed);
+  }
+});
+
+test('SAF-01 shuffled detector order preserves two independent accepted tracks for 100 frames', () => {
+  const mapper = new PoseInputMapper();
+  mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+  for (let i = 1; i <= 100; i++) {
+    const poses = [makePose(0.79, raised), makePose(0.21)];
+    const frame = mapper.update(i % 2 ? poses.reverse() : poses, i * 20);
+    assert.deepEqual(frame, { p1: { moveAxis: -1, catch: true }, p2: { moveAxis: 1, catch: false } });
+  }
+});
+
+test('SAF-02 crossing remains neutral after people separate until deliberate calibration', () => {
+  const mapper = new PoseInputMapper();
+  mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+  for (const [i, xs] of [[0,[0.70,0.30]], [1,[0.65,0.35]], [2,[0.55,0.45]]]) {
+    mapper.update(xs.map(x => makePose(x, raised)), (i + 1) * 20);
+  }
+  assert.deepEqual(mapper.update([makePose(0.25), makePose(0.75, raised)], 100), neutralFrame);
+  assert.equal(mapper.needsRecalibration(), true);
+  assert.deepEqual(mapper.getAssociatedPoses([makePose(0.25), makePose(0.75)], 100), []);
+  assert.equal(mapper.calibrate([makePose(0.75), makePose(0.25)], 110), true);
+  assert.equal(mapper.update([makePose(0.75, raised), makePose(0.25)], 120).p1.catch, true);
+});
+
+test('SAF-03 missed middle frames cannot renew expired anonymous association', () => {
+  const mapper = new PoseInputMapper();
+  mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+  assert.deepEqual(mapper.update([makePose(0.75, raised), makePose(0.25)], 251), neutralFrame);
+});
+
+test('SAF-04 missing slot stays neutral while continuous player can act, re-entry latches', () => {
+  const mapper = new PoseInputMapper();
+  mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+  assert.equal(mapper.update([makePose(0.21, raised)], 20).p2.catch, true);
+  assert.deepEqual(mapper.read(20).p1, neutralFrame.p1);
+  assert.deepEqual(mapper.update([makePose(0.75, raised), makePose(0.21)], 40), neutralFrame);
+});
+
+test('SAF-05 both dropouts release Catch and require explicit recalibration on re-entry', () => {
+  const mapper = new PoseInputMapper();
+  mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+  mapper.update([makePose(0.75, raised), makePose(0.25)], 20);
+  assert.deepEqual(mapper.update([], 40), neutralFrame);
+  assert.deepEqual(mapper.update([makePose(0.75, raised), makePose(0.25)], 60), neutralFrame);
+});
+
+test('SAF-09 extra detected person invalidates calibration, including an invalid third skeleton', () => {
+  const mapper = new PoseInputMapper();
+  const poses = [makePose(0.75), makePose(0.25), makePose(0.5, { visibility: 0.1 })];
+  assert.equal(mapper.canCalibrate(poses), false);
+  mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+  mapper.update(poses, 20);
+  assert.deepEqual(mapper.update([makePose(0.75, raised), makePose(0.25)], 40), neutralFrame);
+});
+
+test('SAF-10 confidence NaN, absent shoulders and low presence never accept input', () => {
+  for (const mutate of [p => {p.landmarks[11].visibility = NaN;}, p => {p.landmarks[12] = undefined;}, p => {p.landmarks[11].presence = 0.1;}, p => {p.landmarks[11].presence = NaN;}, p => {p.landmarks[11].x = NaN;}]) {
+    const mapper = new PoseInputMapper();
+    const bad = makePose(0.75, raised); mutate(bad);
+    assert.equal(mapper.canCalibrate([bad, makePose(0.25)]), false);
+    mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+    assert.deepEqual(mapper.update([bad, makePose(0.25)], 20).p1, neutralFrame.p1);
+  }
+});
+
+test('SAF-11 sudden torso jump and implausible width change cannot silently replace a slot', () => {
+  for (const replacement of [makePose(0.58, raised), makePose(0.75, { ...raised, shoulderWidth: 0.05 })]) {
+    const mapper = new PoseInputMapper();
+    mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+    assert.deepEqual(mapper.update([replacement, makePose(0.25)], 20), neutralFrame);
+  }
+});
+
+test('GS-05 obscured wrist releases prior Catch without losing a valid torso', () => {
+  const mapper = new PoseInputMapper();
+  mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+  mapper.update([makePose(0.75, raised), makePose(0.25)], 20);
+  const pose = makePose(0.75, raised); pose.landmarks[15].presence = 0.1;
+  assert.equal(mapper.update([pose, makePose(0.25)], 40).p1.catch, false);
+});
+
+test('accepted overlay and per-player states agree with current movement and Catch', () => {
+  const mapper = new PoseInputMapper();
+  const poses = [makePose(0.79, raised), makePose(0.21)];
+  mapper.calibrate([makePose(0.75), makePose(0.25)], 0);
+  mapper.update(poses, 20);
+  assert.deepEqual(mapper.getPlayerStates(20), { p1: 'CATCH', p2: 'MOVE_RIGHT' });
+  assert.deepEqual(mapper.getAssociatedPoses(poses,20).map(p=>[p.player,p.catching]), [['p1',true],['p2',false]]);
+  assert.deepEqual(mapper.getAssociatedPoses(poses,270), []);
+});
+
+test('processing wait neutralizes stale input without destroying continuous capture association',()=>{
+ const m=new PoseInputMapper();m.calibrate([makePose(.75),makePose(.25)],100);m.update([makePose(.75,raised),makePose(.25)],100);
+ assert.deepEqual(m.read(350),neutralFrame);assert.equal(m.needsRecalibration(),false);
+ assert.deepEqual(m.getPlayerStates(350),{p1:'WAITING_FOR_FRAME',p2:'WAITING_FOR_FRAME'});assert.deepEqual(m.getAssociatedPoses([makePose(.75),makePose(.25)],350),[]);
+ m.update([makePose(.75,raised),makePose(.25)],240);assert.equal(m.read(370).p1.catch,true);
+ assert.deepEqual(m.read(490),neutralFrame);assert.equal(m.needsRecalibration(),false);
+ m.update([makePose(.75,raised),makePose(.25)],380);assert.equal(m.read(510).p1.catch,true);
+});
+test('a true capture gap still requires calibration even after a neutral processing wait',()=>{
+ const m=new PoseInputMapper();m.calibrate([makePose(.75),makePose(.25)],100);m.update([makePose(.75,raised),makePose(.25)],100);
+ assert.deepEqual(m.read(350),neutralFrame);assert.equal(m.needsRecalibration(),false);
+ assert.deepEqual(m.update([makePose(.75,raised),makePose(.25)],350),neutralFrame);assert.equal(m.needsRecalibration(),true);
+ assert.deepEqual(m.update([makePose(.75,raised),makePose(.25)],400),neutralFrame);
+});
+
+test('processing wait clears held movement hysteresis before the next fresh observation',()=>{
+ const m=new PoseInputMapper();m.calibrate([makePose(.75),makePose(.25)],100);m.update([makePose(.70),makePose(.25)],100);assert.equal(m.read(230).p1.moveAxis,1);
+ assert.deepEqual(m.read(350),neutralFrame);m.update([makePose(.725),makePose(.25)],240);assert.equal(m.read(370).p1.moveAxis,0);
 });

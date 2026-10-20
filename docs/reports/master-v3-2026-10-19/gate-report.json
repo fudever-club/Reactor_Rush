@@ -1,0 +1,428 @@
+{
+  "date": "2026-10-19",
+  "work_package": "STAB-00/STAB-01; FIELD-01 preparation",
+  "baseline_sha": "3e4a80d52ae52d0d6e0d0c17691242546f03c192",
+  "head_sha": "3e4a80d52ae52d0d6e0d0c17691242546f03c192",
+  "approved_scope": {
+    "source": "direct user request in this chat",
+    "quote": "đây là master plan mà mình đã thiết kế ra, thực hiện từng phase rồi báo cáo lại cho mình",
+    "bounds": "current Energy Catch reliability and evidence; no Git commit/push/release, no unapproved Stitch authoring or future-round mechanics"
+  },
+  "changed_files": [
+    "README.md",
+    "docs/gameplay/camera-input-integration.md",
+    "docs/gameplay/cv-02-physical-benchmark-procedure.md",
+    "index.html",
+    "src/adapters/mediapipe-hand-input-adapter.ts",
+    "src/adapters/mediapipe-pose-input-adapter.ts",
+    "src/adapters/pose-input-mapper.ts",
+    "src/game-style.css",
+    "src/main.ts",
+    "src/workers/hand-landmarker.worker.ts",
+    "src/workers/pose-landmarker.worker.ts",
+    "tests/mediapipe-hand-input-adapter.test.mjs",
+    "tests/mediapipe-pose-input-adapter.test.mjs",
+    "tests/pose-input-mapper.test.mjs",
+    "docs/reports/master-v3-2026-10-19/FIELD-01.md",
+    "docs/reports/master-v3-2026-10-19/HAND-FREEZE-FIX.md",
+    "docs/reports/master-v3-2026-10-19/REPORT.md",
+    "docs/reports/master-v3-2026-10-19/baseline.json",
+    "docs/reports/master-v3-2026-10-19/browser/H0-1280.png",
+    "docs/reports/master-v3-2026-10-19/browser/H0-1920.png",
+    "docs/reports/master-v3-2026-10-19/browser/P1-1280.png",
+    "docs/reports/master-v3-2026-10-19/browser/P1-1920.png",
+    "docs/reports/master-v3-2026-10-19/browser/P2-1280.png",
+    "docs/reports/master-v3-2026-10-19/browser/P2-1920.png",
+    "docs/reports/master-v3-2026-10-19/browser/browser-latest-results.json",
+    "docs/reports/master-v3-2026-10-19/browser/browser-results.json",
+    "docs/reports/master-v3-2026-10-19/field-metrics.csv",
+    "docs/reports/master-v3-2026-10-19/field-observations.csv",
+    "docs/reports/master-v3-2026-10-19/gate-report.json",
+    "docs/reports/master-v3-2026-10-19/preservation-audit.json",
+    "docs/superpowers/plans/2026-10-19-master-v3-stab-01.md",
+    "tests/browser/camera-smoke.mjs",
+    "tests/browser/pose-sdk-smoke.mjs",
+    "tests/camera-ui.test.mjs",
+    "src/adapters/hand-input-mapper.ts",
+    "src/adapters/hand-landmarks-renderer.ts",
+    "tests/hand-input-mapper.test.mjs",
+    "tests/browser/hand-movement-smoke.mjs",
+    "docs/reports/master-v3-2026-10-19/HAND-MOVEMENT-FIX.md",
+    "src/adapters/pose-landmarks-renderer.ts",
+    "tests/browser/pose-recovery-smoke.mjs",
+    "docs/reports/master-v3-2026-10-19/POSE-RECOVERY-FIX.md",
+    "tests/browser/pose-calibration-smoke.mjs",
+    "docs/reports/master-v3-2026-10-19/POSE-CALIBRATION-UX-2026-10-20.md"
+  ],
+  "changed_sha256": {
+    "README.md": "b1e6e8f9299b25c2f8fac7e36cc8e27ae4a9347b6efeee34d090a00bdfa9e522",
+    "docs/gameplay/camera-input-integration.md": "4c9098c3d68e313fa2047023ff2d33f561a978079fed2e6e2e3ceeeeef5c647f",
+    "docs/gameplay/cv-02-physical-benchmark-procedure.md": "615bfd1d6634abf091494bf783b4e1213460ece3217419304a6e6941392243e1",
+    "index.html": "a936f8e69ed2295254dcb6fec28c048c8166c887feb032667d718df6bd65bd8f",
+    "src/adapters/mediapipe-hand-input-adapter.ts": "f4fc340fca3660d3ebc46bc2ddb86875df6ec76514523c1c1b69ace3ff365c00",
+    "src/adapters/mediapipe-pose-input-adapter.ts": "cfd0f9a500d432723cb0bfa617541541a1f04164dea632154f762dce2845ec38",
+    "src/adapters/pose-input-mapper.ts": "9118542559baf16bee11f42483e1f8ddad2ee8e68c5dad13a828d73a73e6ae3c",
+    "src/game-style.css": "f158f0f11adc749d8b6dfcde9fabf0dac1af118429066daac669f93b53e2439a",
+    "src/main.ts": "031882dd6102e1bed9a423f525592704a05dc7adbf5b187f0b35259b9c578de4",
+    "src/workers/hand-landmarker.worker.ts": "019cf3073982b6f7dcf02f483e906aaa16e6cd82d2ff48a0aa0633fe70497500",
+    "src/workers/pose-landmarker.worker.ts": "03213f015239444b6f41e18504d2cf750d783580610d9be682a2c6418c3e9cf4",
+    "tests/mediapipe-hand-input-adapter.test.mjs": "9d197169fc6b207480db3e38aa2ba8597ec74e8f8eb6eff920575e6da9fe3b30",
+    "tests/mediapipe-pose-input-adapter.test.mjs": "43f07618080e49c638488b3121a7e23ef375749c0550765f2bc78400887d8f56",
+    "tests/pose-input-mapper.test.mjs": "3836332ed16fb465eac5e7dbb54063e21629358f76fa1122dc2061c65490204a",
+    "docs/reports/master-v3-2026-10-19/FIELD-01.md": "493eb558057e0fe85badcc099c575d73d8b3500672cd4f2186270f48cef7e952",
+    "docs/reports/master-v3-2026-10-19/HAND-FREEZE-FIX.md": "6fbf7cef35862a478d77071adddf1a87b3b9ff0b1d5bd1c5171fd59f0944753a",
+    "docs/reports/master-v3-2026-10-19/REPORT.md": "d880756942d29d67e266b58b0cca61d96a8339a9dfcdd8858f10a914bd9b3c61",
+    "docs/reports/master-v3-2026-10-19/baseline.json": "51e8e2ad1446e6d44403655326210489f94696a94c0f76b87b0210b16ca77446",
+    "docs/reports/master-v3-2026-10-19/browser/H0-1280.png": "3bf405c21bfd0ce60688c3d83731e97698832b0542b6367b489d09078c5426a8",
+    "docs/reports/master-v3-2026-10-19/browser/H0-1920.png": "af8305783bdf6ed0fb0c363b1e1b64e07bef4e0004be6426b0d13d12009c6389",
+    "docs/reports/master-v3-2026-10-19/browser/P1-1280.png": "d1759b03944d0e6c1c230d41bbe43f8cdf1a812c034796a82b944ac27a536629",
+    "docs/reports/master-v3-2026-10-19/browser/P1-1920.png": "bdcbaa56232016dafebd88010e21321b59ca521792f718dc89d6b4dc10b451b6",
+    "docs/reports/master-v3-2026-10-19/browser/P2-1280.png": "abd1382c3e80021a05f0c4578925c52d195aca4a1c16fc66342d37189d85dc1a",
+    "docs/reports/master-v3-2026-10-19/browser/P2-1920.png": "db0b700d1181e25fca245be885480e500cbfc47e0a835095b3703dc24fcb5dc6",
+    "docs/reports/master-v3-2026-10-19/browser/browser-latest-results.json": "a03ec50d4d9a7c406c2b507e23a348e20a55686f3573e48aa1b5db6032eda8bc",
+    "docs/reports/master-v3-2026-10-19/browser/browser-results.json": "9e192f57246bc10618c265270fd3ca732ea9e817d85584f50cb310f976942714",
+    "docs/reports/master-v3-2026-10-19/field-metrics.csv": "056d98de9be3565390d211bda07cc56e548326bb968d4dc99693cf8d02edee8a",
+    "docs/reports/master-v3-2026-10-19/field-observations.csv": "78748bef38c31bebed8d84fe94b2cd03b029d560559a790611894448b6fa2764",
+    "docs/reports/master-v3-2026-10-19/preservation-audit.json": "b4c5efcc90c059d8979cc1d7d27367f37dc5a756c783c588694f34c06fc40627",
+    "docs/superpowers/plans/2026-10-19-master-v3-stab-01.md": "7462626544fd6e5c1464418cf7d30564143cda881711d3c866b7e252022f5375",
+    "tests/browser/camera-smoke.mjs": "0c40b212cc174379b87bc4b058c62357cb9194d67c8697b17518bd13068962f7",
+    "tests/browser/pose-sdk-smoke.mjs": "783cc33c4ec22dbef6fae4550c03506f2a0275cc0ca53036175f1723a4274984",
+    "tests/camera-ui.test.mjs": "5a1caa2a465258a3d1eb5233cce7436b914a8e634993a8ed01921011bc57dcd2",
+    "src/adapters/hand-input-mapper.ts": "99f2852f64fb4eb5cd7b2dbbb1b6ea960689d6e93fff2f55b8f88cf0f3890010",
+    "src/adapters/hand-landmarks-renderer.ts": "ddc1fe0429ca425e31da49d7eb4f52d940c7ebdf27f09c95b493239ee69dfc28",
+    "tests/hand-input-mapper.test.mjs": "c44c1c46dd385d0d4665eae7b912c1edd3d28b4e3ed0cf88588025e50cbbcbb2",
+    "tests/browser/hand-movement-smoke.mjs": "f4c765726a5e15b8c00c3631d75756b497fb7f7ad6b3d45ba595a420cbadb777",
+    "docs/reports/master-v3-2026-10-19/HAND-MOVEMENT-FIX.md": "4a8d9017b58350cfa40020b9db668249aa58c05fbfa956b0c44d85a57bc9c702",
+    "src/adapters/pose-landmarks-renderer.ts": "251d9940f3d3f3f2b675da539bd3c3a79ffdad9d8601e280dfacef5d964d68cc",
+    "tests/browser/pose-recovery-smoke.mjs": "3c2858856e172e197146d65c54cca11448b13e4986bc12be0367f53f60d73979",
+    "docs/reports/master-v3-2026-10-19/POSE-RECOVERY-FIX.md": "c10e7cb688836437954a64de55daf2fb05f45056152846c34da33fde74cb95dd",
+    "tests/browser/pose-calibration-smoke.mjs": "c71d08d081a9f7aa776ee4abafd9ceb69da32964af241f208b9591da86595641",
+    "docs/reports/master-v3-2026-10-19/POSE-CALIBRATION-UX-2026-10-20.md": "3991b8d595dd1d58de16ed9fc4264044b691aafc5e4d9133b41af1fcde31fd19"
+  },
+  "tests": [
+    {
+      "id": "pose-recovery-full-tests",
+      "command": "npm test",
+      "status": "PASS",
+      "count": "136/136",
+      "exit_code": 0,
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/pose-recovery-1792399574161/full-tests-corrected.log"
+    },
+    {
+      "id": "pose-recovery-build",
+      "command": "npm run build (includes typecheck)",
+      "status": "PASS",
+      "exit_code": 0,
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/pose-recovery-1792399574161/build-corrected.log"
+    },
+    {
+      "id": "pose-calibration-ux-full-tests",
+      "command": "npm test",
+      "status": "PASS",
+      "count": "147/147",
+      "exit_code": 0,
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-20-pose-calibration-1792469490678/full-tests-final.log"
+    },
+    {
+      "id": "pose-calibration-ux-build",
+      "command": "npm run build (includes typecheck)",
+      "status": "PASS",
+      "exit_code": 0,
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-20-pose-calibration-1792469490678/build-final.log"
+    }
+  ],
+  "automated_test_count": 147,
+  "browser_evidence": [
+    {
+      "status": "PASS",
+      "scope": "10 synthetic camera/fake-worker scenarios, revision before latest diagnostics",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/browser/browser-results.json"
+    },
+    {
+      "status": "FAIL",
+      "scope": "first fixture pass timed out after screenshot-induced loss; preserved",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/browser-first-run/browser-results.json"
+    },
+    {
+      "status": "PASS",
+      "scope": "one real SDK GPU-to-CPU recovery probe with synthetic video, no people",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/real-sdk-recovery.log"
+    },
+    {
+      "status": "FAIL",
+      "scope": "repeat fresh context real SDK probe timeout 45s; model/WASM HTTP200",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/sdk-final/pose-sdk-results.json"
+    },
+    {
+      "status": "FAIL",
+      "scope": "current revision synthetic worker browser run: H0-1280 and P1-1280 PASS, P2-1280 timed out waiting ACCEPTED IDLE after calibration",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/browser-final-complete/browser-results.json"
+    },
+    {
+      "status": "PASS_LIMITED",
+      "scope": "real SDK isolated-page static replay of cropped camera image; CPU1pose ~8Hz, final108–119ms, calibratedtrue; not motion or field acceptance",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/video-analysis/cpu-replay-results.json"
+    },
+    {
+      "status": "FAIL",
+      "scope": "real SDK full-game headless CPU replay hits2sfirst-frame timeout",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/video-analysis/app-pose-cpu-results.json"
+    },
+    {
+      "status": "DIAGNOSTIC_ONLY",
+      "scope": "test-only first-frame watchdog extension; full game~4Hz, final263–275ms, intermittent readiness and final calibrationfalse; production watchdog unchanged",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/video-analysis/app-pose-coldstart-diagnostic.json"
+    },
+    {
+      "status": "FAIL",
+      "scope": "current production Hand forcedCPU realSDK headless replay timed out; preserves CPU limitation despite pixel-copy change",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/hand-freeze-2026-10-19/hand-production-sdk.json"
+    },
+    {
+      "status": "PASS",
+      "scope": "Hand movement synthetic video/fake worker, 1280x720 at3% and1920x1080 at15%; actual robot both directions, STOP, recenter, edge/twohand guidance and teardown; no SDK/physical claim",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/hand-movement-2026-10-19-1792385393945/browser/hand-movement-results.json"
+    },
+    {
+      "status": "PARTIAL_FAIL",
+      "scope": "Preview-only revision: initialP1/P2Solo1280 PASS;Coop1280 timeout after screenshot; preserved",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/pose-recovery-1792399574161/browser/pose-recovery-results.json"
+    },
+    {
+      "status": "FAIL",
+      "scope": "Preview-only fixture second run, timed out before initialCatch",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/pose-recovery-1792399574161/browser-final/pose-recovery-results.json"
+    },
+    {
+      "status": "FAIL",
+      "scope": "Preview-only isolated bitmap fixture timed out before initialCatch, demonstrating permanent processing-wait relatch",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/pose-recovery-1792399574161/browser-isolated/pose-recovery-results.json"
+    },
+    {
+      "status": "PARTIAL_FAIL",
+      "scope": "Corrected mapper: P1Solo1280 full recovery PASS; P2Solo1280 timed out before initialCatch with tracking-lost/freshness~299ms; remaining6matrix cases not reached. Synthetic video/fake bitmap/fake worker.",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/pose-recovery-1792399574161/browser-corrected/pose-recovery-results.json"
+    },
+    {
+      "status": "ENVIRONMENT_FAIL",
+      "scope": "Initial calibration fixture could not connect: local dev server was off; no product result",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-20-pose-calibration-1792469490678/browser/pose-calibration-results.json"
+    },
+    {
+      "status": "PARTIAL_FAIL",
+      "scope": "Synthetic video/fake bitmap/fake worker: 4 full720p cases PASS including Catch/loss/live calibration/Catch; 1080p P1Solo timed out postSTART Catch with freshness~323ms; remaining3not reached",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-20-pose-calibration-1792469490678/browser-ready/pose-calibration-results.json"
+    },
+    {
+      "status": "PASS_SCOPED",
+      "scope": "8/8 UI-only scenarios: both schemes/Solo/Co-op at720p/1080p; queued request/cancel/3samples/44px/viewport/START entry/teardown; no postSTART Catch or SDK/webcam performance acceptance",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-20-pose-calibration-1792469490678/browser-ui-final/pose-calibration-results.json"
+    }
+  ],
+  "physical_evidence": [
+    {
+      "status": "USER_VIDEO_OBSERVED",
+      "scope": "Solo Pose intermittent calibration; at30s1pose203msage/393mssmoothed inference/4Hz; H0timeout~41s",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/video-analysis/storyboard/storyboard-index.json",
+      "source_sha256": "e7e1886e881a115830f84981e55d1891d0ab2bb37de2afbaa3619e8875f38fa3",
+      "limits": "screen recording not controlled physical benchmark; no current-revision webcam acceptance",
+      "next": "resolve full-game coldstart/slow-frame and browser calibration recovery failures before advancing G2"
+    },
+    {
+      "status": "PASS_SCOPED_USER_CONFIRMED",
+      "scope": "actual Edge webcam, H0SoloGPU, calibration saved, START entered round, results P1score100; user confirmed movement/Catch",
+      "observed_metrics": "~6updatesHz,161ms smoothed inference; not controlled benchmark",
+      "user_quote": "Di chuyển và bắt được",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/hand-freeze-2026-10-19/hand-live-round-result.png"
+    },
+    {
+      "date": "2026-10-19",
+      "timezone": "Asia/Saigon",
+      "source": "Direct user response in this chat",
+      "quote": "Đã đi trái/phải và dừng đúng",
+      "scope": "H0 Solo actual Edge webcam; new movement zones: left, right and STOP",
+      "result": "PASS_SCOPED_USER_CONFIRMED",
+      "limits": "User-reported functional acceptance; no controlled latency, CPU, Co-op, TV or long-duration benchmark; live recenter not separately user-confirmed",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/hand-movement-2026-10-19-1792385393945/user-bilateral-acceptance/user-confirmation.json"
+    },
+    {
+      "date": "2026-10-19",
+      "status": "PARTIAL_USER_CONFIRMED",
+      "scope": "Preview-only Pose revision: skeleton reappears, controls do not resume",
+      "user_quote": "Skeleton hiện lại nhưng chưa điều khiển tiếp được",
+      "limits": "Triggered corrected processing-wait fix; current corrected control retest still PENDING"
+    },
+    {
+      "status": "FAIL_USER_REPORTED",
+      "scope": "Previous corrected recovery revision, before the new calibration UX",
+      "user_quote": "Vẫn không điều khiển tiếp được",
+      "limits": "Historical physical failure remains unresolved; new UX physical test NOT RUN"
+    },
+    {
+      "date": "2026-10-20",
+      "status": "NOT_RUN",
+      "scope": "New one-click Pose calibration UX; no current-revision physical acceptance"
+    }
+  ],
+  "test_environment": {
+    "node": "v25.9.0",
+    "npm": "11.12.1",
+    "os": "Windows 11 Pro",
+    "browser_fixture": "Chromium 151.0.7922.34",
+    "target_dell_hardware": "UNVERIFIED; old docs conflict16GB/32GB"
+  },
+  "independent_eval": "Latest calibration UX independently reviewed;55/55 focused tests PASS and no open actionable findings. Broader browser/performance/physical gates remain open.",
+  "independent_review_records": [
+    {
+      "scope": "mapper/adapter/scene",
+      "executed_tests": "38/38",
+      "status": "PASS with author-fixed lifecycle finding"
+    },
+    {
+      "scope": "GPU-to-CPU recovery plus capture-race guards",
+      "executed_tests": "17/17",
+      "status": "PASS",
+      "limits": "reviewer did not run actual SDK/browser or physical tests"
+    },
+    {
+      "scope": "Pose resize/readiness and Hand GPU-to-CPU recovery, live H0 recalibration and hint restoration",
+      "executed_tests": "42/42 targeted;7/7 final scene",
+      "status": "findings closed",
+      "limits": "reviewer did not run actual SDK/browser or physical tests"
+    },
+    {
+      "scope": "Hand pixel capture, deferred explicit actions and scene lifecycle/mode guards",
+      "executed_tests": "31/31",
+      "status": "findings closed after mode-change RED/GREEN fix",
+      "limits": "reviewer physical tests NOT RUN; agent operated actual Edge and user confirmed behavior separately"
+    },
+    {
+      "scope": "Approved Hand zones/threshold tuning/edge validity/Solo singlehand/live recenter/accepted telemetry",
+      "executed_tests": "50/50",
+      "status": "PASS; no actionable P0/P1",
+      "limits": "distinct reviewer read-only code/tests; physical/browser/TV NOT RUN by reviewer"
+    },
+    {
+      "scope": "Pose candidate preview and corrected delivery-wait vs capture-continuity distinction",
+      "status": "PASS; permanent-relatchP1 closed; calibration-click UX issue P2 remains",
+      "executed_tests": "68/68",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/pose-recovery-1792399574161/independent-review-final.txt",
+      "limits": "Separate independent timing probe; browser/physical not independently validated"
+    },
+    {
+      "date": "2026-10-20",
+      "scope": "One-click calibration lifecycle/stable samples/stale interruptions/START safety/checklist cleanup",
+      "status": "PASS; findings corrected, no new actionable findings",
+      "executed_tests": "55/55",
+      "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-20-pose-calibration-1792469490678/independent-review.txt",
+      "limits": "Code and focused execution; browser/physical NOT independently validated"
+    }
+  ],
+  "p0_open": [],
+  "p1_open": [
+    "Pose slow-frame calibration remains open; current Hand Solo/GPU acceptance does not close Pose or Co-op",
+    "Full-game real SDK CPU replay first-frame timeout and slow frames remain unresolved",
+    "Current-revision browser fixture timed out on P2-1280 after explicit recalibration; prior10/10 result cannot close this failure",
+    "Latest calibration UX full browser probe passes4full720p cases but1080pP1Solo postSTART Catch times out at~323ms freshness; other1080pfull cases not reached. UI-only8/8 PASS does not close performance failure. Prior corrected recovery physical retest user-reported FAIL; current UX physical NOT RUN."
+  ],
+  "rollback_verified": false,
+  "backup_sha256_parity": "PASS for all125 tracked source copies",
+  "protected_hash_audit": {
+    "files": 72,
+    "unchanged": true,
+    "additional": "Pose mapper/renderer and both workers unchanged from prior revision; Hand runtime body unchanged from task snapshot",
+    "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-20-pose-calibration-1792469490678/preservation-audit.json"
+  },
+  "human_acceptance": "HandSoloGPU movement/Catch and bilateral zones user-confirmed PASS. Previous corrected Pose recovery user-reported FAIL. New calibration UX approved and implemented; physical acceptance NOT RUN. Overall phase acceptance PENDING.",
+  "gates": {
+    "G0": "TECHNICAL_PASS; historical CV02 approval discrepancy documented",
+    "G1": "PARTIAL; additional browser safety rows not run",
+    "G2": "PARTIAL/BLOCKED; Hand user accepted; latest Pose calibration UX automated and independent checks PASS,8/8 UI browser PASS, full1080p and realSDK/physical performance still open",
+    "G3": "NOT_RUN_BY_AGENT; USER_TESTING",
+    "G4": "PENDING_HUMAN",
+    "G5": "BLOCKED_WP02_HANDOFF",
+    "G6": "BLOCKED_G4_G5",
+    "G7": "NOT_RUN",
+    "G8": "BLOCKED_MECHANICS_SPEC",
+    "G9": "NOT_RUN",
+    "G10": "NOT_RELEASE_CERTIFIED"
+  },
+  "phases": {
+    "STAB-00": "COMPLETED_TECHNICAL",
+    "STAB-01": "IMPLEMENTED_LOCALLY_GATES_OPEN",
+    "FIELD-01": "PREPARED_USER_TESTING",
+    "WP-02": "SPEC_REVIEW_ONLY",
+    "WP-03": "BLOCKED",
+    "VERT-01": "BLOCKED",
+    "ARC-01": "NOT_STARTED",
+    "R02-SPEC": "PENDING_MECHANICS_DECISION",
+    "R02-DEV": "BLOCKED",
+    "R02-QA": "NOT_STARTED",
+    "OPS-01": "NOT_RELEASE_CERTIFIED",
+    "R03/R04": "DEFERRED"
+  },
+  "hash_note": "Hash inventory excludes this self-referential gate-report.json; all other files reflect the final recorded local revision.",
+  "documentation_verification": {
+    "local_links": "PASS:20 local links,0broken",
+    "diff_whitespace": "PASS",
+    "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-20-pose-calibration-1792469490678/documentation-link-check.json"
+  },
+  "hand_movement": {
+    "approval": "Duyệt, triển khai cách này",
+    "status": "IMPLEMENTED_LOCALLY_AUTOMATED_PASS_USER_BILATERAL_PASS",
+    "default_distance_percent": 8,
+    "range_percent": [
+      3,
+      15
+    ],
+    "release_ratio": 0.55,
+    "neutral_edge_margin_percent": 2,
+    "report": "docs/reports/master-v3-2026-10-19/HAND-MOVEMENT-FIX.md",
+    "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/hand-movement-2026-10-19-1792385393945",
+    "user_acceptance": {
+      "date": "2026-10-19",
+      "timezone": "Asia/Saigon",
+      "source": "Direct user response in this chat",
+      "quote": "Đã đi trái/phải và dừng đúng",
+      "scope": "H0 Solo actual Edge webcam; new movement zones: left, right and STOP",
+      "result": "PASS_SCOPED_USER_CONFIRMED",
+      "limits": "User-reported functional acceptance; no controlled latency, CPU, Co-op, TV or long-duration benchmark; live recenter not separately user-confirmed"
+    }
+  },
+  "p2_open": [],
+  "pose_recovery": {
+    "approval": "Duyệt, sửa theo cách này",
+    "status": "IMPLEMENTED_LOCALLY_AUTOMATED_PASS_PREVIOUS_PHYSICAL_CONTROL_FAIL",
+    "preview_user_quote": "Skeleton hiện lại nhưng chưa điều khiển tiếp được",
+    "correction": "Age>=250ms neutralizes output/held state and waits; existing track history can continue only from fresh monotonically timestamped captures spaced<250ms with valid association; actual loss/ambiguity/gaps retain explicit calibration",
+    "input_freshness_ms": 250,
+    "report": "docs/reports/master-v3-2026-10-19/POSE-RECOVERY-FIX.md",
+    "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-19-master-v3-1792379238706/pose-recovery-1792399574161",
+    "latest_user_quote": "Vẫn không điều khiển tiếp được",
+    "followup_report": "docs/reports/master-v3-2026-10-19/POSE-CALIBRATION-UX-2026-10-20.md"
+  },
+  "last_updated": "2026-10-20",
+  "resolved_findings": [
+    {
+      "finding": "Already-expired Pose calibration click can fail silently; saved-center text can briefly overwrite WAITING guidance; no queued Pose intent added.",
+      "resolution": "Explicit cancellable 8s calibration request with checklist and3stable samples; savedSTART request waits up to3s; automated+independent review PASS",
+      "report": "docs/reports/master-v3-2026-10-19/POSE-CALIBRATION-UX-2026-10-20.md"
+    }
+  ],
+  "pose_calibration_ux": {
+    "date": "2026-10-20",
+    "approval": "được rồi, mình chấp nhận những điều kiện của bạn",
+    "status": "IMPLEMENTED_LOCALLY_AUTOMATED_AND_UI_PASS_PHYSICAL_NOT_RUN",
+    "collection_timeout_ms": 8000,
+    "required_stable_samples": 3,
+    "start_wait_ms": 3000,
+    "center_displacement_max": 0.025,
+    "shoulder_width_variation_max": 0.15,
+    "stability_anchor_ms": 1500,
+    "input_freshness_ms": 250,
+    "minimum_button_height_px": 44,
+    "report": "docs/reports/master-v3-2026-10-19/POSE-CALIBRATION-UX-2026-10-20.md",
+    "evidence": "C:/Users/qnhat/_Project/ReactorRush-evidence/2026-10-20-pose-calibration-1792469490678",
+    "ui_detector": "WARN/DEGRADED:2pre-existing border warnings; regex fallback, computed contrast not evaluated"
+  }
+}

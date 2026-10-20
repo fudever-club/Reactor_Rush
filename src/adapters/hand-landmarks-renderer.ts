@@ -1,4 +1,4 @@
-import type { DetectedHand } from './hand-input-mapper.ts';
+import type { DetectedHand, HandMovementZone } from './hand-input-mapper.ts';
 
 export const HAND_CONNECTIONS: ReadonlyArray<readonly [number, number]> = [
   // Palm base & metacarpals
@@ -19,12 +19,45 @@ export function renderHandOverlay(
   ctx: CanvasRenderingContext2D | null | undefined,
   canvas: HTMLCanvasElement | null | undefined,
   hands: readonly DetectedHand[],
-  soloMode: boolean
+  soloMode: boolean,
+  zones: readonly HandMovementZone[] = []
 ): void {
   if (!ctx || !canvas) return;
   const width = canvas.width;
   const height = canvas.height;
   ctx.clearRect(0, 0, width, height);
+  // Values are mirrored screen coordinates; this canvas itself is flipped by CSS.
+  for (const zone of zones) {
+    ctx.save();
+    const color = zone.player === 'p1' ? '85,223,255' : '255,112,178';
+    const band = (left: number, right: number, active: boolean) => {
+      ctx.fillStyle = 'rgba(' + color + ',' + (active ? '0.23' : '0.07') + ')';
+      ctx.fillRect((1 - right) * width, 0, (right - left) * width, height);
+    };
+    band(zone.slotLeft, zone.leftTrigger, zone.moveAxis < 0);
+    band(zone.stopLeft, zone.stopRight, zone.moveAxis === 0 && zone.currentX !== undefined);
+    band(zone.rightTrigger, zone.slotRight, zone.moveAxis > 0);
+    ctx.strokeStyle = 'rgba(' + color + ',0.8)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect((1 - zone.stopRight) * width, 2, (zone.stopRight - zone.stopLeft) * width, height - 4);
+    for (const x of [zone.leftTrigger, zone.neutralX, zone.rightTrigger]) {
+      ctx.beginPath();ctx.moveTo((1 - x) * width, 0);ctx.lineTo((1 - x) * width, height);ctx.stroke();
+    }
+    const compact = (canvas.clientWidth || width) < 250;
+    const label = (text: string, screenX: number) => {
+      ctx.save();ctx.translate((1 - screenX) * width, 38);ctx.scale(-1, 1);
+      ctx.font = 'bold 30px sans-serif';ctx.textAlign = 'center';ctx.fillStyle = '#ffffff';
+      ctx.fillText(text, 0, 0);ctx.restore();
+    };
+    label(compact ? 'L' : 'LEFT', (zone.slotLeft + zone.leftTrigger) / 2);
+    label('STOP', zone.neutralX);
+    label(compact ? 'R' : 'RIGHT', (zone.slotRight + zone.rightTrigger) / 2);
+    if (zone.currentX !== undefined) {
+      ctx.beginPath();ctx.arc((1 - zone.currentX) * width, height - 24, 9, 0, Math.PI * 2);
+      ctx.fillStyle = '#f6d55c';ctx.fill();
+    }
+    ctx.restore();
+  }
   if (!hands || hands.length === 0) return;
 
   for (const hand of hands) {

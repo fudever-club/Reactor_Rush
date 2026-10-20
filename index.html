@@ -74,8 +74,22 @@
                 <button id="scheme-pose-both" class="scheme-btn active" type="button">POSE BOTH ARMS [P1]</button>
                 <button id="scheme-pose-one" class="scheme-btn" type="button">POSE ONE ARM [P2]</button>
               </div>
+              <p class="camera-instructions">Camera schemes are provisional trials. Final booth selection follows physical testing.</p>
               <p id="camera-instructions" class="camera-instructions">Move one hand left or right; pinch thumb and index finger to catch.</p>
               <p id="camera-calibration-instructions" class="camera-instructions camera-calibration-instructions">Hold one visible hand near the center of the camera, then calibrate.</p>
+              <div id="hand-tuning" class="hand-tuning" hidden>
+                <label for="hand-move-distance">MOVE DISTANCE <output id="hand-move-value" for="hand-move-distance">8%</output></label>
+                <input id="hand-move-distance" type="range" min="3" max="15" step="1" value="8" aria-describedby="hand-move-help" />
+                <span id="hand-move-help">Smaller = more sensitive. Cross the outer lines to move; return inside the STOP box to stop.</span>
+              </div>
+              <ul id="pose-calibration-checks" class="pose-calibration-checks" aria-label="Pose calibration conditions" hidden>
+                <li id="pose-check-camera" data-ready="false">Camera connected</li>
+                <li id="pose-check-players" data-ready="false">Players 0/1</li>
+                <li id="pose-check-shoulders" data-ready="false">Shoulders clear</li>
+                <li id="pose-check-position" data-ready="false">Correct zones</li>
+                <li id="pose-check-fresh" data-ready="false">Fresh samples</li>
+                <li id="pose-check-stable" data-ready="false">Hold still 0/3</li>
+              </ul>
               <p id="camera-status" class="camera-status" role="status" aria-live="polite">Camera is off. It starts only after you choose Enable Camera.</p>
               <p id="camera-hands-status" class="camera-hands-status" role="status" aria-live="polite" aria-atomic="true">P1: waiting</p>
               <label class="camera-consent">
@@ -131,9 +145,10 @@
               <video id="hud-camera-preview" muted playsinline aria-label="Mirrored in-game webcam preview"></video>
               <canvas id="hud-skeleton-overlay" aria-hidden="true"></canvas>
               <div id="hud-camera-badge" class="hud-camera-badge">TRACKING</div>
-              <div id="hud-camera-cue" class="hud-camera-cue">READY</div>
-            </div>
+              </div>
+            <div id="hud-camera-cue" class="hud-camera-cue" role="status" aria-live="off">P1: WAITING</div>
             <div class="hud-camera-controls">
+              <button id="hud-camera-recalibrate" class="hud-camera-toggle" type="button" hidden>CALIBRATE</button>
               <button id="hud-camera-toggle" class="hud-camera-toggle" type="button" aria-label="Toggle camera dock (V)">MINIMIZE [V]</button>
               <button id="stop-camera" class="camera-stop-button" type="button">STOP CAMERA</button>
             </div>

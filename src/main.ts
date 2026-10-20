@@ -65,6 +65,11 @@ interface FallingItem {
   view: Phaser.GameObjects.Container;
 }
 
+const HAND_CALIBRATION_HINTS: Record<NonNullable<CameraMetrics['handCalibrationIssue']>, string> = {
+  CENTER_HAND: 'Move your hand toward the center of your slot so both directions have enough space, then CALIBRATE.',
+  ONE_HAND_ONLY: 'Solo uses one hand only. Keep your other hand out of the camera, then CALIBRATE.'
+};
+
 interface RuntimeUi {
   root: HTMLElement;
   menu: HTMLElement;
@@ -84,6 +89,16 @@ interface RuntimeUi {
   cameraStatus: HTMLElement;
   cameraTitle: HTMLElement;
   cameraHandsStatus: HTMLElement;
+  poseCalibrationChecks: HTMLElement;
+  poseCameraCheck: HTMLElement;
+  posePlayerCheck: HTMLElement;
+  poseShoulderCheck: HTMLElement;
+  posePositionCheck: HTMLElement;
+  poseFreshCheck: HTMLElement;
+  poseStableCheck: HTMLElement;
+  handTuning: HTMLElement;
+  handMoveSlider: HTMLInputElement;
+  handMoveValue: HTMLElement;
   cameraStopButton: HTMLButtonElement;
   resultCameraStopButton: HTMLButtonElement;
   controlsHint: HTMLElement;
@@ -118,6 +133,7 @@ interface RuntimeUi {
   hudCameraBadge: HTMLElement;
   hudCameraCue: HTMLElement;
   hudCameraToggle: HTMLButtonElement;
+  hudCameraRecalibrate: HTMLButtonElement;
 }
 
 class EnergyCatchScene extends Phaser.Scene {
@@ -126,6 +142,9 @@ class EnergyCatchScene extends Phaser.Scene {
   private inputAdapter?: InputAdapter;
   private cameraAdapter?: MediaPipeHandInputAdapter | MediaPipePoseInputAdapter;
   private cameraMode = false;
+  private cameraSessionId = 0;
+  private cameraActionVersion = 0;
+  private handMoveThreshold = 0.08;
   private isSoloMode = true;
   private trackingScheme: 'H0' | 'P1' | 'P2' = 'P1';
   private cameraSetupVisible = false;
@@ -169,12 +188,14 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui.chooseCameraButton.addEventListener('click', this.handleCameraSetupRequested);
     this.ui.cameraEnableButton.addEventListener('click', this.handleCameraEnableRequested);
     this.ui.cameraConsent.addEventListener('change', this.handleCameraConsentChanged);
+    this.ui.handMoveSlider.addEventListener('input', this.handleHandMovementChanged);
     this.ui.cameraCalibrateButton.addEventListener('click', this.handleCameraCalibrationRequested);
     this.ui.cameraStartButton.addEventListener('click', this.handleCameraStartRequested);
     this.ui.cameraBackButton.addEventListener('click', this.handleCameraBackRequested);
     this.ui.cameraStopButton.addEventListener('click', this.handleCameraStopRequested);
     this.ui.resultCameraStopButton.addEventListener('click', this.handleCameraStopRequested);
     this.ui.hudCameraToggle.addEventListener('click', this.toggleHudCameraDock);
+    this.ui.hudCameraRecalibrate.addEventListener('click', this.handleCameraCalibrationRequested);
     this.ui.modeSoloButton?.addEventListener('click', () => this.setSoloMode(true));
     this.ui.modeCoopButton?.addEventListener('click', () => this.setSoloMode(false));
     this.ui.cameraModeSoloButton?.addEventListener('click', () => this.setSoloMode(true));
@@ -273,11 +294,14 @@ class EnergyCatchScene extends Phaser.Scene {
       this.ui?.cameraEnableButton.removeEventListener('click', this.handleCameraEnableRequested);
       this.ui?.cameraConsent.removeEventListener('change', this.handleCameraConsentChanged);
       this.ui?.cameraCalibrateButton.removeEventListener('click', this.handleCameraCalibrationRequested);
+      this.ui?.handMoveSlider.removeEventListener('input', this.handleHandMovementChanged);
       this.ui?.cameraStartButton.removeEventListener('click', this.handleCameraStartRequested);
       this.ui?.cameraBackButton.removeEventListener('click', this.handleCameraBackRequested);
       this.ui?.cameraStopButton.removeEventListener('click', this.handleCameraStopRequested);
       this.ui?.resultCameraStopButton.removeEventListener('click', this.handleCameraStopRequested);
       this.ui?.hudCameraToggle.removeEventListener('click', this.toggleHudCameraDock);
+      this.ui?.hudCameraRecalibrate.removeEventListener('click', this.handleCameraCalibrationRequested);
+      ++this.cameraSessionId;
       this.keyboardAdapter?.destroy();
       this.cameraAdapter?.stop();
       this.inputAdapter = undefined;
@@ -321,6 +345,7 @@ class EnergyCatchScene extends Phaser.Scene {
       }
       this.cameraMode = false;
       this.inputAdapter = this.keyboardAdapter;
+      ++this.cameraSessionId;
       this.cameraAdapter?.stop();
       this.cameraAdapter = undefined;
       this.beginRun();
@@ -345,6 +370,7 @@ class EnergyCatchScene extends Phaser.Scene {
   private handleCameraConsentChanged = (): void => {
     if (!this.ui) return;
     if (!this.ui.cameraConsent.checked && this.cameraAdapter) {
+      ++this.cameraSessionId;
       const adapter = this.cameraAdapter;
       this.cameraAdapter = undefined;
       this.cameraMode = false;
@@ -357,6 +383,7 @@ class EnergyCatchScene extends Phaser.Scene {
       this.ui.cameraCalibrateButton.disabled = true;
       this.ui.cameraStartButton.disabled = true;
       this.setCameraHandsStatus(this.isSoloMode ? 'P1: waiting' : 'P1: waiting · P2: waiting');
+      this.ui.cameraEnableButton.disabled = true;
       this.ui.cameraStatus.textContent = 'Consent withdrawn. Camera stream and model worker stopped.';
       this.updateInputModeUi();
       return;
@@ -372,36 +399,64 @@ class EnergyCatchScene extends Phaser.Scene {
       return;
     }
 
+    const sessionId = ++this.cameraSessionId;
     this.cameraAdapter?.stop();
+    let adapter: MediaPipeHandInputAdapter | MediaPipePoseInputAdapter;
+    const isCurrent = () => sessionId === this.cameraSessionId && this.cameraAdapter === adapter;
     const canvases = [this.ui.cameraCanvas, this.ui.hudCameraCanvas].filter((c): c is HTMLCanvasElement => Boolean(c));
     const commonOptions = {
       soloMode: this.isSoloMode,
       overlayCanvas: canvases,
-      onStatus: (status: CameraInputStatus, message?: string) => this.updateCameraStatus(status, message),
+      onStatus: (status: CameraInputStatus, message?: string) => {
+        if (isCurrent()) this.updateCameraStatus(status, message);
+      },
       onDetection: (players: readonly PlayerId[], canCalibrate: boolean, calibrated: boolean, metrics?: CameraMetrics) =>
-        this.updateCameraDetection(players, canCalibrate, calibrated, metrics)
+        { if (isCurrent()) this.updateCameraDetection(players, canCalibrate, calibrated, metrics); }
     };
 
     if (this.trackingScheme === 'H0') {
-      this.cameraAdapter = new MediaPipeHandInputAdapter(this.ui.cameraVideo, commonOptions);
+      adapter = new MediaPipeHandInputAdapter(this.ui.cameraVideo, { ...commonOptions, moveThreshold: this.handMoveThreshold });
     } else {
-      this.cameraAdapter = new MediaPipePoseInputAdapter(this.ui.cameraVideo, {
+      adapter = new MediaPipePoseInputAdapter(this.ui.cameraVideo, {
         ...commonOptions,
         scheme: this.trackingScheme === 'P1' ? 'P1' : 'P2'
       });
     }
 
+    this.cameraAdapter = adapter;
     this.ui.cameraEnableButton.disabled = true;
     try {
-      await this.cameraAdapter.start();
+      await adapter.start();
     } catch {
+      if (!isCurrent()) return;
       this.ui.cameraEnableButton.disabled = !this.ui.cameraConsent.checked;
       this.ui.cameraEnableButton.textContent = 'TRY CAMERA AGAIN';
     }
   };
 
-  private handleCameraCalibrationRequested = (): void => {
-    const calibrated = this.cameraAdapter?.calibrate() ?? false;
+  private handleCameraCalibrationRequested = async (): Promise<void> => {
+    const adapter = this.cameraAdapter;
+    const session = this.cameraSessionId;
+    const actionVersion = this.cameraActionVersion;
+    if (!adapter) return;
+    const isPose = this.trackingScheme !== 'H0' && adapter instanceof MediaPipePoseInputAdapter;
+    if (isPose && adapter.getMetrics().poseCalibration?.pendingAction === 'calibrate') {
+      ++this.cameraActionVersion;
+      adapter.cancelPendingAction();
+      if (this.ui) this.ui.cameraStatus.textContent = 'Calibration cancelled. Press CALIBRATE when you are ready.';
+      return;
+    }
+    const waitForHand = this.trackingScheme === 'H0' && adapter instanceof MediaPipeHandInputAdapter;
+    if (waitForHand && this.ui) this.ui.cameraStatus.textContent = 'Hold one open hand steady. Waiting for a fresh detection…';
+    const calibrated = waitForHand || isPose ? await adapter.requestCalibration() : adapter.calibrate();
+    if (session !== this.cameraSessionId || adapter !== this.cameraAdapter || actionVersion !== this.cameraActionVersion) return;
+    if (!calibrated && waitForHand && this.ui && adapter.currentStatus === 'ready') {
+      const issue = adapter.getMetrics().handCalibrationIssue;
+      this.ui.cameraStatus.textContent = issue ? HAND_CALIBRATION_HINTS[issue] : 'No valid hand sample yet. Keep the selected players’ hands in frame and press CALIBRATE again.';
+    }
+    if (!calibrated && isPose && this.ui && adapter.currentStatus === 'ready') {
+      this.ui.cameraStatus.textContent = 'Calibration not saved. ' + this.poseCalibrationHint(adapter.getMetrics().poseCalibration) + ' Press CALIBRATE to retry.';
+    }
     if (calibrated && this.ui) {
       const metrics = this.cameraAdapter?.getMetrics();
       const delegateTag = metrics?.delegate ? ` (${metrics.delegate} active)` : '';
@@ -416,8 +471,21 @@ class EnergyCatchScene extends Phaser.Scene {
     }
   };
 
-  private handleCameraStartRequested = (): void => {
-    if (!this.cameraAdapter?.canStart()) return;
+  private handleCameraStartRequested = async (): Promise<void> => {
+    const adapter = this.cameraAdapter;
+    const session = this.cameraSessionId;
+    const actionVersion = this.cameraActionVersion;
+    if (!adapter) return;
+    if (!adapter.canStart() && (adapter instanceof MediaPipeHandInputAdapter || adapter instanceof MediaPipePoseInputAdapter)) {
+      if (this.ui) this.ui.cameraStatus.textContent = 'Waiting for a fresh calibrated sample before starting…';
+      const ready = await adapter.requestStartReadiness();
+      if (session !== this.cameraSessionId || adapter !== this.cameraAdapter || actionVersion !== this.cameraActionVersion) return;
+      if (!ready) {
+        if (this.ui && adapter.currentStatus === 'ready') this.ui.cameraStatus.textContent = 'Could not start with a fresh calibrated sample. If tracking was lost, CALIBRATE again; otherwise try START again.';
+        return;
+      }
+    }
+    if (!adapter.canStart()) return;
     this.cameraMode = true;
     this.inputAdapter = this.cameraAdapter;
     this.cameraSetupVisible = false;
@@ -434,6 +502,7 @@ class EnergyCatchScene extends Phaser.Scene {
       this.ui.hudCameraVideo.pause();
       this.ui.hudCameraVideo.srcObject = null;
     }
+    ++this.cameraSessionId;
     this.cameraAdapter?.stop();
     this.cameraAdapter = undefined;
     this.cameraMode = false;
@@ -448,6 +517,7 @@ class EnergyCatchScene extends Phaser.Scene {
       this.ui.hudCameraVideo.pause();
       this.ui.hudCameraVideo.srcObject = null;
     }
+    ++this.cameraSessionId;
     this.cameraAdapter?.stop();
     this.cameraAdapter = undefined;
     this.cameraMode = false;
@@ -466,6 +536,7 @@ class EnergyCatchScene extends Phaser.Scene {
   };
 
   private setSoloMode(solo: boolean): void {
+    if (this.isSoloMode !== solo) ++this.cameraActionVersion;
     this.isSoloMode = solo;
     this.ui?.modeSoloButton?.classList.toggle('active', solo);
     this.ui?.modeCoopButton?.classList.toggle('active', !solo);
@@ -492,6 +563,7 @@ class EnergyCatchScene extends Phaser.Scene {
     this.updateInstructionsForScheme();
 
     if (this.cameraAdapter) {
+      ++this.cameraSessionId;
       this.cameraAdapter.stop();
       this.cameraAdapter = undefined;
       if (this.ui?.cameraConsent.checked) {
@@ -500,11 +572,27 @@ class EnergyCatchScene extends Phaser.Scene {
     }
   }
 
+  private handleHandMovementChanged = (): void => {
+    if (!this.ui) return;
+    const value = Number(this.ui.handMoveSlider.value) / 100;
+    if (!Number.isFinite(value) || value < 0.03 || value > 0.15) return;
+    this.ui.handMoveValue.textContent = Math.round(value * 100) + '%';
+    if (value === this.handMoveThreshold) return;
+    ++this.cameraActionVersion;
+    this.handMoveThreshold = value;
+    if (this.trackingScheme === 'H0' && this.cameraAdapter && 'setMoveThreshold' in this.cameraAdapter) this.cameraAdapter.setMoveThreshold(value);
+    this.ui.cameraStatus.textContent = 'Movement distance changed to ' + Math.round(value * 100) + '%. Center your hand and CALIBRATE again.';
+  };
+
   private updateInstructionsForScheme(): void {
     if (!this.ui) return;
     const solo = this.isSoloMode;
     const isHand = this.trackingScheme === 'H0';
     const isBothArms = this.trackingScheme === 'P1';
+    this.updatePoseCalibrationUi();
+    this.ui.handTuning.hidden = !isHand;
+    this.ui.handMoveSlider.value = String(Math.round(this.handMoveThreshold * 100));
+    this.ui.handMoveValue.textContent = Math.round(this.handMoveThreshold * 100) + '%';
 
     if (this.ui.cameraInstructions) {
       if (isHand) {
@@ -525,12 +613,12 @@ class EnergyCatchScene extends Phaser.Scene {
     if (this.ui.cameraCalibrationInstructions) {
       if (isHand) {
         this.ui.cameraCalibrationInstructions.textContent = solo
-          ? 'Hold one visible hand near the center of the camera, then calibrate.'
+          ? 'Show only one hand. Hold it near the center, then calibrate.'
           : 'Hold one visible hand near the center of each half, then calibrate both players.';
       } else {
         this.ui.cameraCalibrationInstructions.textContent = solo
-          ? 'Stand centered in camera with arms relaxed, then calibrate.'
-          : 'Stand centered in each half with arms relaxed, then calibrate both players.';
+          ? 'Press CALIBRATE once, then keep your shoulders still. It waits up to 8 seconds for 3 stable samples.'
+          : 'Center one person in each half. Press CALIBRATE once, then keep shoulders still for 3 samples (up to 8 seconds).';
       }
     }
 
@@ -551,6 +639,10 @@ class EnergyCatchScene extends Phaser.Scene {
     if (!this.ui) return;
     if (!this.cameraMode) {
       this.ui.controlsHint.textContent = 'HOLD S / ↓ TO CATCH';
+      return;
+    }
+    if (this.cameraAdapter?.getMetrics().recalibrationRequired) {
+      this.ui.controlsHint.textContent = 'TRACKING LOST · RETURN TO YOUR SLOT · CALIBRATE';
       return;
     }
     if (this.trackingScheme === 'H0') {
@@ -577,7 +669,15 @@ class EnergyCatchScene extends Phaser.Scene {
       stopped: 'Camera stopped. Keyboard controls remain available.',
       error: 'Camera controls could not start. Keyboard controls remain available.'
     };
-    this.ui.cameraStatus.textContent = message || fallbackMessages[status];
+    this.ui.cameraStatus.textContent = message || (status === 'ready' && this.trackingScheme === 'H0'
+      ? 'Camera ready' + delegateTag + '. Hold an open hand in frame and press CALIBRATE HAND.'
+      : fallbackMessages[status]);
+    if (status !== 'ready') {
+      this.ui.cameraCalibrateButton.disabled = true;
+      this.ui.cameraStartButton.disabled = true;
+    } else if (this.trackingScheme === 'H0') {
+      this.ui.cameraCalibrateButton.disabled = false;
+    }
     if (status === 'requesting-camera' || status === 'loading-model' || status === 'ready') {
       this.ui.cameraEnableButton.disabled = true;
       this.ui.cameraEnableButton.textContent = status === 'ready' ? 'CAMERA CONNECTED' : 'CONNECTING…';
@@ -598,6 +698,38 @@ class EnergyCatchScene extends Phaser.Scene {
     }
   }
 
+  private poseCalibrationHint(progress?: CameraMetrics['poseCalibration']): string {
+    if (!progress?.cameraReady) return 'Enable the camera first.';
+    if (!progress.playersReady) return 'Keep exactly ' + progress.expectedPlayers + (progress.expectedPlayers === 1 ? ' person' : ' people') + ' in frame.';
+    if (!progress.shouldersReady) return 'Face the camera with both shoulders clearly visible.';
+    if (!progress.fresh) return 'Waiting for a fresh sample; if frames remain slow, try Hand Pinch.';
+    if (!progress.positionReady) return 'Stand near the center of your own slot.';
+    return 'Keep your shoulders still until all 3 samples are collected.';
+  }
+
+  private updatePoseCalibrationUi(progress?: CameraMetrics['poseCalibration']): void {
+    if (!this.ui) return;
+    const pose = this.trackingScheme !== 'H0';
+    this.ui.poseCalibrationChecks.hidden = !pose;
+    this.ui.cameraCalibrateButton.classList.toggle('pose-calibration-action', pose);
+    this.ui.cameraStartButton.classList.toggle('pose-calibration-action', pose);
+    const saved = progress?.state === 'saved';
+    const expected = progress?.expectedPlayers ?? (this.isSoloMode ? 1 : 2);
+    const entries: Array<[HTMLElement, string, boolean]> = [
+      [this.ui.poseCameraCheck, 'Camera connected', progress?.cameraReady ?? false],
+      [this.ui.posePlayerCheck, 'Players ' + (progress?.detectedPlayers ?? 0) + '/' + expected, saved || (progress?.playersReady ?? false)],
+      [this.ui.poseShoulderCheck, 'Shoulders clear', saved || (progress?.shouldersReady ?? false)],
+      [this.ui.posePositionCheck, 'Correct zones', saved || (progress?.positionReady ?? false)],
+      [this.ui.poseFreshCheck, saved ? 'Samples verified' : 'Fresh samples', saved || (progress?.fresh ?? false)],
+      [this.ui.poseStableCheck, 'Hold still ' + (progress?.stableSamples ?? 0) + '/3', saved || progress?.stableSamples === 3]
+    ];
+    for (const [element, text, ready] of entries) {
+      element.textContent = text;
+      element.setAttribute('data-ready', String(ready));
+      element.setAttribute('aria-label', text + (ready ? ': ready' : ': waiting'));
+    }
+  }
+
   private updateCameraDetection(
     players: readonly PlayerId[],
     canCalibrate: boolean,
@@ -608,8 +740,72 @@ class EnergyCatchScene extends Phaser.Scene {
     const hasP1 = players.includes('p1');
     const hasP2 = players.includes('p2');
     const ambiguity = metrics?.ambiguityReason;
+    if (metrics?.playerStates) {
+      const states = metrics.playerStates;
+      const progress = metrics.poseCalibration;
+      const pending = progress?.pendingAction;
+      const poseReady = this.cameraAdapter?.currentStatus === 'ready' || canCalibrate;
+      this.updatePoseCalibrationUi(progress);
+      const players = this.isSoloMode ? (['p1'] as const) : (['p1', 'p2'] as const);
+      const label = (player: PlayerId) => player.toUpperCase() + ': ' + states[player].replaceAll('_', ' ');
+      const cue = players.map(label).join(' · ');
+      const recovery = metrics.recalibrationRequired ?? false;
+      const waiting = !recovery && players.some(player => states[player] === 'WAITING_FOR_FRAME');
+      const unsafe = recovery || players.some(player => ['AMBIGUOUS', 'LOST', 'RECALIBRATE'].includes(states[player]));
+      const diagnostics = metrics.sampleAgeMs === undefined ? '' : ' · frame ' + metrics.sampleAgeMs + 'ms · ' + metrics.poseCount + ' pose(s)';
+      this.setCameraHandsStatus(cue + ' · ' + metrics.delegate + ' · inference ' + metrics.inferenceMs + 'ms · updates ' + metrics.fps + 'Hz' + diagnostics);
+      const setupHints: Partial<Record<NonNullable<CameraMetrics['readinessReason']>, string>> = {
+        SLOW_FRAMES: 'Frame processing too slow: ' + metrics.sampleAgeMs + 'ms (limit 250ms). Try Hand Pinch or keyboard; calibration stays locked for safety.',
+        WAITING_FOR_FRAME: 'Waiting for a fresh frame. Controls are paused; calibration is still saved.',
+        NO_POSE: 'Searching for a body. Face the camera with both shoulders visible; keep your upper body in frame.',
+        LOW_CONFIDENCE: 'Shoulders are not clear enough. Improve lighting and face the camera with both shoulders visible.',
+        EXTRA_PERSON: 'Too many people detected. Keep only the selected players in the camera frame.',
+        NEED_TWO_PLAYERS: 'Co-op needs two players, one in each half of the preview. Use Solo for one person.',
+        POSITION: 'Stand in the center of your slot, away from the middle boundary, with shoulders visible.',
+        READY_TO_CALIBRATE: recovery
+          ? 'Body detected again. Press CALIBRATE to resume controls. Yellow skeletons are previews.'
+          : 'Body detected (yellow preview). Keep arms relaxed and press CALIBRATE.'
+      };
+      if (!this.cameraMode && metrics.readinessReason && setupHints[metrics.readinessReason]) {
+        this.ui.cameraStatus.textContent = setupHints[metrics.readinessReason]!;
+      }
+      this.ui.cameraHandsStatus.classList.toggle('is-ambiguous', unsafe);
+      this.ui.cameraHandsStatus.classList.toggle('is-ready', calibrated && !unsafe);
+      this.ui.cameraCalibrateButton.disabled = !poseReady || pending === 'start';
+      this.ui.cameraCalibrateButton.textContent = pending === 'calibrate' ? 'CANCEL CALIBRATION' : 'CALIBRATE POSE';
+      this.ui.cameraCalibrateButton.setAttribute('aria-busy', String(pending === 'calibrate'));
+      this.ui.cameraStartButton.disabled = !calibrated || unsafe || !poseReady || Boolean(pending);
+      this.ui.cameraStartButton.textContent = pending === 'start' ? 'WAITING FOR FRAME…' : 'START WITH CAMERA';
+      this.ui.hudCameraRecalibrate.hidden = !recovery && pending !== 'calibrate';
+      this.ui.hudCameraRecalibrate.disabled = !poseReady || pending === 'start';
+      this.ui.hudCameraRecalibrate.textContent = pending === 'calibrate' ? 'CANCEL' : 'CALIBRATE';
+      if (!this.cameraMode && progress) {
+        if (pending === 'calibrate') this.ui.cameraStatus.textContent = 'Collecting stable samples (' + progress.stableSamples + '/3). ' + this.poseCalibrationHint(progress);
+        else if (pending === 'start') this.ui.cameraStatus.textContent = 'Calibration saved. Waiting for a fresh frame to start…';
+        else if (progress.state === 'saved') this.ui.cameraStatus.textContent = 'Calibration saved. Press START; it will wait for a fresh frame.';
+        else if (progress.state === 'timeout') this.ui.cameraStatus.textContent = 'Calibration timed out. ' + this.poseCalibrationHint(progress) + ' Press CALIBRATE to retry.';
+        else if (progress.state === 'cancelled') this.ui.cameraStatus.textContent = 'Calibration cancelled. Press CALIBRATE when ready.';
+      }
+      if (this.cameraMode) {
+        this.updateControlsHintText();
+        if (pending === 'calibrate') this.ui.controlsHint.textContent = 'CALIBRATING ' + progress!.stableSamples + '/3 · KEEP SHOULDERS STILL';
+        const recoveryCue = canCalibrate ? 'BODY FOUND · CALIBRATE'
+          : (metrics.posePreviewCount ?? 0) > 0 ? 'BODY FOUND · CHECK SETUP'
+          : metrics.readinessReason === 'SLOW_FRAMES' ? 'SLOW FRAMES · WAIT' : 'SEARCHING FOR BODY';
+        this.updateHudCameraStatus(unsafe ? 'is-ambiguous' : 'is-tracking', pending === 'calibrate' ? 'CALIBRATING' : recovery ? 'CALIBRATE' : waiting ? 'WAITING' : 'POSE INPUT', pending === 'calibrate' ? 'HOLD STILL · ' + progress!.stableSamples + '/3' : recovery ? recoveryCue + ' · ' + cue : cue);
+      }
+      return;
+    }
+    this.ui.poseCalibrationChecks.hidden = true;
+    this.ui.hudCameraRecalibrate.textContent = 'CALIBRATE';
+    this.ui.cameraStartButton.textContent = 'START WITH CAMERA';
+    const handRecovery = metrics?.recalibrationRequired ?? false;
+    this.ui.hudCameraRecalibrate.hidden = this.trackingScheme !== 'H0';
+    const handWaiting = metrics?.waitingForHand ?? false;
+    const handReady = this.cameraAdapter?.currentStatus === 'ready' || canCalibrate;
+    this.ui.hudCameraRecalibrate.disabled = !handReady || handWaiting;
     const metricsSuffix = metrics && metrics.fps > 0
-      ? ` · ${metrics.delegate} (${metrics.inferenceMs}ms · ${metrics.fps}fps)`
+      ? ` · ${metrics.delegate} (inference ${metrics.inferenceMs}ms · updates ${metrics.fps}Hz)`
       : metrics?.delegate ? ` · ${metrics.delegate}` : '';
 
     const entity = this.trackingScheme === 'H0' ? 'hand' : 'pose';
@@ -620,7 +816,7 @@ class EnergyCatchScene extends Phaser.Scene {
       } else if (hasP1) {
         handsStatus = `P1: ${entity} detected${metricsSuffix}`;
       } else {
-        handsStatus = 'P1: waiting';
+        handsStatus = 'P1: waiting for a hand' + metricsSuffix;
       }
     } else {
       if (ambiguity === 'hands-crossed') {
@@ -636,17 +832,36 @@ class EnergyCatchScene extends Phaser.Scene {
       }
     }
 
+    if (metrics?.handMovementZones?.length) {
+      handsStatus = metrics.handMovementZones.map(zone => {
+        const direction = zone.moveAxis < 0 ? 'LEFT' : zone.moveAxis > 0 ? 'RIGHT' : 'STOP';
+        const current = zone.currentX === undefined ? 'lost' : Math.round(zone.currentX * 100) + '%';
+        return zone.player.toUpperCase() + ': ' + direction + ' · hand ' + current + ' / center ' + Math.round(zone.neutralX * 100) + '%';
+      }).join(' · ') + ' · distance ' + Math.round((metrics.moveThreshold ?? this.handMoveThreshold) * 100) + '%' + metricsSuffix;
+    }
     this.setCameraHandsStatus(handsStatus);
     this.ui.cameraHandsStatus.classList.toggle('is-ambiguous', Boolean(ambiguity));
     this.ui.cameraHandsStatus.classList.toggle('is-ready', Boolean(!ambiguity && (this.isSoloMode ? hasP1 : (hasP1 && hasP2))));
 
-    this.ui.cameraCalibrateButton.disabled = !canCalibrate || Boolean(ambiguity);
+    this.ui.cameraCalibrateButton.disabled = !handReady || handWaiting;
     this.ui.cameraStartButton.disabled = this.isSoloMode
-      ? (!calibrated || !hasP1 || Boolean(ambiguity))
-      : (!calibrated || !hasP1 || !hasP2 || Boolean(ambiguity));
+      ? (!calibrated || !hasP1 || Boolean(ambiguity) || handWaiting)
+      : (!calibrated || !hasP1 || !hasP2 || Boolean(ambiguity) || handWaiting);
+    if (!this.cameraMode && !calibrated && !handWaiting && this.trackingScheme === 'H0' && handReady) {
+      this.ui.cameraStatus.textContent = metrics?.handCalibrationIssue ? HAND_CALIBRATION_HINTS[metrics.handCalibrationIssue] : canCalibrate
+        ? 'Hand detected. Press CALIBRATE HAND and keep it steady.'
+        : 'Hold an open hand in frame, then press CALIBRATE HAND. The button waits up to 3 seconds for a valid sample.';
+    }
 
     if (this.cameraMode) {
-      if (ambiguity === 'hands-crossed') {
+      this.updateControlsHintText();
+      if (handWaiting) {
+        this.ui.controlsHint.textContent = 'HOLD HAND STEADY · CALIBRATING';
+        this.updateHudCameraStatus('is-ambiguous', 'WAIT', 'INPUT PAUSED · HOLD STEADY');
+      } else if (handRecovery) {
+        this.ui.controlsHint.textContent = 'HAND RECOVERED · PRESS CALIBRATE TO RESUME';
+        this.updateHudCameraStatus('is-ambiguous', 'CALIBRATE', 'INPUT PAUSED · CALIBRATE');
+      } else if (ambiguity === 'hands-crossed') {
         this.ui.controlsHint.textContent = `${this.trackingScheme === 'H0' ? 'HANDS' : 'POSES'} CROSSED · RETURN TO YOUR HALF`;
         this.updateHudCameraStatus('is-ambiguous', 'AMBIGUOUS', 'BODIES CROSSED · RETURN TO HALF');
       } else if (ambiguity === 'too-close') {
@@ -662,6 +877,12 @@ class EnergyCatchScene extends Phaser.Scene {
         const missing = !hasP1 ? 'P1' : 'P2';
         this.ui.controlsHint.textContent = `${missing} LOST · RETURN TO CAMERA`;
         this.updateHudCameraStatus('is-lost', 'OUT OF FRAME', `${missing} OUT OF FRAME`);
+      } else if (metrics?.handMovementZones?.length) {
+        const zones = metrics.handMovementZones;
+        const cue = zones.map(zone => zone.player.toUpperCase() + ': ' + (zone.moveAxis < 0 ? 'LEFT' : zone.moveAxis > 0 ? 'RIGHT' : 'STOP') + (zone.catch ? ' + PINCH' : '')).join(' · ');
+        const first = zones[0];
+        const badge = this.isSoloMode ? (first.catch ? 'CATCH' : first.moveAxis < 0 ? 'MOVE LEFT' : first.moveAxis > 0 ? 'MOVE RIGHT' : 'STOP') : 'HAND INPUT';
+        this.updateHudCameraStatus(zones.some(z => z.moveAxis !== 0 || z.catch) ? 'is-action' : 'is-tracking', badge, cue);
       } else {
         const p1Input = this.lastInput.p1;
         const p2Input = this.lastInput.p2;
@@ -692,7 +913,7 @@ class EnergyCatchScene extends Phaser.Scene {
   private updateInputModeUi(): void {
     if (!this.ui) return;
     const isPlaying = this.state.phase === 'playing';
-    this.ui.controlsHint.textContent = this.cameraMode ? 'MOVE HAND LEFT/RIGHT · PINCH TO CATCH' : 'HOLD S / ↓ TO CATCH';
+    this.updateControlsHintText();
     this.ui.cameraStopButton.hidden = !this.cameraMode;
     this.ui.resultCameraStopButton.hidden = !this.cameraMode;
     this.ui.hudCameraDock.hidden = !this.cameraMode || !isPlaying;
@@ -920,6 +1141,16 @@ class EnergyCatchScene extends Phaser.Scene {
       cameraStatus: get('camera-status'),
       cameraTitle: get('camera-title'),
       cameraHandsStatus: get('camera-hands-status'),
+      poseCalibrationChecks: get('pose-calibration-checks'),
+      poseCameraCheck: get('pose-check-camera'),
+      posePlayerCheck: get('pose-check-players'),
+      poseShoulderCheck: get('pose-check-shoulders'),
+      posePositionCheck: get('pose-check-position'),
+      poseFreshCheck: get('pose-check-fresh'),
+      poseStableCheck: get('pose-check-stable'),
+      handTuning: get('hand-tuning'),
+      handMoveSlider: get<HTMLInputElement>('hand-move-distance'),
+      handMoveValue: get('hand-move-value'),
       cameraStopButton: get<HTMLButtonElement>('stop-camera'),
       resultCameraStopButton: get<HTMLButtonElement>('stop-camera-results'),
       controlsHint: get('hud-controls-hint'),
@@ -953,7 +1184,8 @@ class EnergyCatchScene extends Phaser.Scene {
       hudCameraCanvas: (document.getElementById('hud-skeleton-overlay') as HTMLCanvasElement) || undefined,
       hudCameraBadge: get('hud-camera-badge'),
       hudCameraCue: get('hud-camera-cue'),
-      hudCameraToggle: get<HTMLButtonElement>('hud-camera-toggle')
+      hudCameraToggle: get<HTMLButtonElement>('hud-camera-toggle'),
+      hudCameraRecalibrate: get<HTMLButtonElement>('hud-camera-recalibrate')
     };
   }
 

@@ -1,14 +1,41 @@
 import type { InputAdapter, InputFrame, PlayerId } from '../gameplay/core';
-import { HAND_TRACKING_STALE_MS, HandInputMapper, type DetectedHand } from './hand-input-mapper.ts';
+import { HAND_TRACKING_STALE_MS, HandInputMapper, type DetectedHand, type HandMovementZone, type HandCalibrationIssue } from './hand-input-mapper.ts';
+import type { PosePlayerState } from './pose-input-mapper.ts';
 import { renderHandOverlay } from './hand-landmarks-renderer.ts';
 
 export type CameraInputStatus = 'idle' | 'requesting-camera' | 'loading-model' | 'ready' | 'stopped' | 'error';
 
+export interface PoseCalibrationProgress {
+  state: 'idle' | 'collecting' | 'saved' | 'cancelled' | 'timeout';
+  pendingAction?: 'calibrate' | 'start';
+  cameraReady: boolean;
+  expectedPlayers: number;
+  detectedPlayers: number;
+  playersReady: boolean;
+  shouldersReady: boolean;
+  positionReady: boolean;
+  fresh: boolean;
+  stableSamples: number;
+  requiredSamples: number;
+}
+
 export interface CameraMetrics {
+  poseCalibration?: PoseCalibrationProgress;
   delegate: 'GPU' | 'CPU';
   inferenceMs: number;
   fps: number;
-  ambiguityReason?: 'hands-crossed' | 'too-close' | 'multiple-hands' | 'in-deadband' | 'too-far';
+  ambiguityReason?: 'hands-crossed' | 'too-close' | 'multiple-hands' | 'in-deadband' | 'too-far' | 'association-lost' | 'tracking-lost';
+  playerStates?: Record<PlayerId, PosePlayerState>;
+  recalibrationRequired?: boolean;
+  waitingForHand?: boolean;
+  moveThreshold?: number;
+  handMovementZones?: HandMovementZone[];
+  handCalibrationIssue?: HandCalibrationIssue;
+  freshnessMs?: number;
+  sampleAgeMs?: number;
+  poseCount?: number;
+  posePreviewCount?: number;
+  readinessReason?: 'WAITING_FOR_FRAME' | 'SLOW_FRAMES' | 'NO_POSE' | 'LOW_CONFIDENCE' | 'EXTRA_PERSON' | 'NEED_TWO_PLAYERS' | 'POSITION' | 'READY_TO_CALIBRATE' | 'ACCEPTED';
 }
 
 export interface MediaPipeHandInputOptions {
@@ -27,6 +54,7 @@ export interface MediaPipeHandInputOptions {
   requestFrame?: (callback: FrameRequestCallback) => number;
   cancelFrame?: (handle: number) => void;
   soloMode?: boolean;
+  moveThreshold?: number;
   overlayCanvas?: HTMLCanvasElement | HTMLCanvasElement[];
   wasmRoot?: string;
   modelPath?: string;
@@ -117,6 +145,9 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private detectionWasFresh = false;
   private disposed = false;
   private calibrated = false;
+  private cpuFallbackAttempted = false;
+  private recoveryNeedsCalibration = false;
+  private pendingAction?: { kind: 'calibrate' | 'start'; promise: Promise<boolean>; resolve: (ready: boolean) => void; timer: ReturnType<typeof setTimeout> };
   private status: CameraInputStatus = 'idle';
   private startPromise?: Promise<void>;
   private readonly video: HTMLVideoElement;
@@ -132,7 +163,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       this.overlayCanvases = [];
     }
     this.soloMode = options.soloMode ?? false;
-    this.mapper = new HandInputMapper({ soloMode: this.soloMode });
+    this.mapper = new HandInputMapper({ soloMode: this.soloMode, moveEnterThreshold: options.moveThreshold });
     this.wasmRoot = options.wasmRoot ?? WASM_ROOT;
     this.modelPath = options.modelPath ?? MODEL_PATH;
     this.createWorker = options.createWorker ?? (() => new Worker(
@@ -144,7 +175,18 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       }
       return navigator.mediaDevices.getUserMedia(constraints);
     });
-    this.createBitmap = options.createBitmap ?? ((source) => createImageBitmap(source));
+    this.createBitmap = options.createBitmap ?? (async (source) => {
+      if (this.activeDelegate !== 'CPU') return createImageBitmap(source);
+      // Detach pixels from the video/GPU resource before a CPU fallback worker reads them.
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(1, 320 / Math.max(source.videoWidth, source.videoHeight));
+      canvas.width = Math.max(1, Math.round(source.videoWidth * scale));
+      canvas.height = Math.max(1, Math.round(source.videoHeight * scale));
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) throw new Error('Could not copy camera pixels for CPU tracking.');
+      ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+      return createImageBitmap(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    });
     this.now = options.now ?? (() => performance.now());
     this.requestFrame = options.requestFrame ?? ((callback) => requestAnimationFrame(callback));
     this.cancelFrame = options.cancelFrame ?? ((handle) => cancelAnimationFrame(handle));
@@ -154,10 +196,16 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   }
 
   getMetrics(): CameraMetrics {
+    const issue = this.isDetectionFresh() ? this.mapper.getCalibrationIssue(this.latestHands) : undefined;
     return {
       delegate: this.activeDelegate,
       inferenceMs: Math.round(this.smoothedInferenceMs),
       fps: Math.round(this.smoothedFps),
+      recalibrationRequired: this.recoveryNeedsCalibration,
+      waitingForHand: Boolean(this.pendingAction),
+      moveThreshold: this.mapper.getMoveThreshold(),
+      handMovementZones: this.calibrated && this.pendingAction?.kind !== 'calibrate' ? this.mapper.getMovementZones(this.now()) : [],
+      handCalibrationIssue: issue,
       ambiguityReason: this.mapper.getLastAmbiguityReason()
     };
   }
@@ -172,9 +220,19 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
 
   setSoloMode(solo: boolean): void {
     if (this.soloMode === solo) return;
+    this.finishFreshAction(false);
     this.soloMode = solo;
     this.mapper.setSoloMode(solo);
     this.calibrated = false;
+    this.notifyDetection();
+  }
+
+  setMoveThreshold(threshold: number): void {
+    if (threshold === this.mapper.getMoveThreshold()) return;
+    this.mapper.setMoveThreshold(threshold);
+    this.finishFreshAction(false);
+    this.calibrated = false;
+    this.recoveryNeedsCalibration = true;
     this.notifyDetection();
   }
 
@@ -193,6 +251,8 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   async start(): Promise<void> {
     if (this.startPromise) return this.startPromise;
     this.disposed = false;
+    this.cpuFallbackAttempted = false;
+    this.recoveryNeedsCalibration = false;
     this.setStatus('requesting-camera');
     this.startPromise = this.startResources();
     try {
@@ -203,7 +263,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   }
 
   read(): InputFrame {
-    if (this.status !== 'ready' || !this.calibrated) {
+    if (this.status !== 'ready' || !this.calibrated || this.pendingAction?.kind === 'calibrate') {
       return { p1: { ...NEUTRAL.p1 }, p2: { ...NEUTRAL.p2 } };
     }
     return this.mapper.read(this.now());
@@ -214,19 +274,52 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   }
 
   canStart(): boolean {
-    return this.status === 'ready' && this.calibrated && this.isDetectionFresh() && this.mapper.canCalibrate(this.latestHands);
+    return this.status === 'ready' && this.calibrated && this.isDetectionFresh() && this.mapper.canTrack(this.latestHands);
   }
 
   calibrate(): boolean {
     if (!this.canCalibrate()) return false;
     this.calibrated = this.mapper.calibrate(this.latestHands, this.now());
+    if (this.calibrated) this.recoveryNeedsCalibration = false;
     this.notifyDetection();
     return this.calibrated;
+  }
+
+  requestCalibration(): Promise<boolean> {
+    return this.requestFreshAction('calibrate');
+  }
+
+  requestStartReadiness(): Promise<boolean> {
+    return this.requestFreshAction('start');
+  }
+
+  private requestFreshAction(kind: 'calibrate' | 'start'): Promise<boolean> {
+    if (this.disposed || this.status !== 'ready' || (kind === 'start' && !this.calibrated)) return Promise.resolve(false);
+    if (this.pendingAction) return this.pendingAction.kind === kind ? this.pendingAction.promise : Promise.resolve(false);
+    if (kind === 'calibrate' ? this.calibrate() : this.canStart()) return Promise.resolve(true);
+    let settle!: (ready: boolean) => void;
+    const promise = new Promise<boolean>(resolve => { settle = resolve; });
+    const timer = setTimeout(() => {
+      this.finishFreshAction(false);
+      this.notifyDetection();
+    }, 3_000);
+    this.pendingAction = { kind, promise, resolve: settle, timer };
+    this.notifyDetection();
+    return promise;
+  }
+
+  private finishFreshAction(ready: boolean): void {
+    const pending = this.pendingAction;
+    if (!pending) return;
+    this.pendingAction = undefined;
+    clearTimeout(pending.timer);
+    pending.resolve(ready);
   }
 
   stop(): void {
     if (this.disposed && !this.stream && !this.worker) return;
     this.disposed = true;
+    this.finishFreshAction(false);
     if (this.frameHandle !== undefined) this.cancelFrame(this.frameHandle);
     this.frameHandle = undefined;
     this.readyReject?.(new Error('Camera setup cancelled.'));
@@ -287,7 +380,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     }
   }
 
-  private waitUntilWorkerReady(worker: Worker): Promise<void> {
+  private waitUntilWorkerReady(worker: Worker, delegate: 'GPU' | 'CPU' = 'GPU'): Promise<void> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         cleanup();
@@ -323,7 +416,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       };
       worker.addEventListener('message', onMessage);
       worker.addEventListener('error', onError);
-      worker.postMessage({ type: 'init', wasmRoot: this.wasmRoot, modelPath: this.modelPath });
+      worker.postMessage({ type: 'init', wasmRoot: this.wasmRoot, modelPath: this.modelPath, delegate });
     });
   }
 
@@ -332,7 +425,8 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     const now = this.now();
     this.expireStaleDetection(now);
     if (this.inFlight && now - this.inFlightSince > INFERENCE_TIMEOUT_MS) {
-      this.fail('The hand model stopped responding. Camera controls were stopped; keyboard controls remain available.');
+      if (this.activeDelegate === 'GPU' && !this.cpuFallbackAttempted) void this.retryWithCpu();
+      else this.fail('The hand model stopped responding on CPU. Camera controls were stopped; keyboard controls remain available.');
       return;
     }
     if (
@@ -346,21 +440,21 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       this.lastFrameSentAt = now;
       this.inFlight = true;
       this.inFlightSince = now;
+      const capturedWorker = this.worker;
       Promise.resolve().then(() => this.createBitmap(this.video)).then((bitmap) => {
-        if (this.disposed || !this.worker) {
+        if (this.disposed || this.worker !== capturedWorker) {
           bitmap.close();
-          this.inFlight = false;
-          this.inFlightSince = Number.NEGATIVE_INFINITY;
           return;
         }
         try {
-          this.worker.postMessage({ type: 'frame', bitmap, timestamp: now }, [bitmap]);
+          capturedWorker.postMessage({ type: 'frame', bitmap, timestamp: now }, [bitmap]);
           this.frameCaptureFailures = 0;
         } catch (error) {
           bitmap.close();
           throw error;
         }
       }).catch((error: unknown) => {
+        if (this.disposed || this.worker !== capturedWorker) return;
         this.inFlight = false;
         this.inFlightSince = Number.NEGATIVE_INFINITY;
         this.frameCaptureFailures += 1;
@@ -371,6 +465,42 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     }
     this.frameHandle = this.requestFrame(this.captureFrame);
   };
+
+  private async retryWithCpu(): Promise<void> {
+    if (this.disposed || this.cpuFallbackAttempted) return;
+    this.cpuFallbackAttempted = true;
+    this.finishFreshAction(false);
+    this.worker?.removeEventListener('message', this.handleWorkerMessage);
+    this.worker?.removeEventListener('error', this.handleWorkerError);
+    this.worker?.terminate();
+    this.worker = undefined;
+    this.inFlight = false;
+    this.inFlightSince = Number.NEGATIVE_INFINITY;
+    this.lastVideoTime = -1;
+    this.lastFrameSentAt = Number.NEGATIVE_INFINITY;
+    this.lastDetectionAt = Number.NEGATIVE_INFINITY;
+    this.latestHands = [];
+    this.detectionWasFresh = false;
+    this.lastResultAt = 0;
+    this.smoothedFps = 0;
+    this.smoothedInferenceMs = 0;
+    this.calibrated = false;
+    this.mapper.reset();
+    this.recoveryNeedsCalibration = true;
+    this.setStatus('loading-model', 'Hand GPU processing stalled. Trying CPU; calibrate again when ready.');
+    this.notifyDetection();
+    try {
+      const worker = this.createWorker();
+      this.worker = worker;
+      await this.waitUntilWorkerReady(worker, 'CPU');
+      if (this.disposed) return;
+      this.setStatus('ready', 'Hand CPU fallback ready. Calibrate again before starting.');
+      this.notifyDetection();
+      this.frameHandle = this.requestFrame(this.captureFrame);
+    } catch (error) {
+      if (!this.disposed) this.fail(errorMessage(error));
+    }
+  }
 
   private handleWorkerMessage = (event: MessageEvent<WorkerResponse>): void => {
     if (this.disposed) return;
@@ -398,6 +528,10 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       this.latestHands = event.data.hands.map((landmarks) => ({ landmarks }));
       this.detectionWasFresh = this.latestHands.length > 0;
       if (this.calibrated) this.mapper.update(this.latestHands, this.lastDetectionAt);
+      if (this.pendingAction) {
+        const ready = this.pendingAction.kind === 'calibrate' ? this.calibrate() : this.canStart();
+        if (ready) this.finishFreshAction(true);
+      }
       this.notifyDetection();
     } else if (event.data.type === 'error') {
       this.fail(event.data.message);
@@ -415,6 +549,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private fail(message: string): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.finishFreshAction(false);
     this.readyReject?.(new Error(message));
     this.readyReject = undefined;
     this.releaseResources();
@@ -470,6 +605,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
         if (right) visiblePlayers.push(PLAYER_ID.p2);
       }
     }
+    const metrics = this.getMetrics();
     for (const canvas of this.overlayCanvases) {
       const ctx = canvas.getContext('2d');
       if (!ctx) continue;
@@ -479,9 +615,8 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
           canvas.height = this.video.videoHeight;
         }
       }
-      renderHandOverlay(ctx, canvas, fresh ? this.latestHands : [], this.soloMode);
+      renderHandOverlay(ctx, canvas, fresh ? this.latestHands : [], this.soloMode, metrics.handMovementZones);
     }
-    const metrics = this.getMetrics();
     this.onMetrics?.(metrics);
     this.onDetection?.(visiblePlayers, this.canCalibrate(), this.calibrated, metrics);
   }

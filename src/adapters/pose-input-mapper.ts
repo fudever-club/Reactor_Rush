@@ -23,10 +23,11 @@ const NEUTRAL_FRAME: InputFrame = {
   p2: { ...NEUTRAL_PLAYER }
 };
 
-export const POSE_TRACKING_STALE_MS = 300;
+export const POSE_TRACKING_STALE_MS = 250;
 export const MIN_SHOULDER_WIDTH = 0.04;
 
-export type PoseAmbiguityReason = 'hands-crossed' | 'too-close' | 'multiple-hands' | 'in-deadband' | 'too-far';
+export type PoseAmbiguityReason = 'hands-crossed' | 'too-close' | 'multiple-hands' | 'in-deadband' | 'too-far' | 'association-lost' | 'tracking-lost';
+export type PosePlayerState = 'WAITING' | 'WAITING_FOR_FRAME' | 'DETECTED_NOT_READY' | 'ACCEPTED_IDLE' | 'MOVE_LEFT' | 'MOVE_RIGHT' | 'CATCH' | 'AMBIGUOUS' | 'LOST' | 'RECALIBRATE' | 'KEYBOARD_FALLBACK';
 
 interface PlayerControl {
   neutralTorsoX: number;
@@ -47,7 +48,9 @@ const VISIBILITY_MIN = 0.35;
 
 function isPointValid(p: NormalizedPoseLandmark | undefined): p is NormalizedPoseLandmark {
   if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) return false;
-  if (typeof p.visibility === 'number' && p.visibility < VISIBILITY_MIN) return false;
+  for (const confidence of [p.visibility, p.presence]) {
+    if (confidence !== undefined && (!Number.isFinite(confidence) || confidence < VISIBILITY_MIN)) return false;
+  }
   return true;
 }
 
@@ -103,7 +106,9 @@ export class PoseInputMapper {
   private readonly centerDeadBand: number;
 
   private controls?: Record<PlayerId, PlayerControl>;
-  private lastKnownX?: Record<PlayerId, number>;
+  private tracks: Partial<Record<PlayerId, { x: number; width: number; at: number; live: boolean }>> = {};
+  private associated: Partial<Record<PlayerId, DetectedPose>> = {};
+  private recalibrationRequired = false;
   private lastUpdateAt = Number.NEGATIVE_INFINITY;
   private lastAmbiguityReason?: PoseAmbiguityReason;
   private frame: InputFrame = cloneFrame(NEUTRAL_FRAME);
@@ -141,6 +146,7 @@ export class PoseInputMapper {
   }
 
   canCalibrate(poses: readonly DetectedPose[]): boolean {
+    if (poses.length !== (this.soloMode ? 1 : 2)) return false;
     const validMetrics = poses.map((p) => extractPoseMetrics(p, this.minShoulderWidth)).filter((m) => m.isValid);
 
     if (this.soloMode) {
@@ -172,7 +178,7 @@ export class PoseInputMapper {
         p1: { neutralTorsoX: m.screenTorsoX, neutralShoulderWidth: m.shoulderWidth, moveAxis: 0, catch: false },
         p2: { neutralTorsoX: 0.75, neutralShoulderWidth: m.shoulderWidth, moveAxis: 0, catch: false }
       };
-      this.lastKnownX = { p1: m.screenTorsoX, p2: 0.75 };
+      this.tracks = { p1: { x: m.screenTorsoX, width: m.shoulderWidth, at: now, live: true } };
     } else {
       const [pA, pB] = validMetrics;
       const left = pA.screenTorsoX < pB.screenTorsoX ? pA : pB;
@@ -182,135 +188,87 @@ export class PoseInputMapper {
         p1: { neutralTorsoX: left.screenTorsoX, neutralShoulderWidth: left.shoulderWidth, moveAxis: 0, catch: false },
         p2: { neutralTorsoX: right.screenTorsoX, neutralShoulderWidth: right.shoulderWidth, moveAxis: 0, catch: false }
       };
-      this.lastKnownX = { p1: left.screenTorsoX, p2: right.screenTorsoX };
+      this.tracks = { p1: { x: left.screenTorsoX, width: left.shoulderWidth, at: now, live: true }, p2: { x: right.screenTorsoX, width: right.shoulderWidth, at: now, live: true } };
     }
 
+    this.associated = {};
+    this.recalibrationRequired = false;
     this.lastUpdateAt = now;
     this.lastAmbiguityReason = undefined;
     this.frame = cloneFrame(NEUTRAL_FRAME);
     return true;
   }
 
+  needsRecalibration(): boolean {
+    return this.recalibrationRequired || Object.values(this.tracks).some(track => !track.live);
+  }
+
+  private invalidate(reason: PoseAmbiguityReason): InputFrame {
+    this.recalibrationRequired = true;
+    this.lastAmbiguityReason = reason;
+    this.associated = {};
+    this.frame = cloneFrame(NEUTRAL_FRAME);
+    for (const ctrl of Object.values(this.controls ?? {})) {
+      ctrl.moveAxis = 0;
+      ctrl.catch = false;
+    }
+    return cloneFrame(this.frame);
+  }
+
   update(poses: readonly DetectedPose[], now = performance.now()): InputFrame {
-    if (!this.controls) {
-      this.frame = cloneFrame(NEUTRAL_FRAME);
-      return this.read(now);
+    if (!this.controls || this.recalibrationRequired) return cloneFrame(NEUTRAL_FRAME);
+    if (!Number.isFinite(now) || now < this.lastUpdateAt || now - this.lastUpdateAt >= this.staleAfterMs) {
+      return this.invalidate('tracking-lost');
     }
-
-    const validPoses = poses
-      .map((p) => ({ pose: p, metrics: extractPoseMetrics(p, this.minShoulderWidth) }))
-      .filter((entry) => entry.metrics.isValid);
-
-    // Solo mode processing
-    if (this.soloMode) {
-      if (validPoses.length > 1) {
-        this.lastAmbiguityReason = 'multiple-hands';
-        this.frame.p1 = { ...NEUTRAL_PLAYER };
-        this.frame.p2 = { ...NEUTRAL_PLAYER };
-        return this.read(now);
-      }
-      if (validPoses.length === 0) {
-        this.lastAmbiguityReason = undefined;
-        this.frame.p1 = { ...NEUTRAL_PLAYER };
-        this.frame.p2 = { ...NEUTRAL_PLAYER };
-        return this.read(now);
-      }
-
-      this.lastAmbiguityReason = undefined;
-      const { metrics } = validPoses[0];
-      this.updatePlayerControl('p1', metrics);
-      this.lastKnownX!.p1 = metrics.screenTorsoX;
-      this.lastUpdateAt = now;
-      return this.read(now);
+    if (poses.length > (this.soloMode ? 1 : 2)) return this.invalidate('multiple-hands');
+    const valid = poses.map(pose => ({ pose, metrics: extractPoseMetrics(pose, this.minShoulderWidth) }))
+      .filter(entry => entry.metrics.isValid);
+    if (valid.length === 0) return this.invalidate('tracking-lost');
+    if (valid.length === 2 && Math.abs(valid[0].metrics.screenTorsoX - valid[1].metrics.screenTorsoX) < 0.15) {
+      return this.invalidate('too-close');
     }
-
-    // Co-op mode processing (2 players)
-    if (validPoses.length > 2) {
-      this.lastAmbiguityReason = 'multiple-hands';
-      this.frame = cloneFrame(NEUTRAL_FRAME);
-      return this.read(now);
+    if (!this.soloMode && valid.length === 2 &&
+        (valid.every(e => e.metrics.screenTorsoX < 0.5) || valid.every(e => e.metrics.screenTorsoX > 0.5))) {
+      return this.invalidate('hands-crossed');
     }
-
-    // Check proximity if 2 poses present
-    if (validPoses.length === 2) {
-      const diff = Math.abs(validPoses[0].metrics.screenTorsoX - validPoses[1].metrics.screenTorsoX);
-      if (diff < 0.15) {
-        this.lastAmbiguityReason = 'too-close';
-        this.frame = cloneFrame(NEUTRAL_FRAME);
-        return this.read(now);
+    const accepted: Partial<Record<PlayerId, typeof valid[number]>> = {};
+    for (const entry of valid) {
+      const m = entry.metrics;
+      if (!this.soloMode && Math.abs(m.screenTorsoX - 0.5) <= this.centerDeadBand) {
+        return this.invalidate('hands-crossed');
       }
+      // A slot token means uninterrupted anonymous visual continuity, never personal identity.
+      // Never use detector array order or current left/right sorting as association.
+      const candidates = (Object.keys(this.tracks) as PlayerId[]).filter(player => {
+        const track = this.tracks[player]!;
+        const dt = now - track.at;
+        if (!track.live || dt < 0 || dt >= this.staleAfterMs) return false;
+        const distanceGate = Math.min(0.14, 0.06 + dt * 0.0004);
+        const widthRatio = m.shoulderWidth / track.width;
+        return Math.abs(m.screenTorsoX - track.x) <= distanceGate && widthRatio >= 0.6 && widthRatio <= 1.75;
+      });
+      if (candidates.length !== 1 || accepted[candidates[0]]) return this.invalidate('association-lost');
+      const player = candidates[0];
+      if (!this.soloMode && ((player === 'p1' && m.screenTorsoX >= 0.5 - this.centerDeadBand) ||
+          (player === 'p2' && m.screenTorsoX <= 0.5 + this.centerDeadBand))) return this.invalidate('hands-crossed');
+      accepted[player] = entry;
     }
-
-    // Associate poses with P1 and P2 based on calibrated neutral positions
-    const p1Neutral = this.controls.p1.neutralTorsoX;
-    const p2Neutral = this.controls.p2.neutralTorsoX;
-
-    let p1PoseMetrics: PoseMetrics | undefined;
-    let p2PoseMetrics: PoseMetrics | undefined;
-
-    if (validPoses.length === 1) {
-      const m = validPoses[0].metrics;
-      const distP1 = Math.abs(m.screenTorsoX - p1Neutral);
-      const distP2 = Math.abs(m.screenTorsoX - p2Neutral);
-
-      // Deadband check
-      if (Math.abs(m.screenTorsoX - 0.5) < this.centerDeadBand) {
-        this.lastAmbiguityReason = 'in-deadband';
-        this.frame = cloneFrame(NEUTRAL_FRAME);
-        return this.read(now);
-      }
-
-      if (distP1 < distP2 && m.screenTorsoX < 0.5 - this.centerDeadBand) {
-        p1PoseMetrics = m;
-      } else if (distP2 < distP1 && m.screenTorsoX > 0.5 + this.centerDeadBand) {
-        p2PoseMetrics = m;
+    this.associated = {};
+    for (const player of Object.keys(this.tracks) as PlayerId[]) {
+      const entry = accepted[player];
+      if (entry) {
+        this.updatePlayerControl(player, entry.metrics);
+        this.tracks[player] = { x: entry.metrics.screenTorsoX, width: entry.metrics.shoulderWidth, at: now, live: true };
+        this.associated[player] = entry.pose;
       } else {
-        // Person crossed over to opposing side
-        this.lastAmbiguityReason = 'hands-crossed';
-        this.frame = cloneFrame(NEUTRAL_FRAME);
-        return this.read(now);
+        this.tracks[player]!.live = false; // Re-entry cannot prove this is the calibrated person.
+        this.controls[player].moveAxis = 0;
+        this.controls[player].catch = false;
+        this.frame[player] = { ...NEUTRAL_PLAYER };
       }
-    } else if (validPoses.length === 2) {
-      const [entryA, entryB] = validPoses;
-      const mA = entryA.metrics;
-      const mB = entryB.metrics;
-
-      // Ensure one is on left and one on right
-      const leftEntry = mA.screenTorsoX < mB.screenTorsoX ? mA : mB;
-      const rightEntry = mA.screenTorsoX < mB.screenTorsoX ? mB : mA;
-
-      // Crossing check: left entry must be < 0.5, right entry must be > 0.5
-      if (leftEntry.screenTorsoX > 0.5 - this.centerDeadBand || rightEntry.screenTorsoX < 0.5 + this.centerDeadBand) {
-        this.lastAmbiguityReason = 'hands-crossed';
-        this.frame = cloneFrame(NEUTRAL_FRAME);
-        return this.read(now);
-      }
-
-      p1PoseMetrics = leftEntry;
-      p2PoseMetrics = rightEntry;
     }
-
-    this.lastAmbiguityReason = undefined;
-
-    if (p1PoseMetrics) {
-      this.updatePlayerControl('p1', p1PoseMetrics);
-      this.lastKnownX!.p1 = p1PoseMetrics.screenTorsoX;
-    } else {
-      this.controls.p1.moveAxis = 0;
-      this.controls.p1.catch = false;
-      this.frame.p1 = { ...NEUTRAL_PLAYER };
-    }
-
-    if (p2PoseMetrics) {
-      this.updatePlayerControl('p2', p2PoseMetrics);
-      this.lastKnownX!.p2 = p2PoseMetrics.screenTorsoX;
-    } else {
-      this.controls.p2.moveAxis = 0;
-      this.controls.p2.catch = false;
-      this.frame.p2 = { ...NEUTRAL_PLAYER };
-    }
-
     this.lastUpdateAt = now;
+    this.lastAmbiguityReason = undefined;
     return this.read(now);
   }
 
@@ -346,61 +304,47 @@ export class PoseInputMapper {
 
   read(now = performance.now()): InputFrame {
     if (!this.controls) return cloneFrame(NEUTRAL_FRAME);
-    if (this.lastAmbiguityReason) return cloneFrame(NEUTRAL_FRAME);
-    if (now - this.lastUpdateAt > this.staleAfterMs) {
+    if (!Number.isFinite(now) || now < this.lastUpdateAt) return this.invalidate('tracking-lost');
+    // The input deadline is a delivery-time safety limit, not proof that an
+    // already captured, in-flight observation has lost anonymous continuity.
+    // update() still latches any actual capture gap >=250ms or invalid association.
+    if (this.recalibrationRequired) return cloneFrame(NEUTRAL_FRAME);
+    if (now - this.lastUpdateAt >= this.staleAfterMs) {
+      for (const ctrl of Object.values(this.controls)) { ctrl.moveAxis = 0; ctrl.catch = false; }
+      this.frame = cloneFrame(NEUTRAL_FRAME);
       return cloneFrame(NEUTRAL_FRAME);
     }
     return cloneFrame(this.frame);
   }
 
-  getAssociatedPoses(poses: readonly DetectedPose[]): Array<{ player: PlayerId; landmarks: NormalizedPoseLandmark[]; catching: boolean }> {
-    if (!this.controls) return [];
-    const valid = poses
-      .map((p) => ({ landmarks: p.landmarks, metrics: extractPoseMetrics(p, this.minShoulderWidth) }))
-      .filter((e) => e.metrics.isValid);
-
-    const result: Array<{ player: PlayerId; landmarks: NormalizedPoseLandmark[]; catching: boolean }> = [];
-
-    if (this.soloMode) {
-      if (valid.length === 1) {
-        result.push({
-          player: 'p1',
-          landmarks: [...valid[0].landmarks],
-          catching: this.frame.p1.catch
-        });
-      }
-      return result;
+  getPlayerStates(now = performance.now()): Record<PlayerId, PosePlayerState> {
+    const frame = this.read(now);
+    const states: Record<PlayerId, PosePlayerState> = { p1: 'WAITING', p2: 'WAITING' };
+    if (!this.controls) return states;
+    for (const player of Object.keys(this.tracks) as PlayerId[]) {
+      if (this.recalibrationRequired) states[player] = 'RECALIBRATE';
+      else if (!this.tracks[player]!.live) states[player] = 'LOST';
+      else if (now - this.lastUpdateAt >= this.staleAfterMs) states[player] = 'WAITING_FOR_FRAME';
+      else if (frame[player].catch) states[player] = 'CATCH';
+      else if (frame[player].moveAxis < 0) states[player] = 'MOVE_LEFT';
+      else if (frame[player].moveAxis > 0) states[player] = 'MOVE_RIGHT';
+      else states[player] = 'ACCEPTED_IDLE';
     }
+    return states;
+  }
 
-    if (valid.length === 1) {
-      const m = valid[0].metrics;
-      const isP1 = m.screenTorsoX < 0.5;
-      result.push({
-        player: isP1 ? 'p1' : 'p2',
-        landmarks: [...valid[0].landmarks],
-        catching: isP1 ? this.frame.p1.catch : this.frame.p2.catch
-      });
-    } else if (valid.length === 2) {
-      const left = valid[0].metrics.screenTorsoX < valid[1].metrics.screenTorsoX ? valid[0] : valid[1];
-      const right = valid[0].metrics.screenTorsoX < valid[1].metrics.screenTorsoX ? valid[1] : valid[0];
-      result.push({
-        player: 'p1',
-        landmarks: [...left.landmarks],
-        catching: this.frame.p1.catch
-      });
-      result.push({
-        player: 'p2',
-        landmarks: [...right.landmarks],
-        catching: this.frame.p2.catch
-      });
-    }
-
-    return result;
+  getAssociatedPoses(poses: readonly DetectedPose[], now = performance.now()): Array<{ player: PlayerId; landmarks: NormalizedPoseLandmark[]; catching: boolean }> {
+    const frame = this.read(now);
+    if (!this.controls || this.recalibrationRequired || now - this.lastUpdateAt >= this.staleAfterMs) return [];
+    return (Object.keys(this.associated) as PlayerId[]).filter(player => poses.includes(this.associated[player]!))
+      .map(player => ({ player, landmarks: [...this.associated[player]!.landmarks], catching: frame[player].catch }));
   }
 
   reset(): void {
     this.controls = undefined;
-    this.lastKnownX = undefined;
+    this.tracks = {};
+    this.associated = {};
+    this.recalibrationRequired = false;
     this.lastUpdateAt = Number.NEGATIVE_INFINITY;
     this.lastAmbiguityReason = undefined;
     this.frame = cloneFrame(NEUTRAL_FRAME);
