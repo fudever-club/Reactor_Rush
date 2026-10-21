@@ -534,3 +534,85 @@ test('Pose refuses an already-ended camera track before loading a model',async()
  try{await assert.rejects(adapter.start(),/camera stopped/);assert.equal(calls.worker,0);assert.equal(track.stopped,true);assert.equal(adapter.currentStatus,'error');}
  finally{adapter.stop();}
 });
+
+// These regressions fail if recovery never resumes, resumes before neutral stability,
+// accepts an expired/discontinuous observation, or silently enables Co-op recovery.
+async function lostSoloPose(scheme='P1') {
+ const f=createAdapter({now:100,soloMode:true,scheme});await f.adapter.start();
+ result(f.worker,100,[makePoseData(.5)]);assert.equal(f.adapter.calibrate(),true);
+ f.clock.now=200;result(f.worker,200,[]);assert.equal(f.adapter.getMetrics().recalibrationRequired,true);
+ return f;
+}
+function sendSoloAt(f,t,poses=[makePoseData(.6)],captured=t){f.clock.now=t;result(f.worker,captured,poses);}
+for(const scheme of ['P1','P2'])test('Solo auto recovery restores '+scheme+' only after a neutral continuous one-second dwell',async()=>{
+ const f=await lostSoloPose(scheme);try{
+ for(let t=300;t<=1200;t+=100){sendSoloAt(f,t);assert.equal(f.adapter.getMetrics().recalibrationRequired,true);assert.equal(f.adapter.read().p1.catch,false);assert.equal(f.adapter.read().p1.moveAxis,0);}
+ assert.equal(f.adapter.getMetrics().soloRecovery.state,'collecting');
+ sendSoloAt(f,1300);assert.equal(f.adapter.getMetrics().recalibrationRequired,false);assert.equal(f.adapter.canStart(),true);assert.equal(f.adapter.read().p1.moveAxis,0,'new neutral center is saved');assert.equal(f.adapter.read().p1.catch,false);
+ sendSoloAt(f,1400,[activePose(.6)]);assert.equal(f.adapter.read().p1.catch,true,'deliberate gesture after recovery works');
+ }finally{f.adapter.stop();}
+});
+test('Solo auto recovery never substitutes for initial calibration',async()=>{
+ const f=createAdapter({now:100,soloMode:true});await f.adapter.start();try{
+ for(let t=100;t<=1600;t+=100)sendSoloAt(f,t);assert.equal(f.adapter.canStart(),false);assert.equal(f.adapter.getMetrics().soloRecovery,undefined);
+ }finally{f.adapter.stop();}
+});
+for(const scheme of ['P1','P2'])test('Co-op stays manual after loss for '+scheme,async()=>{
+ const f=createAdapter({now:100,soloMode:false,scheme});await f.adapter.start();try{
+ const poses=[makePoseData(.25),makePoseData(.75)];result(f.worker,100,poses);assert.equal(f.adapter.calibrate(),true);sendSoloAt(f,200,[]);
+ for(let t=300;t<=1900;t+=100)sendSoloAt(f,t,poses);
+ assert.equal(f.adapter.getMetrics().recalibrationRequired,true);assert.equal(f.adapter.getMetrics().soloRecovery,undefined);assert.equal(f.adapter.read().p1.catch,false);assert.equal(f.adapter.calibrate(),true);
+ }finally{f.adapter.stop();}
+});
+for(const bad of ['raised','hidden-wrist','hidden-shoulder','extra-person','outside-slot','moving','stale','duplicate','future'])test('Solo auto recovery resets the full neutral dwell after '+bad,async()=>{
+ const f=await lostSoloPose('P2');try{
+ for(const t of [300,400,500])sendSoloAt(f,t);
+ let pose=makePoseData(.6),poses=[pose],capture=600;
+ if(bad==='raised')poses=[activePose(.6)];
+ if(bad==='hidden-wrist')pose.landmarks[15].visibility=.1;
+ if(bad==='hidden-shoulder')pose.landmarks[11].visibility=.1;
+ if(bad==='extra-person')poses.push(makePoseData(.3));
+ if(bad==='outside-slot')poses=[makePoseData(.96)];
+ if(bad==='moving')poses=[makePoseData(.4)];
+ if(bad==='stale')capture=350;
+ if(bad==='duplicate')capture=500;
+ if(bad==='future')capture=601;
+ sendSoloAt(f,600,poses,capture);
+ for(let t=700;t<=1600;t+=100){sendSoloAt(f,t);assert.equal(f.adapter.getMetrics().recalibrationRequired,true,bad+' must not carry old progress');}
+ sendSoloAt(f,1700);assert.equal(f.adapter.getMetrics().recalibrationRequired,false);
+ }finally{f.adapter.stop();}
+});
+test('Solo auto recovery requires six observations even if two observations span one second',async()=>{
+ const f=await lostSoloPose();try{
+ sendSoloAt(f,300);sendSoloAt(f,1300);assert.equal(f.adapter.getMetrics().recalibrationRequired,true,'one-second capture gap cannot be bridged');
+ for(let t=1400;t<=2200;t+=100)sendSoloAt(f,t);assert.equal(f.adapter.getMetrics().recalibrationRequired,true);
+ sendSoloAt(f,2300);assert.equal(f.adapter.getMetrics().recalibrationRequired,false);
+ }finally{f.adapter.stop();}
+});
+test('manual Solo calibration cancels automatic progress and keeps explicit cancellation authoritative',async()=>{
+ const f=await lostSoloPose();try{
+ for(const t of [300,400,500])sendSoloAt(f,t);
+ const pending=f.adapter.requestCalibration();f.adapter.cancelPendingAction();assert.equal(await pending,false);
+ for(let t=600;t<=1900;t+=100)sendSoloAt(f,t);
+ assert.equal(f.adapter.canStart(),false);assert.equal(f.adapter.getMetrics().soloRecovery,undefined);
+ }finally{f.adapter.stop();}
+});
+test('Solo auto recovery progress cannot survive a stopped and restarted camera session',async()=>{
+ const f=await lostSoloPose();try{
+ for(const t of [300,400,500])sendSoloAt(f,t);f.adapter.stop();await f.adapter.start();
+ for(let t=600;t<=1900;t+=100)sendSoloAt(f,t);
+ assert.equal(f.adapter.canStart(),false);assert.equal(f.adapter.getMetrics().soloRecovery,undefined);
+ }finally{f.adapter.stop();}
+});
+
+test('Solo auto recovery accumulates neutral captures across130ms delivery waits without extending input freshness',async()=>{
+ const f=await lostSoloPose();try{
+ const poses=[makePoseData(.6)];
+ for(let capture=300;capture<=1420;capture+=140){
+  if(capture>300){f.clock.now=capture-140+250;f.calls.frameCallback();assert.equal(f.adapter.read().p1.catch,false);assert.equal(f.adapter.read().p1.moveAxis,0);}
+  sendSoloAt(f,capture+130,poses,capture);
+  assert.equal(f.adapter.getMetrics().recalibrationRequired,capture<1420,'fresh continuous captures must complete the dwell despite neutral delivery waits');
+ }
+ assert.equal(f.adapter.canStart(),true);
+ }finally{f.adapter.stop();}
+});

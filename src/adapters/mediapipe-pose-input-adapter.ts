@@ -59,6 +59,8 @@ const SAMPLE_INTERVAL_MS = 65;
 const MODEL_READY_TIMEOUT_MS = 30_000;
 const INFERENCE_TIMEOUT_MS = 2_000;
 const MAX_FRAME_CAPTURE_FAILURES = 3;
+const SOLO_RECOVERY_STABLE_MS = 1_000;
+const SOLO_RECOVERY_MIN_SAMPLES = 6;
 
 const NEUTRAL: InputFrame = {
   p1: { moveAxis: 0, catch: false },
@@ -136,6 +138,8 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
   private stableSamples = 0;
   private stableAnchor?: Array<{ x: number; width: number }>;
   private stableAt = Number.NEGATIVE_INFINITY;
+  private soloRecoverySamples = 0;
+  private soloRecoveryAnchor?: { x: number; width: number; at: number; lastAt: number };
   private readonly video: HTMLVideoElement;
   private readonly overlayCanvases: HTMLCanvasElement[];
 
@@ -189,6 +193,7 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
   getMetrics(): CameraMetrics {
     return {
       poseCalibration: this.getCalibrationProgress(),
+      soloRecovery: this.getSoloRecoveryProgress(),
       delegate: this.activeDelegate,
       inferenceMs: Math.round(this.smoothedInferenceMs),
       fps: Math.round(this.smoothedFps),
@@ -216,13 +221,17 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
     this.cancelPendingAction();
     this.calibrationState = 'idle';
     this.soloMode = solo;
+    this.resetSoloRecovery();
     this.mapper.setSoloMode(solo);
     this.calibrated = false;
     this.notifyDetection();
   }
 
   setScheme(scheme: PoseGestureScheme): void {
-    if (scheme !== this.mapper.getScheme()) this.cancelPendingAction();
+    if (scheme !== this.mapper.getScheme()) {
+      this.cancelPendingAction();
+      this.resetSoloRecovery();
+    }
     this.mapper.setScheme(scheme);
   }
 
@@ -271,6 +280,7 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
     this.calibrated = this.mapper.calibrate(this.latestPoses, this.lastDetectionAt);
     if (this.calibrated) {
       this.recoveryNeedsCalibration = false;
+      this.resetSoloRecovery();
       this.mapper.update(this.latestPoses, this.lastDetectionAt);
     }
     this.notifyDetection();
@@ -284,6 +294,7 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
     this.recoveryNeedsCalibration = true;
     this.mapper.reset();
     this.resetCalibrationSamples();
+    this.resetSoloRecovery();
     this.calibrationState = 'collecting';
     return this.beginPendingAction('calibrate', 8_000);
   }
@@ -348,6 +359,64 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
     if (!stable) { this.stableAnchor = points; this.stableAt = this.lastDetectionAt; this.stableSamples = 1; }
     else this.stableSamples += 1;
     if (this.stableSamples >= 3) this.finishPendingAction(this.calibrate());
+  }
+
+  private canAutomaticallyRecoverSolo(): boolean {
+    // This starts a new anonymous Solo association, not proof of personal identity.
+    // Initial calibration, explicit requests/cancellation, Co-op and CPU retry stay manual.
+    return !this.disposed && this.status === 'ready' && this.soloMode && this.calibrated &&
+      this.mapper.needsRecalibration() && !this.recoveryNeedsCalibration && !this.pendingAction;
+  }
+
+  private resetSoloRecovery(): void {
+    this.soloRecoveryAnchor = undefined;
+    this.soloRecoverySamples = 0;
+  }
+
+  private getSoloRecoveryProgress(): CameraMetrics['soloRecovery'] {
+    if (!this.canAutomaticallyRecoverSolo()) return undefined;
+    const anchor = this.isDetectionFresh() ? this.soloRecoveryAnchor : undefined;
+    return {
+      state: anchor ? 'collecting' : 'waiting',
+      stableSamples: anchor ? this.soloRecoverySamples : 0,
+      stableForMs: anchor ? Math.max(0, anchor.lastAt - anchor.at) : 0,
+      requiredStableMs: SOLO_RECOVERY_STABLE_MS
+    };
+  }
+
+  private processSoloRecovery(): void {
+    if (!this.canAutomaticallyRecoverSolo() || !this.canCalibrate()) {
+      this.resetSoloRecovery();
+      return;
+    }
+    const pose = this.latestPoses[0];
+    const metrics = extractPoseMetrics(pose);
+    const visible = [11, 12, 15, 16].every(index => {
+      const p = pose.landmarks[index];
+      return p && Number.isFinite(p.x) && Number.isFinite(p.y) &&
+        p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1 &&
+        [p.visibility, p.presence].every(v => v === undefined || (Number.isFinite(v) && v >= 0.35));
+    });
+    const armsRelaxed = visible && [15, 16].every((index, arm) =>
+      pose.landmarks[index].y >= pose.landmarks[11 + arm].y + metrics.shoulderWidth * 0.1);
+    if (!armsRelaxed) {
+      this.resetSoloRecovery();
+      return;
+    }
+    const at = this.lastDetectionAt;
+    const anchor = this.soloRecoveryAnchor;
+    if (!anchor || at <= anchor.lastAt || at - anchor.lastAt >= POSE_TRACKING_STALE_MS ||
+        Math.abs(metrics.screenTorsoX - anchor.x) > 0.025 ||
+        Math.abs(metrics.shoulderWidth / anchor.width - 1) > 0.15) {
+      this.soloRecoveryAnchor = { x: metrics.screenTorsoX, width: metrics.shoulderWidth, at, lastAt: at };
+      this.soloRecoverySamples = 1;
+      return;
+    }
+    anchor.lastAt = at;
+    this.soloRecoverySamples += 1;
+    if (this.soloRecoverySamples >= SOLO_RECOVERY_MIN_SAMPLES && at - anchor.at >= SOLO_RECOVERY_STABLE_MS) {
+      this.calibrate(); // The accepted neutral sample cannot assert Catch or movement.
+    }
   }
 
   private getCalibrationProgress(): PoseCalibrationProgress {
@@ -594,12 +663,14 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
       this.detectedPoseCount = event.data.poses.length;
       this.validPoseCount = event.data.poses.filter(pose => extractPoseMetrics(pose).isValid).length;
       if (!Number.isFinite(capturedAt) || capturedAt > now || capturedAt <= this.lastDetectionAt) {
+        this.resetSoloRecovery();
         if (this.pendingAction?.kind === 'calibrate') this.resetCalibrationSamples();
         this.expireStaleDetection(now);
         this.notifyDetection();
         return;
       }
       if (now - capturedAt >= POSE_TRACKING_STALE_MS) {
+        this.resetSoloRecovery();
         if (this.pendingAction?.kind === 'calibrate') this.resetCalibrationSamples();
         this.expireStaleDetection(now);
         this.notifyDetection();
@@ -610,6 +681,7 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
       this.detectionWasFresh = this.latestPoses.length > 0;
       if (this.calibrated) this.mapper.update(this.latestPoses, this.lastDetectionAt);
       this.processPendingAction();
+      this.processSoloRecovery();
       this.notifyDetection();
     } else if (event.data.type === 'error') {
       this.fail(event.data.message);
@@ -641,6 +713,7 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
   }
 
   private releaseResources(): void {
+    this.resetSoloRecovery();
     clearTimeout(this.modelReadyTimer);
     this.modelReadyTimer = undefined;
     if (this.frameHandle !== undefined) this.cancelFrame(this.frameHandle);
@@ -738,6 +811,8 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
 
   private expireStaleDetection(now: number): void {
     if (!this.detectionWasFresh || now - this.lastDetectionAt < POSE_TRACKING_STALE_MS) return;
+    // Delivery expiry neutralizes input/preview; only later capture timestamps
+    // can prove a discontinuity. Retain the neutral dwell anchor until then.
     this.latestPoses = [];
     this.detectionWasFresh = false;
     if (this.calibrated) this.mapper.read(now);

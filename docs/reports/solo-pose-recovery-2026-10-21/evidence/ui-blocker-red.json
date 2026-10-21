@@ -1,0 +1,48 @@
+{
+  "method": "Synthetic video/bitmap and80ms fake worker; real built page/input/HUD; no physical inference proof",
+  "browser": "154.0.8037.57",
+  "results": [
+    {
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: auto recovery must show extra-person blocker\n    at file:///workspace/Reactor_Rush/tests/browser/solo-pose-recovery-smoke.mjs:37:11",
+      "state": {
+        "state": "playing",
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 1,
+            "detectedPlayers": 2,
+            "playersReady": false,
+            "shouldersReady": false,
+            "positionReady": false,
+            "fresh": true,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "soloRecovery": {
+            "state": "waiting",
+            "stableSamples": 0,
+            "stableForMs": 0,
+            "requiredStableMs": 1000
+          },
+          "delegate": "GPU",
+          "inferenceMs": 12,
+          "fps": 9,
+          "playerStates": {
+            "p1": "RECALIBRATE",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": true,
+          "readinessReason": "EXTRA_PERSON",
+          "sampleAgeMs": 102,
+          "poseCount": 2,
+          "posePreviewCount": 2,
+          "freshnessMs": 156.3999999994412,
+          "ambiguityReason": "tracking-lost"
+        },
+        "badge": "AUTO RECOVERY"
+      }
+    }
+  ]
+}

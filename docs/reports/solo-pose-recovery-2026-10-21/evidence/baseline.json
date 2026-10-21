@@ -1,0 +1,36 @@
+{
+  "root": "/workspace/Reactor_Rush",
+  "head": "e850a9c80449efa16c4f802b7bd7fd6e464ed4b8",
+  "status": "?? docs/reports/field-feedback-2026-10-21.md\n",
+  "scope": "Solo automatic reacquisition after initial manual calibration; Co-op manual; no250ms/catch/scoring/model/renderer changes",
+  "files": [
+    {
+      "path": "src/adapters/mediapipe-pose-input-adapter.ts",
+      "sha256": "404d9d9753e02c0c6f6f0672d1698d43ce178ab45f221ba8cc6f17affea86bb6"
+    },
+    {
+      "path": "src/adapters/mediapipe-hand-input-adapter.ts",
+      "sha256": "7db716f00990702b0c19acdb90173a2283178a8991447e07d19c9552174b930c"
+    },
+    {
+      "path": "src/main.ts",
+      "sha256": "031882dd6102e1bed9a423f525592704a05dc7adbf5b187f0b35259b9c578de4"
+    },
+    {
+      "path": "tests/mediapipe-pose-input-adapter.test.mjs",
+      "sha256": "f65a54ce0c0aeacf39f414b7d4d36a0b360e2586430016682435618e0b5564bf"
+    },
+    {
+      "path": "docs/gameplay/camera-input-integration.md",
+      "sha256": "e441bdf1b98b113a41e5a4c9dfc56b0a5f88c58ff0621a2d90f30744d2bf58da"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/FIELD-01.md",
+      "sha256": "493eb558057e0fe85badcc099c575d73d8b3500672cd4f2186270f48cef7e952"
+    },
+    {
+      "path": "docs/reports/field-feedback-2026-10-21.md",
+      "sha256": "646200f898620785a40706bb2acbe41e083544478b36b3bca4c7aa36a95c303e"
+    }
+  ]
+}

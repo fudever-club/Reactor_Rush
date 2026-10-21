@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "status": "LOCAL_IMPLEMENTATION_VERIFIED_PHYSICAL_PENDING",
+  "baseline_head": "e850a9c80449efa16c4f802b7bd7fd6e464ed4b8",
+  "local_time": "2026-10-21T12:00:54.255345+07:00",
+  "scope_authority": {
+    "user_request": "Automatic calibration after tracking loss for booth operation",
+    "user_choice": "Solo first; keep Co-op manual",
+    "field_clarification": "Far-distance manual calibration completes and gameplay works; no measured detection/model fault established"
+  },
+  "policy": {
+    "initial_calibration": "manual",
+    "initial_start": "manual",
+    "solo_reacquisition": "automatic after neutral stable fresh observations; new anonymous association",
+    "coop_reacquisition": "manual",
+    "sample_age_limit_ms_exclusive": 250,
+    "capture_gap_limit_ms_exclusive": 250,
+    "minimum_stable_capture_duration_ms": 1000,
+    "minimum_samples": 6,
+    "center_anchor_tolerance": 0.025,
+    "shoulder_width_variation_ratio": 0.15,
+    "manual_override_and_cancel": "preserved",
+    "identity_guarantee": false
+  },
+  "verification": {
+    "node": {
+      "pass": 191,
+      "fail": 0,
+      "skip": 0,
+      "evidence": "evidence/node-tests.json"
+    },
+    "build": {
+      "status": "PASS",
+      "advisory": "existing bundle>500kB",
+      "evidence": "evidence/build.json"
+    },
+    "browser_solo_coop": {
+      "pass": 6,
+      "evidence": "evidence/solo-recovery-browser.json",
+      "method": "real built UI/input; fake video/bitmap/80or130ms worker plus350ms stale-result injection"
+    },
+    "browser_lifecycle": {
+      "pass": 13,
+      "evidence": "evidence/lifecycle.json"
+    },
+    "browser_preview": {
+      "pass": 8,
+      "evidence": "evidence/preview-recovery.json"
+    },
+    "independent": {
+      "reviewer": "/root/camera_audit",
+      "focused_adapter_pass": 66,
+      "focused_scene_pass": 16,
+      "custom_delayed_delivery_reproduction": "PASS after P1 correction; captures140ms apart, results130ms old, >2.1s observed; input neutral and preview clear during delivery expiry",
+      "scope": "Independent focused execution and source review; not physical or independent browser execution",
+      "final_report_review": "PASS_APPROVED_SOLO_SCOPE_AND_REPORT_CONSISTENCY_ONLY",
+      "evidence": "independent-review.md"
+    }
+  },
+  "runtime_sha256": "e77a6302463854f3516f7210adc8d25736872f0887faeda79ff62e572362f714",
+  "source_files": [
+    {
+      "path": "src/main.ts",
+      "sha256": "34c602b06bb0cb57026b902f94f120fc4a5be0051907c3440d87ad7c289a10c7"
+    },
+    {
+      "path": "src/adapters/mediapipe-pose-input-adapter.ts",
+      "sha256": "2378d2a94de2d903f595577d97b3db5bcfafb6e654fdb7b4af4cd54144380edb"
+    },
+    {
+      "path": "src/adapters/mediapipe-hand-input-adapter.ts",
+      "sha256": "5f14a1a412d7df1f971f87627acafe9d883cd98f6b10b263918ca5dffbcebe2a"
+    },
+    {
+      "path": "tests/mediapipe-pose-input-adapter.test.mjs",
+      "sha256": "b79693c8e78ddbb96a5c877264e06bf070ff2c6e4868c270107bcdc735495dd9"
+    },
+    {
+      "path": "tests/browser/solo-pose-recovery-smoke.mjs",
+      "sha256": "e2f3d9057dd5c3764eb55371ac3d6a61883608c28ea37f048e0e9d30a9902439"
+    },
+    {
+      "path": "tests/browser/pose-recovery-smoke.mjs",
+      "sha256": "16d16a1f2ed96ad92249a6d599963057275d6a91470d8355c9f6f07fc04ff13a"
+    },
+    {
+      "path": "docs/gameplay/camera-input-integration.md",
+      "sha256": "01371831f20c507f794235fe030c44ce1b1f854a70eb0bb86ad41685dbfe1ab0"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/FIELD-01.md",
+      "sha256": "5f00f05d865b8b31c53335a13954f114a10b6f002944b18ef4c5b70aa845a01f"
+    },
+    {
+      "path": "docs/reports/field-feedback-2026-10-21.md",
+      "sha256": "5679d1c432ad27fd39903c384854b024f4d2433bd497034577956d7d9ee38e7d"
+    }
+  ],
+  "unchanged_runtime_members": 86,
+  "gate_acceptance": "No G2/G3 promotion; physical automatic recovery not tested by user yet",
+  "git": "Pre-commit evidence snapshot based on e850a9c; user subsequently authorized commit/push. The commit containing this report identifies the delivery revision.",
+  "package": {
+    "path": "/var/tmp/reactor-rush-solo-recovery/Reactor-Rush-Solo-Auto-Recovery-Test.zip",
+    "bytes": 23381756,
+    "sha256": "e9c9a8204f44c12939895846d1bba8239d34dc85e84cde40ef89d2f6452c48a5",
+    "payload_files": 26,
+    "status": "LOCAL_TEST_CANDIDATE_NOT_RELEASE",
+    "manifest_and_build_bytes_verified": true
+  },
+  "evidence_index": {
+    "path": "evidence-index.json",
+    "sha256": "1ba51b1989e9ffe000652b71d44832a2b092894d02543fd2da3ef613cb2fc645"
+  }
+}

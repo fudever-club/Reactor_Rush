@@ -750,6 +750,18 @@ class EnergyCatchScene extends Phaser.Scene {
       const label = (player: PlayerId) => player.toUpperCase() + ': ' + states[player].replaceAll('_', ' ');
       const cue = players.map(label).join(' · ');
       const recovery = metrics.recalibrationRequired ?? false;
+      const autoRecovery = metrics.soloRecovery;
+      const autoRecoveryBlockers: Partial<Record<NonNullable<CameraMetrics['readinessReason']>, string>> = {
+        NO_POSE: 'SEARCHING FOR BODY',
+        LOW_CONFIDENCE: 'SHOW BOTH SHOULDERS',
+        EXTRA_PERSON: 'ONE PERSON ONLY',
+        POSITION: 'STAND IN SOLO ZONE',
+        SLOW_FRAMES: 'SLOW FRAMES · WAIT',
+        WAITING_FOR_FRAME: 'WAITING FOR A FRESH FRAME'
+      };
+      const autoRecoveryCue = autoRecovery?.state === 'collecting'
+        ? 'HOLD STILL · ' + Math.min(100, Math.floor(autoRecovery.stableForMs / autoRecovery.requiredStableMs * 100)) + '%'
+        : (metrics.readinessReason && autoRecoveryBlockers[metrics.readinessReason]) || 'SHOW SHOULDERS & HANDS · LOWER BOTH ARMS';
       const waiting = !recovery && players.some(player => states[player] === 'WAITING_FOR_FRAME');
       const unsafe = recovery || players.some(player => ['AMBIGUOUS', 'LOST', 'RECALIBRATE'].includes(states[player]));
       const diagnostics = metrics.sampleAgeMs === undefined ? '' : ' · frame ' + metrics.sampleAgeMs + 'ms · ' + metrics.poseCount + ' pose(s)';
@@ -786,13 +798,17 @@ class EnergyCatchScene extends Phaser.Scene {
         else if (progress.state === 'timeout') this.ui.cameraStatus.textContent = 'Calibration timed out. ' + this.poseCalibrationHint(progress) + ' Press CALIBRATE to retry.';
         else if (progress.state === 'cancelled') this.ui.cameraStatus.textContent = 'Calibration cancelled. Press CALIBRATE when ready.';
       }
+      if (autoRecovery && !this.cameraMode) {
+        this.ui.cameraStatus.textContent = 'Solo auto recovery: ' + autoRecoveryCue + '. CALIBRATE remains available.';
+      }
       if (this.cameraMode) {
         this.updateControlsHintText();
+        if (autoRecovery) this.ui.controlsHint.textContent = 'SOLO AUTO RECOVERY · ' + autoRecoveryCue;
         if (pending === 'calibrate') this.ui.controlsHint.textContent = 'CALIBRATING ' + progress!.stableSamples + '/3 · KEEP SHOULDERS STILL';
         const recoveryCue = canCalibrate ? 'BODY FOUND · CALIBRATE'
           : (metrics.posePreviewCount ?? 0) > 0 ? 'BODY FOUND · CHECK SETUP'
           : metrics.readinessReason === 'SLOW_FRAMES' ? 'SLOW FRAMES · WAIT' : 'SEARCHING FOR BODY';
-        this.updateHudCameraStatus(unsafe ? 'is-ambiguous' : 'is-tracking', pending === 'calibrate' ? 'CALIBRATING' : recovery ? 'CALIBRATE' : waiting ? 'WAITING' : 'POSE INPUT', pending === 'calibrate' ? 'HOLD STILL · ' + progress!.stableSamples + '/3' : recovery ? recoveryCue + ' · ' + cue : cue);
+        this.updateHudCameraStatus(unsafe ? 'is-ambiguous' : 'is-tracking', pending === 'calibrate' ? 'CALIBRATING' : autoRecovery ? 'AUTO RECOVERY' : recovery ? 'CALIBRATE' : waiting ? 'WAITING' : 'POSE INPUT', pending === 'calibrate' ? 'HOLD STILL · ' + progress!.stableSamples + '/3' : autoRecovery ? autoRecoveryCue : recovery ? recoveryCue + ' · ' + cue : cue);
       }
       return;
     }

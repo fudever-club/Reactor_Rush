@@ -42,3 +42,15 @@ Ngưỡng từ master v3: không silent swap; neutral <=250 ms bắt buộc; pre
 Chỉ chủ dự án chọn H0/P1/P2 hoặc NONE — RETEST / KEYBOARD ONLY sau khi có dữ liệu G3. Ghi người duyệt, ngày, bản build, phạm vi, giới hạn và lý do. Hai người thử không tự động tương đương nghiên cứu sáu người hay nghiệm thu booth.
 
 Các ID trong CSV dùng namespace **MASTER-V3**, không trộn với FT-xx/G6 trong protocol CV-02 cũ. [Hợp đồng camera hiện tại](../../gameplay/camera-input-integration.md) ghi chính xác mapping và giới hạn anonymous tracking.
+
+## Bổ sung Solo auto recovery —21/10/2026
+
+Theo lựa chọn mới của người dùng, chỉSolo có tự hiệu chuẩn lại sau lầncalibration đầu; Co-op ở bước6 vẫn thủ công. Chưa coi triển khai này là physicalPASS.
+
+1. ChọnSolo, thử riêng Pose One Arm vàTwo Arm; hiệu chuẩn vàSTART bằngnút lần đầu.
+2. Giơ tay đểCatch, rời khung; kiểm tra robot ngừngCatch/di chuyển. Quay lại nhưng giữ taygiơ: không được tự phục hồi.
+3. Hạ cảhai tay, để camera thấy đủvai/cổtay, đứngổn định trongvùngSolo tối thiểu1giây. HUD phải hiệnAUTO RECOVERY/HOLD STILL; sau phục hồi robotđứng trungtính. Giơ tay cóchủđích sauđó mớiCatch. Không cần bấmCALIBRATE để thực hiện vòng này.
+4. Thử người thứhai đi vào, chevai/cổtay, đứng gầnmép và ởcác khoảng cách cóđánhdấu; các điều kiện khôngđạt phải ngăn hoàn tất và hiện hướng dẫn. Ghi tiếntrình bịreset, thời gianphục hồi vàCatchngoàiýmuốn nếu có; không suy ra giới hạn250ms bằng mắtthường.
+5. ChuyểnCo-op: mấtbody rồi quaylại vẫn cầnCALIBRATE thủcông. Đổi ngườiSolo có thể tạoliênkếtẩn danh mới sau dwell; không coi đây là nhận dạngcùng người. STOP/consent/fallback vẫn phải hoạtđộng.
+
+[Hợp đồng Solo](../../gameplay/camera-input-integration.md#solo-automatic-recovery-2026-10-21), [bằngchứng triểnkhai](../solo-pose-recovery-2026-10-21/REPORT.md).

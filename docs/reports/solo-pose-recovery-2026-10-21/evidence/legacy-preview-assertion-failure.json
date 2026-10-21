@@ -1,0 +1,49 @@
+{
+  "browser": "154.0.8037.57",
+  "method": "synthetic video, fake bitmap capture and fake worker; tests preview/scene only, no actual SDK or physical benchmark",
+  "results": [
+    {
+      "status": "FAIL",
+      "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at /workspace/Reactor_Rush/tests/browser/pose-recovery-smoke.mjs:26:78",
+      "state": {
+        "phase": "playing",
+        "status": "Calibration saved. Press START; it will wait for a fresh frame.",
+        "cue": "SHOW SHOULDERS & HANDS · LOWER BOTH ARMS",
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 1,
+            "detectedPlayers": 1,
+            "playersReady": true,
+            "shouldersReady": true,
+            "positionReady": true,
+            "fresh": true,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "soloRecovery": {
+            "state": "waiting",
+            "stableSamples": 0,
+            "stableForMs": 0,
+            "requiredStableMs": 1000
+          },
+          "delegate": "GPU",
+          "inferenceMs": 12,
+          "fps": 15,
+          "playerStates": {
+            "p1": "RECALIBRATE",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": true,
+          "readinessReason": "READY_TO_CALIBRATE",
+          "sampleAgeMs": 20,
+          "poseCount": 1,
+          "posePreviewCount": 1,
+          "freshnessMs": 93.1000000005588,
+          "ambiguityReason": "tracking-lost"
+        }
+      }
+    }
+  ]
+}

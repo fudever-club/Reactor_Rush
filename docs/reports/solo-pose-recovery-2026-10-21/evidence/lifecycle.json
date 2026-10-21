@@ -1,0 +1,58 @@
+{
+  "browser": "154.0.8037.57",
+  "method": "Synthetic video, fake bitmap/worker; disconnect/error events injected; consent UI and late stream cleanup exercised; blur event injected. Not OS permission-revoke or physical camera testing.",
+  "results": [
+    {
+      "id": "H0-withdraw-consent",
+      "status": "PASS"
+    },
+    {
+      "id": "H0-disconnect",
+      "status": "PASS"
+    },
+    {
+      "id": "H0-worker-error",
+      "status": "PASS"
+    },
+    {
+      "id": "H0-cancel-permission",
+      "status": "PASS"
+    },
+    {
+      "id": "P1-withdraw-consent",
+      "status": "PASS"
+    },
+    {
+      "id": "P1-disconnect",
+      "status": "PASS"
+    },
+    {
+      "id": "P1-worker-error",
+      "status": "PASS"
+    },
+    {
+      "id": "P1-cancel-permission",
+      "status": "PASS"
+    },
+    {
+      "id": "P2-withdraw-consent",
+      "status": "PASS"
+    },
+    {
+      "id": "P2-disconnect",
+      "status": "PASS"
+    },
+    {
+      "id": "P2-worker-error",
+      "status": "PASS"
+    },
+    {
+      "id": "P2-cancel-permission",
+      "status": "PASS"
+    },
+    {
+      "id": "keyboard-focus-loss",
+      "status": "PASS"
+    }
+  ]
+}

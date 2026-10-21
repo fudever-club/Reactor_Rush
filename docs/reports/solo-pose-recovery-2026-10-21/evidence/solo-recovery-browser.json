@@ -1,0 +1,116 @@
+{
+  "method": "Synthetic video/bitmap and80/130ms fake worker, injected350ms stale results; real built page/input/HUD; no physical inference proof",
+  "browser": "154.0.8037.57",
+  "results": [
+    {
+      "solo": true,
+      "scheme": "P1",
+      "delay": 80,
+      "status": "PASS",
+      "cleanup": true,
+      "checks": [
+        "initial manual calibration/START",
+        "Catch before loss",
+        "neutral after loss",
+        "raised arms do not recover",
+        "slow-frame blocker visible",
+        "extra-person blocker visible and does not recover",
+        "neutral dwell automatically restores Solo with HUD progress",
+        "Catch restored by deliberate gesture",
+        "teardown"
+      ],
+      "errors": []
+    },
+    {
+      "solo": false,
+      "scheme": "P1",
+      "delay": 80,
+      "status": "PASS",
+      "cleanup": true,
+      "checks": [
+        "initial manual calibration/START",
+        "Catch before loss",
+        "neutral after loss",
+        "raised arms do not recover",
+        "Co-op requires manual CALIBRATE",
+        "Catch restored by deliberate gesture",
+        "teardown"
+      ],
+      "errors": []
+    },
+    {
+      "solo": true,
+      "scheme": "P2",
+      "delay": 80,
+      "status": "PASS",
+      "cleanup": true,
+      "checks": [
+        "initial manual calibration/START",
+        "Catch before loss",
+        "neutral after loss",
+        "raised arms do not recover",
+        "slow-frame blocker visible",
+        "extra-person blocker visible and does not recover",
+        "neutral dwell automatically restores Solo with HUD progress",
+        "Catch restored by deliberate gesture",
+        "teardown"
+      ],
+      "errors": []
+    },
+    {
+      "solo": false,
+      "scheme": "P2",
+      "delay": 80,
+      "status": "PASS",
+      "cleanup": true,
+      "checks": [
+        "initial manual calibration/START",
+        "Catch before loss",
+        "neutral after loss",
+        "raised arms do not recover",
+        "Co-op requires manual CALIBRATE",
+        "Catch restored by deliberate gesture",
+        "teardown"
+      ],
+      "errors": []
+    },
+    {
+      "solo": true,
+      "scheme": "P1",
+      "delay": 130,
+      "status": "PASS",
+      "cleanup": true,
+      "checks": [
+        "initial manual calibration/START",
+        "Catch before loss",
+        "neutral after loss",
+        "raised arms do not recover",
+        "slow-frame blocker visible",
+        "extra-person blocker visible and does not recover",
+        "neutral dwell automatically restores Solo with HUD progress",
+        "Catch restored by deliberate gesture",
+        "teardown"
+      ],
+      "errors": []
+    },
+    {
+      "solo": true,
+      "scheme": "P2",
+      "delay": 130,
+      "status": "PASS",
+      "cleanup": true,
+      "checks": [
+        "initial manual calibration/START",
+        "Catch before loss",
+        "neutral after loss",
+        "raised arms do not recover",
+        "slow-frame blocker visible",
+        "extra-person blocker visible and does not recover",
+        "neutral dwell automatically restores Solo with HUD progress",
+        "Catch restored by deliberate gesture",
+        "teardown"
+      ],
+      "errors": []
+    }
+  ]
+}

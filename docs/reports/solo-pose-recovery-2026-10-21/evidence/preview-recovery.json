@@ -1,0 +1,126 @@
+{
+  "browser": "154.0.8037.57",
+  "method": "synthetic video, fake bitmap capture and fake worker; tests preview/scene only, no actual SDK or physical benchmark",
+  "results": [
+    {
+      "id": "P1-Solo-1280",
+      "status": "PASS",
+      "checks": [
+        "amber skeleton before calibration",
+        "accepted Catch",
+        "loss neutral and searching",
+        "inference continues while lost",
+        "amber returned skeleton and recovery guidance",
+        "no automatic input while arms raised",
+        "explicit recalibration override restores Catch",
+        "lower arms releases Catch",
+        "teardown"
+      ]
+    },
+    {
+      "id": "P2-Solo-1280",
+      "status": "PASS",
+      "checks": [
+        "amber skeleton before calibration",
+        "accepted Catch",
+        "loss neutral and searching",
+        "inference continues while lost",
+        "amber returned skeleton and recovery guidance",
+        "no automatic input while arms raised",
+        "explicit recalibration override restores Catch",
+        "lower arms releases Catch",
+        "teardown"
+      ]
+    },
+    {
+      "id": "P1-Coop-1280",
+      "status": "PASS",
+      "checks": [
+        "amber skeleton before calibration",
+        "accepted Catch",
+        "loss neutral and searching",
+        "inference continues while lost",
+        "amber returned skeleton and recovery guidance",
+        "no automatic input while arms raised",
+        "explicit recalibration override restores Catch",
+        "lower arms releases Catch",
+        "teardown"
+      ]
+    },
+    {
+      "id": "P2-Coop-1280",
+      "status": "PASS",
+      "checks": [
+        "amber skeleton before calibration",
+        "accepted Catch",
+        "loss neutral and searching",
+        "inference continues while lost",
+        "amber returned skeleton and recovery guidance",
+        "no automatic input while arms raised",
+        "explicit recalibration override restores Catch",
+        "lower arms releases Catch",
+        "teardown"
+      ]
+    },
+    {
+      "id": "P1-Solo-1920",
+      "status": "PASS",
+      "checks": [
+        "amber skeleton before calibration",
+        "accepted Catch",
+        "loss neutral and searching",
+        "inference continues while lost",
+        "amber returned skeleton and recovery guidance",
+        "no automatic input while arms raised",
+        "explicit recalibration override restores Catch",
+        "lower arms releases Catch",
+        "teardown"
+      ]
+    },
+    {
+      "id": "P2-Solo-1920",
+      "status": "PASS",
+      "checks": [
+        "amber skeleton before calibration",
+        "accepted Catch",
+        "loss neutral and searching",
+        "inference continues while lost",
+        "amber returned skeleton and recovery guidance",
+        "no automatic input while arms raised",
+        "explicit recalibration override restores Catch",
+        "lower arms releases Catch",
+        "teardown"
+      ]
+    },
+    {
+      "id": "P1-Coop-1920",
+      "status": "PASS",
+      "checks": [
+        "amber skeleton before calibration",
+        "accepted Catch",
+        "loss neutral and searching",
+        "inference continues while lost",
+        "amber returned skeleton and recovery guidance",
+        "no automatic input while arms raised",
+        "explicit recalibration override restores Catch",
+        "lower arms releases Catch",
+        "teardown"
+      ]
+    },
+    {
+      "id": "P2-Coop-1920",
+      "status": "PASS",
+      "checks": [
+        "amber skeleton before calibration",
+        "accepted Catch",
+        "loss neutral and searching",
+        "inference continues while lost",
+        "amber returned skeleton and recovery guidance",
+        "no automatic input while arms raised",
+        "explicit recalibration override restores Catch",
+        "lower arms releases Catch",
+        "teardown"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "path": "/var/tmp/reactor-rush-solo-recovery/Reactor-Rush-Solo-Auto-Recovery-Test.zip",
+  "bytes": 23381756,
+  "sha256": "e9c9a8204f44c12939895846d1bba8239d34dc85e84cde40ef89d2f6452c48a5",
+  "payload_files": 26,
+  "status": "LOCAL_TEST_CANDIDATE_NOT_RELEASE",
+  "manifest_and_build_bytes_verified": true
+}

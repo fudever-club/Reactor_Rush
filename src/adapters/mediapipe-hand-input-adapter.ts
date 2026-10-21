@@ -21,6 +21,12 @@ export interface PoseCalibrationProgress {
 
 export interface CameraMetrics {
   poseCalibration?: PoseCalibrationProgress;
+  soloRecovery?: {
+    state: 'waiting' | 'collecting';
+    stableSamples: number;
+    stableForMs: number;
+    requiredStableMs: number;
+  };
   delegate: 'GPU' | 'CPU';
   inferenceMs: number;
   fps: number;
