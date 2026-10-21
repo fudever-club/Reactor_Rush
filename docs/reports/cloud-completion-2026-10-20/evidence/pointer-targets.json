@@ -1,0 +1,28 @@
+{
+  "browser": "154.0.8037.57",
+  "method": "Real page DOM/CSS; results visibility forced only for isolated pointer hit testing; not a full game round.",
+  "results": [
+    {
+      "id": "results-pointer-1280",
+      "geometry": {
+        "pointerEvents": "auto",
+        "height": 44,
+        "inViewport": true,
+        "receivesPointer": true,
+        "hit": "BUTTON"
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "results-pointer-1920",
+      "geometry": {
+        "pointerEvents": "auto",
+        "height": 44,
+        "inViewport": true,
+        "receivesPointer": true,
+        "hit": "BUTTON"
+      },
+      "status": "PASS"
+    }
+  ]
+}

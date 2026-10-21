@@ -1,0 +1,854 @@
+{
+  "schema_version": 1,
+  "closed_local": "2026-10-21T00:42:37.493414+07:00",
+  "scope": "Autonomous diagnostic optimization inside STAB/FIELD preparation. No ARC renderer/delegate policy shipping, gameplay/future-round/design/release changes.",
+  "status": "RESEARCH_COMPLETE_G2_BLOCKED",
+  "baseline_head": "e027110c27014309ead783563c9b4ba7e2e0b77d",
+  "runtime_digest_unchanged": "1ef353185942df71113b5c07cba91e76bff6cf90addaefcf27e6ee68362a347a",
+  "entry_snapshot_file_count": 194,
+  "entry_files_changed": [],
+  "new_runtime_changes": 0,
+  "product_speedup_claim": null,
+  "experiments": [
+    {
+      "id": "ablation",
+      "config": {
+        "base": "http://127.0.0.1:4173",
+        "seconds": 8,
+        "warmupSeconds": 2,
+        "variants": [
+          "baseline",
+          "no-overlays",
+          "no-ui",
+          "no-raster"
+        ],
+        "order": [
+          "baseline",
+          "no-overlays",
+          "no-ui",
+          "no-raster",
+          "no-raster",
+          "no-ui",
+          "no-overlays",
+          "baseline"
+        ],
+        "fixtureSha256": "651fc3cb14c6167f520e5655b8dfd36be0b1539258e7c0a5e23a828b56f064a6"
+      },
+      "method": "Synthetic 640x360 24Hz video; fake bitmap and fake 130ms worker; Co-op P1 1280x720. Ablations intentionally disable components and are not shippable changes. No inference/physical camera or GPU benchmark.",
+      "complete": true,
+      "wall_seconds": 101.549309048,
+      "trials": 8,
+      "variants": {
+        "baseline": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 36.80224243680372,
+            "min": 33.34903672113185,
+            "max": 40.25544815247559,
+            "raw": [
+              40.25544815247559,
+              33.34903672113185
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 3.825766517418349,
+            "min": 3.7041031712577555,
+            "max": 3.9474298635789418,
+            "raw": [
+              3.9474298635789418,
+              3.7041031712577555
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 210.60000000009313,
+            "min": 197.6000000005588,
+            "max": 223.59999999962747,
+            "raw": [
+              197.6000000005588,
+              223.59999999962747
+            ]
+          },
+          "late_results": 2,
+          "capture_gaps_ge250": 1,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": []
+        },
+        "no-overlays": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 33.48565866935256,
+            "min": 25.833374732973525,
+            "max": 41.137942605731595,
+            "raw": [
+              41.137942605731595,
+              25.833374732973525
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 3.639299013278852,
+            "min": 3.334257911471166,
+            "max": 3.9443401150865385,
+            "raw": [
+              3.9443401150865385,
+              3.334257911471166
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 256.00000000046566,
+            "min": 181.6000000005588,
+            "max": 330.40000000037253,
+            "raw": [
+              181.6000000005588,
+              330.40000000037253
+            ]
+          },
+          "late_results": 5,
+          "capture_gaps_ge250": 5,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": []
+        },
+        "no-ui": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 40.590174913957796,
+            "min": 40.426908150063745,
+            "max": 40.75344167785184,
+            "raw": [
+              40.426908150063745,
+              40.75344167785184
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 3.940790149748853,
+            "min": 3.9345278564686397,
+            "max": 3.947052443029066,
+            "raw": [
+              3.947052443029066,
+              3.9345278564686397
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 178.39999999990687,
+            "min": 176.5,
+            "max": 180.29999999981374,
+            "raw": [
+              176.5,
+              180.29999999981374
+            ]
+          },
+          "late_results": 0,
+          "capture_gaps_ge250": 0,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": []
+        },
+        "no-raster": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 59.838003387537505,
+            "min": 59.81145033402011,
+            "max": 59.8645564410549,
+            "raw": [
+              59.81145033402011,
+              59.8645564410549
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 0.7277426053349381,
+            "min": 0.6876007991509021,
+            "max": 0.7678844115189741,
+            "raw": [
+              0.6876007991509021,
+              0.7678844115189741
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 133.20000000018626,
+            "min": 130.90000000037253,
+            "max": 135.5,
+            "raw": [
+              130.90000000037253,
+              135.5
+            ]
+          },
+          "late_results": 0,
+          "capture_gaps_ge250": 0,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": []
+        }
+      },
+      "evidence": "evidence/ablation.json"
+    },
+    {
+      "id": "fallback-pump",
+      "config": {
+        "base": "http://127.0.0.1:4173",
+        "seconds": 8,
+        "warmupSeconds": 2,
+        "variants": [
+          "baseline",
+          "canvas-fallback",
+          "timer-pump"
+        ],
+        "order": [
+          "baseline",
+          "canvas-fallback",
+          "timer-pump",
+          "timer-pump",
+          "canvas-fallback",
+          "baseline"
+        ],
+        "quantileConvention": "Higher empirical quantile: sorted[ceil((n-1)*p)]; p50 is not interpolated median",
+        "fixtureSha256": "651fc3cb14c6167f520e5655b8dfd36be0b1539258e7c0a5e23a828b56f064a6"
+      },
+      "method": "Synthetic 640x360 24Hz video; fake bitmap and fake 130ms worker; Co-op P1 1280x720. Ablations intentionally disable components and are not shippable changes. No inference/physical camera or GPU benchmark.",
+      "complete": true,
+      "wall_seconds": 73.632088321,
+      "trials": 6,
+      "variants": {
+        "baseline": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 33.11181132729851,
+            "min": 33.02911777488049,
+            "max": 33.19450487971654,
+            "raw": [
+              33.02911777488049,
+              33.19450487971654
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 3.5913478747978944,
+            "min": 3.5433219369677382,
+            "max": 3.63937381262805,
+            "raw": [
+              3.63937381262805,
+              3.5433219369677382
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 247.85000000009313,
+            "min": 215.79999999981374,
+            "max": 279.90000000037253,
+            "raw": [
+              279.90000000037253,
+              215.79999999981374
+            ]
+          },
+          "late_results": 5,
+          "capture_gaps_ge250": 5,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": []
+        },
+        "canvas-fallback": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 59.94830044015228,
+            "min": 59.92958274027738,
+            "max": 59.96701814002718,
+            "raw": [
+              59.96701814002718,
+              59.92958274027738
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 0.6184535390055601,
+            "min": 0.6109101244316053,
+            "max": 0.6259969535795149,
+            "raw": [
+              0.6109101244316053,
+              0.6259969535795149
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 133.90000000037253,
+            "min": 131.70000000018626,
+            "max": 136.1000000005588,
+            "raw": [
+              131.70000000018626,
+              136.1000000005588
+            ]
+          },
+          "late_results": 0,
+          "capture_gaps_ge250": 0,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": []
+        },
+        "timer-pump": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 34.0661369362423,
+            "min": 34.049533372272336,
+            "max": 34.08274050021227,
+            "raw": [
+              34.08274050021227,
+              34.049533372272336
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 3.593480206613484,
+            "min": 3.586225987160268,
+            "max": 3.6007344260667002,
+            "raw": [
+              3.586225987160268,
+              3.6007344260667002
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 249.60000000009313,
+            "min": 235.40000000037253,
+            "max": 263.79999999981374,
+            "raw": [
+              235.40000000037253,
+              263.79999999981374
+            ]
+          },
+          "late_results": 5,
+          "capture_gaps_ge250": 5,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": []
+        }
+      },
+      "evidence": "evidence/fallback-pump.json"
+    },
+    {
+      "id": "real-sdk",
+      "config": {
+        "base": "http://127.0.0.1:4173",
+        "seconds": 8,
+        "warmupSeconds": 2,
+        "order": [
+          "baseline",
+          "canvas-fallback",
+          "canvas-fallback",
+          "baseline"
+        ],
+        "quantileConvention": "Higher empirical quantile ceil((n-1)p)"
+      },
+      "method": "Actual local SDK/model/WASM; CPU delegate requested explicitly for both renderers; synthetic 640x360 24Hz video without people; adapter downsamples CPU inference input to320x180. Camera setup phase, not gameplay/body tracking. No screenshots in measurement windows.",
+      "complete": true,
+      "wall_seconds": 51.197301709,
+      "trials": 4,
+      "variants": {
+        "baseline": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 19.188843270846043,
+            "min": 17.3973556019481,
+            "max": 20.98033093974399,
+            "raw": [
+              17.3973556019481,
+              20.98033093974399
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 3.6166816588705992,
+            "min": 3.533305621831114,
+            "max": 3.7000576959100844,
+            "raw": [
+              3.533305621831114,
+              3.7000576959100844
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 144.1999999997206,
+            "min": 130.70000000018626,
+            "max": 157.69999999925494,
+            "raw": [
+              157.69999999925494,
+              130.70000000018626
+            ]
+          },
+          "late_results": 2,
+          "capture_gaps_ge250": null,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": [
+            true,
+            true
+          ],
+          "capture_gap_status": "NOT_MEASURED_BY_THIS_SUMMARY"
+        },
+        "canvas-fallback": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 35.89137616370762,
+            "min": 34.31366432501982,
+            "max": 37.46908800239541,
+            "raw": [
+              37.46908800239541,
+              34.31366432501982
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 2.0981923578105675,
+            "min": 2.065328104313797,
+            "max": 2.1310566113073377,
+            "raw": [
+              2.065328104313797,
+              2.1310566113073377
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 83.24999999953434,
+            "min": 78.59999999962747,
+            "max": 87.8999999994412,
+            "raw": [
+              87.8999999994412,
+              78.59999999962747
+            ]
+          },
+          "late_results": 2,
+          "capture_gaps_ge250": null,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": [
+            true,
+            true
+          ],
+          "capture_gap_status": "NOT_MEASURED_BY_THIS_SUMMARY"
+        }
+      },
+      "evidence": "evidence/real-sdk.json"
+    },
+    {
+      "id": "cpu-capture",
+      "config": {
+        "base": "http://127.0.0.1:4173",
+        "seconds": 8,
+        "warmupSeconds": 2,
+        "order": [
+          "canvas-fallback",
+          "canvas-cpu-capture",
+          "canvas-cpu-capture",
+          "canvas-fallback"
+        ],
+        "captureExperiment": true,
+        "quantileConvention": "Higher empirical quantile ceil((n-1)p)"
+      },
+      "method": "Actual local SDK/model/WASM; CPU delegate requested explicitly for both renderers; synthetic 640x360 24Hz video without people; adapter downsamples CPU inference input to320x180. Camera setup phase, not gameplay/body tracking. No screenshots in measurement windows.",
+      "complete": true,
+      "wall_seconds": 48.356912646000005,
+      "trials": 4,
+      "variants": {
+        "canvas-fallback": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 42.0617908542729,
+            "min": 38.58737730712645,
+            "max": 45.53620440141935,
+            "raw": [
+              38.58737730712645,
+              45.53620440141935
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 1.972933191496025,
+            "min": 1.9443818304307505,
+            "max": 2.0014845525613,
+            "raw": [
+              2.0014845525613,
+              1.9443818304307505
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 48.64999999990687,
+            "min": 38.59999999962747,
+            "max": 58.700000000186265,
+            "raw": [
+              58.700000000186265,
+              38.59999999962747
+            ]
+          },
+          "late_results": 0,
+          "capture_gaps_ge250": null,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": [
+            true,
+            true
+          ],
+          "capture_gap_status": "NOT_MEASURED_BY_THIS_SUMMARY"
+        },
+        "canvas-cpu-capture": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 33.16352444896599,
+            "min": 30.750077808901334,
+            "max": 35.57697108903064,
+            "raw": [
+              30.750077808901334,
+              35.57697108903064
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 2.219952846598294,
+            "min": 2.1750451889949076,
+            "max": 2.2648605042016805,
+            "raw": [
+              2.2648605042016805,
+              2.1750451889949076
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 105.14999999990687,
+            "min": 65.59999999962747,
+            "max": 144.70000000018626,
+            "raw": [
+              144.70000000018626,
+              65.59999999962747
+            ]
+          },
+          "late_results": 3,
+          "capture_gaps_ge250": null,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": [
+            true,
+            true
+          ],
+          "capture_gap_status": "NOT_MEASURED_BY_THIS_SUMMARY"
+        }
+      },
+      "evidence": "evidence/cpu-capture.json"
+    },
+    {
+      "id": "long-renderer",
+      "config": {
+        "base": "http://127.0.0.1:4173",
+        "seconds": 20,
+        "warmupSeconds": 2,
+        "variants": [
+          "baseline",
+          "canvas-fallback"
+        ],
+        "order": [
+          "baseline",
+          "canvas-fallback",
+          "canvas-fallback",
+          "baseline"
+        ],
+        "quantileConvention": "Higher empirical quantile: sorted[ceil((n-1)*p)]; p50 is not interpolated median",
+        "fixtureSha256": "651fc3cb14c6167f520e5655b8dfd36be0b1539258e7c0a5e23a828b56f064a6"
+      },
+      "method": "Synthetic 640x360 24Hz video; fake bitmap and fake 130ms worker; Co-op P1 1280x720. Ablations intentionally disable components and are not shippable changes. No inference/physical camera or GPU benchmark.",
+      "complete": true,
+      "wall_seconds": 96.316565719,
+      "trials": 4,
+      "variants": {
+        "baseline": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 41.37964741175321,
+            "min": 41.17012994790146,
+            "max": 41.58916487560496,
+            "raw": [
+              41.17012994790146,
+              41.58916487560496
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 3.9785861168288648,
+            "min": 3.9766864283290784,
+            "max": 3.9804858053286507,
+            "raw": [
+              3.9766864283290784,
+              3.9804858053286507
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 172.50000000046566,
+            "min": 171.6000000005588,
+            "max": 173.40000000037253,
+            "raw": [
+              173.40000000037253,
+              171.6000000005588
+            ]
+          },
+          "late_results": 0,
+          "capture_gaps_ge250": 0,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": []
+        },
+        "canvas-fallback": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 60.003048667023194,
+            "min": 59.9951044794019,
+            "max": 60.01099285464448,
+            "raw": [
+              59.9951044794019,
+              60.01099285464448
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 0.5908559842682763,
+            "min": 0.5586225953130465,
+            "max": 0.6230893732235063,
+            "raw": [
+              0.6230893732235063,
+              0.5586225953130465
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 130.60000000009313,
+            "min": 130.59999999962747,
+            "max": 130.6000000005588,
+            "raw": [
+              130.6000000005588,
+              130.59999999962747
+            ]
+          },
+          "late_results": 0,
+          "capture_gaps_ge250": 0,
+          "first_fresh_result_ms_derived": null,
+          "page_errors": [],
+          "cleanup_flags": []
+        }
+      },
+      "evidence": "evidence/long-renderer.json"
+    },
+    {
+      "id": "delegate-startup",
+      "config": {
+        "base": "http://127.0.0.1:4173",
+        "seconds": 8,
+        "warmupSeconds": 2,
+        "order": [
+          "canvas-auto",
+          "canvas-fallback",
+          "canvas-fallback",
+          "canvas-auto"
+        ],
+        "captureExperiment": false,
+        "delegateExperiment": true,
+        "quantileConvention": "Higher empirical quantile ceil((n-1)p)"
+      },
+      "method": "Actual local SDK/model/WASM; CPU delegate requested explicitly unless canvas-auto; compare config.order; synthetic 640x360 24Hz video without people; adapter downsamples CPU inference input to320x180. Camera setup phase, not gameplay/body tracking. No screenshots in measurement windows.",
+      "complete": true,
+      "wall_seconds": 62.320112778,
+      "trials": 4,
+      "variants": {
+        "canvas-auto": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 43.85747026641953,
+            "min": 40.812263587498464,
+            "max": 46.9026769453406,
+            "raw": [
+              40.812263587498464,
+              46.9026769453406
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 1.9803610515627743,
+            "min": 1.840415762293327,
+            "max": 2.1203063408322214,
+            "raw": [
+              2.1203063408322214,
+              1.840415762293327
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 43.200000000186265,
+            "min": 26.700000000186265,
+            "max": 59.700000000186265,
+            "raw": [
+              59.700000000186265,
+              26.700000000186265
+            ]
+          },
+          "late_results": 0,
+          "capture_gaps_ge250": null,
+          "first_fresh_result_ms_derived": {
+            "median": 6884.649999999907,
+            "min": 6769.799999999814,
+            "max": 6999.5,
+            "raw": [
+              6769.799999999814,
+              6999.5
+            ]
+          },
+          "page_errors": [],
+          "cleanup_flags": [
+            true,
+            true
+          ],
+          "capture_gap_status": "NOT_MEASURED_BY_THIS_SUMMARY"
+        },
+        "canvas-fallback": {
+          "trials": 2,
+          "raf_hz": {
+            "median": 28.88973849423122,
+            "min": 23.685457129320397,
+            "max": 34.094019859142044,
+            "raw": [
+              34.094019859142044,
+              23.685457129320397
+            ]
+          },
+          "cgroup_cpu_equivalents": {
+            "median": 2.3031169656759287,
+            "min": 2.126665505313044,
+            "max": 2.4795684260388136,
+            "raw": [
+              2.126665505313044,
+              2.4795684260388136
+            ]
+          },
+          "result_age_p95_ms": {
+            "median": 62.5,
+            "min": 48.200000000186265,
+            "max": 76.79999999981374,
+            "raw": [
+              48.200000000186265,
+              76.79999999981374
+            ]
+          },
+          "late_results": 0,
+          "capture_gaps_ge250": null,
+          "first_fresh_result_ms_derived": {
+            "median": 1161.8999999999069,
+            "min": 1106.5999999996275,
+            "max": 1217.2000000001863,
+            "raw": [
+              1217.2000000001863,
+              1106.5999999996275
+            ]
+          },
+          "page_errors": [],
+          "cleanup_flags": [
+            true,
+            true
+          ],
+          "capture_gap_status": "NOT_MEASURED_BY_THIS_SUMMARY"
+        }
+      },
+      "evidence": "evidence/delegate-startup.json"
+    }
+  ],
+  "impact_experimental_only": {
+    "synthetic_canvas_environment_cpu_reduction_percent": 85.14909651524098,
+    "synthetic_canvas_raf_increase_percent": 45.006186422894245,
+    "sdk_canvas_environment_cpu_reduction_percent": 41.985705248225216,
+    "sdk_canvas_result_age_p95_reduction_percent": 42.26768377274921,
+    "cpu_first_first_fresh_result_reduction_percent": 83.12332507825492
+  },
+  "total_trials": 30,
+  "total_suite_wall_seconds": 433.372290221,
+  "bounds": "Each suite sequential, 120s graceful watchdog; all six actual suites completed below120s. Combined suite time is separately reported, not claimed below120s. No installed dependencies, package downloads, privileged operations or external writes.",
+  "automated_verification": {
+    "node_tests": {
+      "pass": 173,
+      "fail": 0,
+      "skip": 0,
+      "evidence": "evidence/regression-tests.log"
+    },
+    "script_syntax": "PASS both new scripts",
+    "git_diff_check": "PASS",
+    "build": "NOT RUN this round: test harness/documentation only; prior successful build is historical"
+  },
+  "gates": {
+    "G0": {
+      "status": "TECHNICAL_PASS_ORIGINAL_IDENTITY_UNVERIFIED",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    },
+    "G1": {
+      "status": "PARTIAL",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    },
+    "G2": {
+      "status": "BLOCKED_REVISE",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    },
+    "G3": {
+      "status": "PHYSICAL_NOT_RUN_PREPARATION_READY",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    },
+    "G4": {
+      "status": "PENDING_HUMAN_CHOICE",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    },
+    "G5": {
+      "status": "BLOCKED_SCOPE_ACCESS_APPROVAL",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    },
+    "G6": {
+      "status": "BLOCKED_G4_G5",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    },
+    "G7": {
+      "status": "NOT_RUN_NOT_AUTHORIZED",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    },
+    "G8": {
+      "status": "BLOCKED_MECHANICS_SPEC",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    },
+    "G9": {
+      "status": "NOT_RUN_DEPENDENCY_BLOCKED",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    },
+    "G10": {
+      "status": "NOT_RELEASE_CERTIFIED_NOT_AUTHORIZED",
+      "reference": "../cloud-completion-2026-10-20/status.json",
+      "change_this_round": "No gate acceptance promoted"
+    }
+  },
+  "independent_evaluation": {
+    "kind": "Distinct read-only review of scripts and raw measurements; no independent browser/test execution this round",
+    "reviewer": "/root/camera_audit",
+    "status": "PASS_RESEARCH_METHODOLOGY_AND_REPORT_CONSISTENCY_ONLY",
+    "evidence": "independent-review.md",
+    "corrected_findings": [
+      "Unmeasured SDK capture gaps now null/NOT_MEASURED rather than0",
+      "Other exploratory harness limitations retained and corrected in later versions"
+    ]
+  },
+  "decisions": {
+    "retain": [
+      "Two reusable diagnostic benchmark scripts, raw results, controlled configurations and evidence-backed opportunity descriptions"
+    ],
+    "reject_for_shipping": [
+      "Suppressing selected WebGL draw submissions: removes required visuals",
+      "Overlay/UI removal: no consistent comparable performance benefit",
+      "Additive8ms timer pump: late results persist",
+      "CPU canvas readback capture: mixed/worse latency and more late results"
+    ],
+    "pending_scope_and_validation": [
+      "Renderer-selection/Canvas policy is ARC-dependent, requires authorization and actual gameplay/physical/visual validation",
+      "CPU-first policy for software-rendered hosts: measured local startup benefit; not a general hardware-GPU policy"
+    ]
+  },
+  "limitations": [
+    "Only2 trials/configuration; descriptive medians/ranges, no confidence/significance claim",
+    "Cgroup CPU covers entire execution environment; rAF cadence is not measured physical display FPS",
+    "Synthetic worker is EventTarget plus main-thread130ms timer, not actual worker compute",
+    "Real SDK measurements have no people and remain in setup phase; no body accuracy/control acceptance",
+    "20s longer baseline trials passed while earlier8s trials failed; rare latency spikes are nondeterministic",
+    "Canvas SDK still had late results up to492.7ms; G2 remains blocked",
+    "Lower inference wall time does not prove faster model arithmetic",
+    "Uploaded reconstructed roadmap not used as implementation authorization"
+  ],
+  "benchmark_source_hashes": {
+    "tests/browser/pose-performance-benchmark.mjs": "3d5abd5d198482630db4a280f16730da70c3c44f23bc49c8f935e5e1c55e445c",
+    "tests/browser/pose-sdk-performance-benchmark.mjs": "32d8e8b9fa0b0fc5c989f2ede42dc6cfd7c269f91144446635bb2d087b8c6e6c"
+  }
+}

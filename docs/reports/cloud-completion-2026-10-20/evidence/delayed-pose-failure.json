@@ -1,0 +1,121 @@
+{
+  "method": "synthetic video, fake bitmap and fake worker with130ms result delay; UI/state only, no model/webcam benchmark",
+  "browser": "154.0.8037.57",
+  "results": [
+    {
+      "id": "P1-Solo-1280",
+      "status": "PASS",
+      "checks": [
+        "requestable before detection",
+        "oneclick cancel",
+        "3stable samples saved",
+        "checklist and44px controls",
+        "START with130ms result delay",
+        "bodyloss then queued live calibration and Catch restored",
+        "resource cleanup"
+      ],
+      "geometry": [
+        {
+          "id": "#pose-calibration-checks",
+          "left": 109.609375,
+          "right": 737.015625,
+          "top": 358.515625,
+          "bottom": 418.078125,
+          "height": 59.5625
+        },
+        {
+          "id": "#calibrate-camera",
+          "left": 428.15625,
+          "right": 737.015625,
+          "top": 537.046875,
+          "bottom": 581.046875,
+          "height": 44
+        },
+        {
+          "id": "#start-camera-round",
+          "left": 109.609375,
+          "right": 418.46875,
+          "top": 592.734375,
+          "bottom": 636.734375,
+          "height": 44
+        }
+      ]
+    },
+    {
+      "id": "P2-Solo-1280",
+      "status": "PASS",
+      "checks": [
+        "requestable before detection",
+        "oneclick cancel",
+        "3stable samples saved",
+        "checklist and44px controls",
+        "START with130ms result delay",
+        "bodyloss then queued live calibration and Catch restored",
+        "resource cleanup"
+      ],
+      "geometry": [
+        {
+          "id": "#pose-calibration-checks",
+          "left": 109.609375,
+          "right": 737.015625,
+          "top": 333.515625,
+          "bottom": 393.078125,
+          "height": 59.5625
+        },
+        {
+          "id": "#calibrate-camera",
+          "left": 428.15625,
+          "right": 737.015625,
+          "top": 512.046875,
+          "bottom": 556.046875,
+          "height": 44
+        },
+        {
+          "id": "#start-camera-round",
+          "left": 109.609375,
+          "right": 418.46875,
+          "top": 567.734375,
+          "bottom": 611.734375,
+          "height": 44
+        }
+      ]
+    },
+    {
+      "status": "FAIL",
+      "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at /workspace/Reactor_Rush/tests/browser/pose-calibration-smoke.mjs:25:825",
+      "state": {
+        "status": "Calibration saved. Press START; it will wait for a fresh frame.",
+        "cue": "BODY FOUND · CALIBRATE · P1: RECALIBRATE · P2: RECALIBRATE",
+        "phase": "playing",
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 2,
+            "playersReady": true,
+            "shouldersReady": true,
+            "positionReady": true,
+            "fresh": true,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "GPU",
+          "inferenceMs": 12,
+          "fps": 6,
+          "playerStates": {
+            "p1": "RECALIBRATE",
+            "p2": "RECALIBRATE"
+          },
+          "recalibrationRequired": true,
+          "readinessReason": "READY_TO_CALIBRATE",
+          "sampleAgeMs": 131,
+          "poseCount": 2,
+          "posePreviewCount": 2,
+          "freshnessMs": 183.59999999962747,
+          "ambiguityReason": "tracking-lost"
+        }
+      }
+    }
+  ]
+}

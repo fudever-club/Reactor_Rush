@@ -1,0 +1,42 @@
+{
+  "browser": "154.0.8037.57",
+  "method": "synthetic video, fake bitmap capture and fake worker; tests preview/scene only, no actual SDK or physical benchmark",
+  "results": [
+    {
+      "status": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: amber skeleton visible before calibration\n    at file:///workspace/Reactor_Rush/tests/browser/pose-recovery-smoke.mjs:22:385",
+      "state": {
+        "phase": "menu",
+        "status": "Body detected (yellow preview). Keep arms relaxed and press CALIBRATE.",
+        "cue": "P1: WAITING",
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 1,
+            "detectedPlayers": 1,
+            "playersReady": true,
+            "shouldersReady": true,
+            "positionReady": true,
+            "fresh": true,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "GPU",
+          "inferenceMs": 12,
+          "fps": 0,
+          "playerStates": {
+            "p1": "DETECTED_NOT_READY",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": false,
+          "readinessReason": "READY_TO_CALIBRATE",
+          "sampleAgeMs": 32,
+          "poseCount": 1,
+          "posePreviewCount": 1,
+          "freshnessMs": 81.20000000018626
+        }
+      }
+    }
+  ]
+}

@@ -46,4 +46,4 @@ The gameplay unit tests cover combo scoring, hazard penalties, timer and result 
 - Keyboard co-op is implemented and remains available. Optional MediaPipe camera input is an integration beta; real camera interaction and Dell Vostro performance have not been verified in this report.
 - No benchmark has been run on the Dell Vostro 15 5510. Existing production build output has a Phaser JavaScript chunk over Vite's 500 kB warning threshold; runtime frame rate on the target laptop remains unverified.
 - The lane split and scoring values are first-pass balancing choices. No external playtest data is available yet.
-- The project directory has no Git metadata, so change review and revert currently rely on local files rather than a Git diff.
+- The original workspace recorded by this document had no Git metadata. The current Cloud checkout does have Git; see the [current engineering baseline](../reports/cloud-completion-2026-10-20/REPORT.md). Historical no-Git evidence is not a description of this checkout; no new commit/push was performed.

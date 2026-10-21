@@ -446,3 +446,91 @@ test('Pose START intent survives a delivery wait but never calibrates after real
 test('Pose checklist clears saved conditions when camera stops',async()=>{
  const {adapter,worker}=createAdapter({now:100,soloMode:true});await adapter.start();result(worker,100,[makePoseData(.5)]);adapter.calibrate();assert.equal(adapter.getMetrics().poseCalibration.state,'saved');adapter.stop();const p=adapter.getMetrics().poseCalibration;assert.equal(p.cameraReady,false);assert.equal(p.playersReady,false);assert.equal(p.shouldersReady,false);assert.equal(p.detectedPlayers,0);assert.equal(p.stableSamples,0);
 });
+
+
+test('repeated start is idempotent and leaves only one owned camera session', async () => {
+  const {adapter,calls}=createAdapter();
+  try {
+    await adapter.start(); await adapter.start();
+    assert.equal(calls.camera,1); assert.equal(calls.worker,1);
+  } finally { adapter.stop(); }
+});
+
+test('stop permits immediate restart while an obsolete permission request is pending', async () => {
+  const requests=[]; const workers=[];
+  const {adapter}=createAdapter({getUserMedia:()=>new Promise(resolve=>requests.push(resolve)),
+    createWorker:()=>{const worker=new FakeWorker();workers.push(worker);return worker;}});
+  const old=fakeStream(); const current=fakeStream();
+  const first=adapter.start();adapter.stop();const second=adapter.start();
+  try {
+    assert.equal(requests.length,2);
+    requests[1](current.stream);await second;
+    requests[0](old.stream);await first;
+    assert.equal(old.track.stopped,true);assert.equal(current.track.stopped,false);
+    assert.equal(adapter.currentStatus,'ready');assert.equal(workers.length,1);
+  } finally { for(const resolve of requests)resolve(old.stream);adapter.stop();await Promise.allSettled([first,second]); }
+});
+
+test('cancelled CPU recovery cannot fail or stop an immediately restarted camera session', async () => {
+  const workers=[new FakeWorker(true,'GPU'),new FakeWorker(false,'CPU'),new FakeWorker(true,'GPU')];
+  const {adapter,video,calls,clock}=createAdapter({createWorker:()=>workers.shift(),createBitmap:async()=>({close(){}})});
+  await adapter.start();video.readyState=2;video.currentTime=1;clock.now=100;calls.frameCallback();
+  await Promise.resolve();await Promise.resolve();await Promise.resolve();
+  clock.now=2201;video.currentTime=2;calls.frameCallback();
+  assert.equal(adapter.currentStatus,'loading-model');
+  adapter.stop();await adapter.start();
+  try {assert.equal(adapter.currentStatus,'ready');assert.equal(calls.camera,2);assert.equal(calls.worker,3);}
+  finally {adapter.stop();}
+});
+
+
+test('synchronous Pose bitmap failures are contained and release resources after three attempts',async()=>{
+  const {adapter,video,calls,clock,worker,track}=createAdapter({createBitmap:()=>{throw Error('sync capture failure');}});
+  await adapter.start();video.readyState=2;
+  try {
+    for(let i=1;i<=3;i++){clock.now=100*i;video.currentTime=i;assert.doesNotThrow(()=>calls.frameCallback());await new Promise(resolve=>setImmediate(resolve));}
+    assert.equal(adapter.currentStatus,'error');assert.equal(worker.terminated,true);assert.equal(track.stopped,true);
+  }finally{adapter.stop();}
+});
+
+test('failed Pose bitmap transfers close untransferred frames',async()=>{
+  let closed=0;const {adapter,video,calls,clock,worker}=createAdapter({createBitmap:async()=>({close(){closed++;}})});
+  await adapter.start();worker.postMessage=()=>{throw Error('transfer failed');};video.readyState=2;clock.now=100;video.currentTime=1;
+  try {calls.frameCallback();await new Promise(resolve=>setImmediate(resolve));assert.equal(closed,1);}
+  finally{adapter.stop();}
+});
+
+test('Pose worker bootstrap errors reject startup immediately and clean up',async()=>{
+ const {adapter,worker,track}=createAdapter({autoReady:false});
+ const starting=adapter.start();const rejected=assert.rejects(starting,/bootstrap failure/);
+ await new Promise(resolve=>setImmediate(resolve));worker.emit('error',{message:'bootstrap failure'});
+ try {await Promise.race([rejected,new Promise((_,reject)=>setTimeout(()=>reject(Error('startup did not reject promptly')),100))]);assert.equal(track.stopped,true);assert.equal(worker.terminated,true);}
+ finally{adapter.stop();await Promise.allSettled([starting,rejected]);}
+});
+
+
+test('obsolete video playback rejection cannot fail a restarted session', async () => {
+  const {adapter,video}=createAdapter();
+  let rejectPlayback;video.play=()=>new Promise((_,reject)=>{rejectPlayback=reject;});
+  const first=adapter.start();await new Promise(resolve=>setImmediate(resolve));
+  adapter.stop();video.play=async()=>{};await adapter.start();
+  try{rejectPlayback(Error('obsolete playback'));await first;assert.equal(adapter.currentStatus,'ready');}
+  finally{adapter.stop();}
+});
+
+test('start during CPU recovery does not allocate another stream or replace the fallback worker',async()=>{
+  const gpu=new FakeWorker(true,'GPU');const cpu=new FakeWorker(false,'CPU');let count=0;
+  const {adapter,video,calls,clock}=createAdapter({createWorker:()=>count++===0?gpu:cpu,createBitmap:async()=>({close(){}})});
+  await adapter.start();video.readyState=2;video.currentTime=1;clock.now=100;calls.frameCallback();
+  await new Promise(resolve=>setImmediate(resolve));clock.now=2201;video.currentTime=2;calls.frameCallback();
+  const repeated=adapter.start();await new Promise(resolve=>setImmediate(resolve));
+  try{assert.equal(calls.camera,1);assert.equal(calls.worker,2);cpu.emit('message',{data:{type:'ready',delegate:'CPU'}});await repeated;await new Promise(resolve=>setImmediate(resolve));assert.equal(adapter.currentStatus,'ready');}
+  finally{adapter.stop();await Promise.allSettled([repeated]);}
+});
+
+
+test('Pose refuses an already-ended camera track before loading a model',async()=>{
+ const {adapter,track,calls}=createAdapter();track.readyState='ended';
+ try{await assert.rejects(adapter.start(),/camera stopped/);assert.equal(calls.worker,0);assert.equal(track.stopped,true);assert.equal(adapter.currentStatus,'error');}
+ finally{adapter.stop();}
+});

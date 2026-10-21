@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "status": "STAB_IMPLEMENTED_ACCEPTANCE_OPEN_FIELD_PREPARATION_READY",
+  "scope_authority": "Latest direct user instruction: STAB-01 bugfixes/regressions and FIELD-01 preparation only. Reconstructed roadmap provisional, not original or new implementation authorization.",
+  "baseline_head": "e027110c27014309ead783563c9b4ba7e2e0b77d",
+  "current_head": "e027110c27014309ead783563c9b4ba7e2e0b77d",
+  "application_runtime_sha256": "1ef353185942df71113b5c07cba91e76bff6cf90addaefcf27e6ee68362a347a",
+  "source_sha256_excluding_evidence_envelope": "b4e0cdb8e280c453786d79433c84f853902796cd23c841f988a211e16dc289cc",
+  "gates": {
+    "G0": {
+      "status": "TECHNICAL_PASS_ORIGINAL_IDENTITY_UNVERIFIED",
+      "observed": [
+        "151-file pre-edit snapshot SHA256 parity",
+        "current checkout rebaseline; runtime/source digests",
+        "77 protected files unchanged; HEAD unchanged"
+      ],
+      "not_established": [
+        "Original master v3 archive identity/content unverified; reconstructed reference is provisional",
+        "Historical CV02 approval discrepancy not retroactively resolved"
+      ],
+      "evidence": [
+        "evidence/baseline-before.json",
+        "evidence/current-checkout-baseline.json",
+        "evidence/preservation-audit.json"
+      ]
+    },
+    "G1": {
+      "status": "PARTIAL",
+      "observed": [
+        "173/173 Node tests; build/typecheck PASS",
+        "13/13 injected lifecycle/browser cases",
+        "3/3 Chromium native permission revocation cases with fake camera",
+        "10/10 general camera cases"
+      ],
+      "not_established": [
+        "Complete original safety-matrix certification",
+        "Physical disconnect, OS-level permission UI and actual background-tab camera operation"
+      ],
+      "evidence": [
+        "evidence/node-tests.log",
+        "evidence/build.log",
+        "evidence/lifecycle.json",
+        "evidence/native-permission.json",
+        "evidence/camera-matrix.json"
+      ]
+    },
+    "G2": {
+      "status": "BLOCKED_REVISE",
+      "observed": [
+        "Current production pointer2/2,Hand2/2,recovery8/8,camera10/10",
+        "Real SDK/model/WASM three cold synthetic-video probes PASS",
+        "10 fresh-page start/stop cycles and10 timer/results/replay rounds completed"
+      ],
+      "not_established": [
+        "130ms delayed Pose production Co-op failed after two Solo passes",
+        "Five of six Pose endurance rounds ended with recalibrationRequired; no continuous-tracking acceptance",
+        "Instrumented SwiftShader Co-op trace: >=250ms capture gaps and late results; no target-device certification"
+      ],
+      "evidence": [
+        "evidence/delayed-pose-failure.json",
+        "evidence/pose-recovery.json",
+        "evidence/hand-movement.json",
+        "evidence/endurance.json",
+        "evidence/pose-profile-long.json",
+        "evidence/sdk-cold-1.json",
+        "evidence/sdk-cold-2.json",
+        "evidence/sdk-cold-3.json"
+      ]
+    },
+    "G3": {
+      "status": "PHYSICAL_NOT_RUN_PREPARATION_READY",
+      "observed": [
+        "FIELD runbook/templates retained; validator9/9 tests PASS",
+        "Empty physical CSV templates correctly return INCOMPLETE"
+      ],
+      "not_established": [
+        "Target laptop/camera/people/TV measurements",
+        "Accuracy,distance,lighting,FPS,body latency,physical offline/endurance acceptance"
+      ],
+      "evidence": [
+        "evidence/field-readiness.json",
+        "../../operations/booth-local.md",
+        "../master-v3-2026-10-19/FIELD-01.md"
+      ]
+    },
+    "G4": {
+      "status": "PENDING_HUMAN_CHOICE",
+      "observed": [],
+      "not_established": [
+        "No field-evidence-based H0/P1/P2/NONE decision authorized or made"
+      ],
+      "evidence": []
+    },
+    "G5": {
+      "status": "BLOCKED_SCOPE_ACCESS_APPROVAL",
+      "observed": [
+        "Local handoff proposal only; no Stitch tool advertised"
+      ],
+      "not_established": [
+        "Specific WP02 implementation approval/editor access/canonical frame IDs/design acceptance; no shared-project write"
+      ],
+      "evidence": [
+        "../../superpowers/plans/2026-10-20-wp02-handoff-proposal.md"
+      ]
+    },
+    "G6": {
+      "status": "BLOCKED_G4_G5",
+      "observed": [
+        "Art/rig/assets/manifest unchanged"
+      ],
+      "not_established": [
+        "Approved production assets and required integration authorization; WP03 not started"
+      ],
+      "evidence": [
+        "evidence/preservation-audit.json"
+      ]
+    },
+    "G7": {
+      "status": "NOT_RUN_NOT_AUTHORIZED",
+      "observed": [],
+      "not_established": [
+        "Dependent work not executed/certified; no ARC01 runtime change"
+      ],
+      "evidence": []
+    },
+    "G8": {
+      "status": "BLOCKED_MECHANICS_SPEC",
+      "observed": [],
+      "not_established": [
+        "No verified approved Duo Circuit,Cool the Core or Final Boss mechanics; no Round2/future code"
+      ],
+      "evidence": []
+    },
+    "G9": {
+      "status": "NOT_RUN_DEPENDENCY_BLOCKED",
+      "observed": [],
+      "not_established": [
+        "Later-round implementation/QA prerequisites absent; no invented pass"
+      ],
+      "evidence": []
+    },
+    "G10": {
+      "status": "NOT_RELEASE_CERTIFIED_NOT_AUTHORIZED",
+      "observed": [
+        "Local technical package/preparation only; SHA256 manifest26payload files"
+      ],
+      "not_established": [
+        "Physical/human release acceptance and explicit publish authorization; no commit,push,merge,deploy or release"
+      ],
+      "evidence": [
+        "../../operations/booth-local.md"
+      ]
+    }
+  },
+  "automated_tests": {
+    "node": {
+      "passed": 173,
+      "failed": 0,
+      "skipped": 0
+    },
+    "build": "PASS",
+    "independent_focused_initial": 108,
+    "independent_field_final": 9,
+    "independent_package_final": 3
+  },
+  "independent_evaluation": {
+    "agent": "camera_audit",
+    "scope": "Distinct read-only code/source review, focused test execution and existing evidence inspection; no independent physical/browser execution",
+    "finding_resolution": "FIELD2P2,package1P1,results-JSON1P2 closed; existing Pose performance blocker preserved",
+    "final_disposition": "PASS_LOCAL_PATCH_AND_EVIDENCE_ONLY",
+    "overall_G2": "BLOCKED_REVISE",
+    "record": "independent-review.md",
+    "final_verified_source_files": 164
+  },
+  "physical_measurements": "NOT_RUN",
+  "release_authorized": false,
+  "roadmap_attachment": {
+    "name": "Reactor_Rush_Master_Roadmap_v3_RECONSTRUCTED_2026-10-20.zip",
+    "read": false,
+    "failure": "download_file attachment directory EROFS in parent and distinct-agent attempts",
+    "authority": "Subsequent user chat scope instruction; archive contents not used as approval or mechanics"
+  },
+  "completed_local_timestamp": "2026-10-21T00:22:33.057400+07:00",
+  "archive": {
+    "path": "/var/tmp/reactor-rush-completion-20261020T163138Z/Reactor-Rush-Booth-Candidate.zip",
+    "bytes": 23381155,
+    "sha256": "bbbfa5f196e7ef5e9999ab9b6169db20cfc406a2f0a67592d3fc275b51c048b4",
+    "payload_matches_final_build": true,
+    "release_certified": false
+  },
+  "browser_summary": {
+    "results_pointer": {
+      "pass": 2
+    },
+    "hand_movement": {
+      "pass": 2
+    },
+    "lifecycle_injected": {
+      "pass": 13
+    },
+    "native_permission_fake_device": {
+      "pass": 3
+    },
+    "general_camera": {
+      "pass": 10
+    },
+    "sdk_no_people_cold_probes": {
+      "pass": 3
+    },
+    "preview_recovery": {
+      "pass": 8
+    },
+    "delayed_pose_130ms": {
+      "pass": 2,
+      "fail": 1,
+      "not_reached": 5
+    },
+    "fresh_page_start_stop_cycles": {
+      "pass": 10
+    },
+    "production_timer_results_replay_rounds": {
+      "completed": 10,
+      "sessions": 5,
+      "wall_seconds_range": [
+        60.19068852300005,
+        64.556042805
+      ],
+      "pose_rounds_requiring_recalibration_at_end": 5,
+      "total_pose_rounds": 6,
+      "continuous_tracking_accepted": false
+    }
+  },
+  "scope_reference": "Local recorded gates + latest direct user instruction; no original archive identity verification claimed",
+  "evidence_index": {
+    "path": "evidence/index.json",
+    "sha256": "1233d993e9cae6c5c125b56e1eb696ce1993f092684cf1c790684633bc9e3289"
+  }
+}

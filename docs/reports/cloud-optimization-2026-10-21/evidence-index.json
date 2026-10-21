@@ -1,0 +1,66 @@
+{
+  "files": [
+    {
+      "path": "evidence/ablation-harness-v1.mjs",
+      "bytes": 7887,
+      "sha256": "a59266de437f0dbaf4babc4f083131508c786bb26ba15a4171c2222c4119ff17"
+    },
+    {
+      "path": "evidence/ablation.json",
+      "bytes": 202163,
+      "sha256": "3cd20b6ab36526922a98dd99c2a4ba97f150ff959b3e394a56c83cb6ccebd668"
+    },
+    {
+      "path": "evidence/baseline.json",
+      "bytes": 32121,
+      "sha256": "f756bfd9ad3b44f63e6334d5cda7f5b16cd36c0eea28bd9f33c9ae6dbff61f96"
+    },
+    {
+      "path": "evidence/cpu-capture.json",
+      "bytes": 243002,
+      "sha256": "f8e97b72aca0b200c4e02e0f3a121d716cdcd141b2d29fd7f71c4e99d02bfa65"
+    },
+    {
+      "path": "evidence/delegate-startup.json",
+      "bytes": 264083,
+      "sha256": "a2e6d6401afb6d5a9ee73afab22a3a6d376879d620cafc607cfce8981620f233"
+    },
+    {
+      "path": "evidence/environment.json",
+      "bytes": 8213,
+      "sha256": "eb17d71815098b5ab359a85b40242d310b181299bd33ce32378a56439fd4e603"
+    },
+    {
+      "path": "evidence/fallback-pump.json",
+      "bytes": 163925,
+      "sha256": "13ec79fcd9e00c38ee340b0d8c34e4b60a64efd8cf01650a1de832072c54b51c"
+    },
+    {
+      "path": "evidence/long-renderer.json",
+      "bytes": 256503,
+      "sha256": "adb0d276939a1bc5ec30be19d0ee14aaebce1a6eb9cd7f065324b388f62ff239"
+    },
+    {
+      "path": "evidence/preservation.json",
+      "bytes": 236,
+      "sha256": "5b96e76926301192050177a9891418a948355787ba5d213cc82187351b2ed28f"
+    },
+    {
+      "path": "evidence/real-sdk.json",
+      "bytes": 107447,
+      "sha256": "4e443ec9cfa0ea735ae9406005f8708c7fc37561d43d0b9118538a80ed412dae"
+    },
+    {
+      "path": "evidence/regression-tests.log",
+      "bytes": 16551,
+      "sha256": "02a7f58691059eaac945e1f5ce3b4240a0069aa64e54c23ff05f835aad064026"
+    },
+    {
+      "path": "evidence/sdk-harness-v1.mjs",
+      "bytes": 6863,
+      "sha256": "4620669fe3bdf49fc5f1c77bdfa6aceb1f494c6d72980cb6f239b3752acc7b22"
+    }
+  ],
+  "documentation_links_checked": 17,
+  "broken_links": []
+}

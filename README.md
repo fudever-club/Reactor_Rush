@@ -46,7 +46,7 @@ Game mang đến trải nghiệm điều khiển đa phương thức đột phá
   - Inference chạy trong **Web Worker**; chi phí CPU/GPU và ảnh hưởng tới vòng game vẫn cần đo trên thiết bị đích.
   - **GPU Acceleration (WebGL)** và CPU fallback một lần khi inference GPU quá hạn. Cần hiệu chuẩn lại sau khôi phục; hiệu năng thực tế chưa được nghiệm thu.
   - **Visual Landmark Skeleton Overlay**: Hiển thị khung xương và 21 khớp bàn tay thời gian thực với mã màu trực quan (Cyan cho P1, Pink cho P2).
-  - **Pinch-to-Catch**: Nhận diện chuẩn xác cử chỉ chụm ngón cái và ngón trỏ với hiệu ứng phát sáng phản hồi tức thì.
+  - **Pinch-to-Catch**: Ánh xạ cử chỉ chụm ngón cái/ngón trỏ sang Catch và hiển thị phản hồi; độ chính xác thực tế cần được đo trong FIELD-01.
   - Cơ chế **Hiệu chuẩn (Calibration)** thông minh lưu trữ tọa độ trung tính của người chơi trước khi bắt đầu.
 - 🤖 **2D Cutout Rig Animation**:
   - Hệ thống nhân vật robot P1 Cyan & P2 Pink chuyển động mượt mà qua các trạng thái: *Idle, Move, Catch*.
@@ -210,3 +210,8 @@ Phát triển với tinh thần mã nguồn mở và chia sẻ học thuật b�
 ## Master plan v3 — tiến độ 19/10/2026
 
 [Báo cáo phase và gate](docs/reports/master-v3-2026-10-19/REPORT.md) · [Hướng dẫn thử FIELD-01](docs/reports/master-v3-2026-10-19/FIELD-01.md). Camera P1 là lựa chọn thử nghiệm, chưa phải default booth được chấp thuận. Mất liên tục tracking Pose cần bấm CALIBRATE; STOP CAMERA đưa về bàn phím. Chưa có nghiệm thu phần cứng hoặc release.
+
+
+## Cloud engineering checkpoint — started20/10/2026
+
+[Current engineering report](docs/reports/cloud-completion-2026-10-20/REPORT.md) · [Local booth package and field checks](docs/operations/booth-local.md). Camera lifecycle/capture fixes and results STOP hit-target correction are implemented;173/173 Node tests and build passed. Production browser/field gate details are in the report. Physical camera/TV acceptance, art approval and release remain separate.

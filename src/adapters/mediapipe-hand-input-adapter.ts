@@ -150,6 +150,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   private pendingAction?: { kind: 'calibrate' | 'start'; promise: Promise<boolean>; resolve: (ready: boolean) => void; timer: ReturnType<typeof setTimeout> };
   private status: CameraInputStatus = 'idle';
   private startPromise?: Promise<void>;
+  private sessionGeneration = 0;
   private readonly video: HTMLVideoElement;
   private readonly overlayCanvases: HTMLCanvasElement[];
 
@@ -250,15 +251,18 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
 
   async start(): Promise<void> {
     if (this.startPromise) return this.startPromise;
+    if (!this.disposed && (this.status === 'ready' || this.status === 'loading-model')) return;
+    const generation = ++this.sessionGeneration;
     this.disposed = false;
     this.cpuFallbackAttempted = false;
     this.recoveryNeedsCalibration = false;
     this.setStatus('requesting-camera');
-    this.startPromise = this.startResources();
+    const starting = this.startResources(generation);
+    this.startPromise = starting;
     try {
-      await this.startPromise;
+      await starting;
     } finally {
-      this.startPromise = undefined;
+      if (this.startPromise === starting) this.startPromise = undefined;
     }
   }
 
@@ -319,6 +323,8 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
   stop(): void {
     if (this.disposed && !this.stream && !this.worker) return;
     this.disposed = true;
+    this.sessionGeneration += 1;
+    this.startPromise = undefined;
     this.finishFreshAction(false);
     if (this.frameHandle !== undefined) this.cancelFrame(this.frameHandle);
     this.frameHandle = undefined;
@@ -334,7 +340,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     this.notifyDetection();
   }
 
-  private async startResources(): Promise<void> {
+  private async startResources(generation: number): Promise<void> {
     try {
       const stream = await this.getUserMedia({
         audio: false,
@@ -345,7 +351,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
           frameRate: { ideal: 15, max: 20 }
         }
       });
-      if (this.disposed) {
+      if (this.disposed || generation !== this.sessionGeneration) {
         stopStream(stream);
         return;
       }
@@ -357,25 +363,25 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       this.video.muted = true;
       this.video.playsInline = true;
       await this.video.play();
-      if (this.disposed) return;
+      if (this.disposed || generation !== this.sessionGeneration) return;
       this.video.dataset.active = 'true';
 
       this.setStatus('loading-model');
       this.worker = this.createWorker();
       await this.waitUntilWorkerReady(this.worker);
-      if (this.disposed) return;
+      if (this.disposed || generation !== this.sessionGeneration) return;
 
       if (isVideoTrackEnded(videoTrack)) throw new Error('The camera disconnected while the hand model was loading.');
       this.setStatus('ready');
       this.frameHandle = this.requestFrame(this.captureFrame);
     } catch (error) {
+      if (generation !== this.sessionGeneration) return;
       if (this.disposed) {
         if (this.status === 'error') throw error instanceof Error ? error : new Error(errorMessage(error));
         return;
       }
       const message = errorMessage(error);
-      this.releaseResources();
-      this.setStatus('error', message);
+      this.fail(message);
       throw new Error(message, { cause: error });
     }
   }
@@ -468,6 +474,7 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
 
   private async retryWithCpu(): Promise<void> {
     if (this.disposed || this.cpuFallbackAttempted) return;
+    const generation = this.sessionGeneration;
     this.cpuFallbackAttempted = true;
     this.finishFreshAction(false);
     this.worker?.removeEventListener('message', this.handleWorkerMessage);
@@ -493,12 +500,12 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
       const worker = this.createWorker();
       this.worker = worker;
       await this.waitUntilWorkerReady(worker, 'CPU');
-      if (this.disposed) return;
+      if (this.disposed || generation !== this.sessionGeneration) return;
       this.setStatus('ready', 'Hand CPU fallback ready. Calibrate again before starting.');
       this.notifyDetection();
       this.frameHandle = this.requestFrame(this.captureFrame);
     } catch (error) {
-      if (!this.disposed) this.fail(errorMessage(error));
+      if (!this.disposed && generation === this.sessionGeneration) this.fail(errorMessage(error));
     }
   }
 
@@ -587,6 +594,8 @@ export class MediaPipeHandInputAdapter implements InputAdapter {
     this.inFlight = false;
     this.inFlightSince = Number.NEGATIVE_INFINITY;
     this.frameCaptureFailures = 0;
+    this.lastVideoTime = -1;
+    this.lastFrameSentAt = Number.NEGATIVE_INFINITY;
     this.lastResultAt = 0;
     this.smoothedFps = 0;
     this.smoothedInferenceMs = 0;

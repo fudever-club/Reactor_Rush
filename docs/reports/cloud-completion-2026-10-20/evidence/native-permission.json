@@ -1,0 +1,69 @@
+{
+  "browser": "154.0.8037.57",
+  "method": "Chromium native getUserMedia with built-in fake capture device; permission revoked through browser CDP; model/bitmap fake; no people or physical webcam.",
+  "results": [
+    {
+      "id": "H0-native-permission-revoke",
+      "status": "PASS",
+      "before": {
+        "permission": "granted",
+        "tracks": [
+          {
+            "label": "fake_device_0",
+            "state": "live"
+          }
+        ]
+      },
+      "after": {
+        "permission": "denied",
+        "status": "error",
+        "workersStopped": true,
+        "tracks": [
+          "ended"
+        ]
+      }
+    },
+    {
+      "id": "P1-native-permission-revoke",
+      "status": "PASS",
+      "before": {
+        "permission": "granted",
+        "tracks": [
+          {
+            "label": "fake_device_0",
+            "state": "live"
+          }
+        ]
+      },
+      "after": {
+        "permission": "denied",
+        "status": "error",
+        "workersStopped": true,
+        "tracks": [
+          "ended"
+        ]
+      }
+    },
+    {
+      "id": "P2-native-permission-revoke",
+      "status": "PASS",
+      "before": {
+        "permission": "granted",
+        "tracks": [
+          {
+            "label": "fake_device_0",
+            "state": "live"
+          }
+        ]
+      },
+      "after": {
+        "permission": "denied",
+        "status": "error",
+        "workersStopped": true,
+        "tracks": [
+          "ended"
+        ]
+      }
+    }
+  ]
+}

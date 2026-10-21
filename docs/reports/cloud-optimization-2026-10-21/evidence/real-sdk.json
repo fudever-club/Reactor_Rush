@@ -1,0 +1,4162 @@
+{
+  "method": "Actual local SDK/model/WASM; CPU delegate requested explicitly for both renderers; synthetic 640x360 24Hz video without people; adapter downsamples CPU inference input to320x180. Camera setup phase, not gameplay/body tracking. No screenshots in measurement windows.",
+  "config": {
+    "base": "http://127.0.0.1:4173",
+    "seconds": 8,
+    "warmupSeconds": 2,
+    "order": [
+      "baseline",
+      "canvas-fallback",
+      "canvas-fallback",
+      "baseline"
+    ],
+    "quantileConvention": "Higher empirical quantile ceil((n-1)p)"
+  },
+  "trials": [
+    {
+      "variant": "baseline",
+      "browser": "154.0.8037.57",
+      "initial": {
+        "at": 5521.299999999814,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 0,
+            "playersReady": false,
+            "shouldersReady": false,
+            "positionReady": false,
+            "fresh": false,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 47,
+          "fps": 17,
+          "playerStates": {
+            "p1": "WAITING",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": false,
+          "readinessReason": "NO_POSE",
+          "sampleAgeMs": 31,
+          "poseCount": 0,
+          "posePreviewCount": 0,
+          "freshnessMs": 77.59999999962747
+        }
+      },
+      "seconds": 8.047200000000187,
+      "raw": {
+        "ended": 13568.5,
+        "trace": [
+          {
+            "type": "result",
+            "at": 5591.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 40.09999999962747,
+            "age": 62.39999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5666.5,
+            "delegate": "CPU",
+            "inferenceMs": 42.700000000186265,
+            "age": 67.6000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5746.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 42.40000000037253,
+            "age": 73.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5784.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 28.90000000037253,
+            "age": 33.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5909,
+            "delegate": "CPU",
+            "inferenceMs": 63.5,
+            "age": 81.6000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5986,
+            "delegate": "CPU",
+            "inferenceMs": 39.90000000037253,
+            "age": 70.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6059.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 37.299999999813735,
+            "age": 68.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6096.699999999255,
+            "delegate": "CPU",
+            "inferenceMs": 30.200000000186265,
+            "age": 31.899999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6225.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 65.5,
+            "age": 76,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6297.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 55.30000000074506,
+            "age": 67.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6371,
+            "delegate": "CPU",
+            "inferenceMs": 43.700000000186265,
+            "age": 60.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6410.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 22.100000000558794,
+            "age": 28.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6527.199999999255,
+            "delegate": "CPU",
+            "inferenceMs": 51,
+            "age": 68.19999999925494,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6626.699999999255,
+            "delegate": "CPU",
+            "inferenceMs": 41.89999999944121,
+            "age": 89.8999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6677,
+            "delegate": "CPU",
+            "inferenceMs": 27.899999999441206,
+            "age": 45.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6808,
+            "delegate": "CPU",
+            "inferenceMs": 45.5,
+            "age": 92.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6893.699999999255,
+            "delegate": "CPU",
+            "inferenceMs": 43.40000000037253,
+            "age": 81.3999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6952.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 24,
+            "age": 53.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7040.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 55.700000000186265,
+            "age": 68.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7147.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 48.700000000186265,
+            "age": 89.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7233.699999999255,
+            "delegate": "CPU",
+            "inferenceMs": 41.39999999944121,
+            "age": 82,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7370.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 44.200000000186265,
+            "age": 130.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7481.199999999255,
+            "delegate": "CPU",
+            "inferenceMs": 16.5,
+            "age": 68.69999999925494,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7601.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 50.19999999925494,
+            "age": 90,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7812.199999999255,
+            "delegate": "CPU",
+            "inferenceMs": 33,
+            "age": 157.69999999925494,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7970.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 141.6000000005588,
+            "age": 153.6000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8063.699999999255,
+            "delegate": "CPU",
+            "inferenceMs": 79,
+            "age": 80.8999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8472.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 92.19999999925494,
+            "age": 103.29999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8621.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 57.10000000055879,
+            "age": 144.1000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8949.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 212.79999999981374,
+            "age": 240.79999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9409.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 431.20000000018626,
+            "age": 434.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9533,
+            "delegate": "CPU",
+            "inferenceMs": 76.70000000018626,
+            "age": 119.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9666.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 78.1000000005588,
+            "age": 125.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9827.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 44.09999999962747,
+            "age": 156.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9882.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 21.299999999813735,
+            "age": 52.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10020.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 58.09999999962747,
+            "age": 74.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10157.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 59.299999999813735,
+            "age": 78.29999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10358.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 55.40000000037253,
+            "age": 196,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10459.199999999255,
+            "delegate": "CPU",
+            "inferenceMs": 61.59999999962747,
+            "age": 95.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10566.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 78.59999999962747,
+            "age": 101.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10628.699999999255,
+            "delegate": "CPU",
+            "inferenceMs": 49.700000000186265,
+            "age": 54.89999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10724.5,
+            "delegate": "CPU",
+            "inferenceMs": 54,
+            "age": 61.80000000074506,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10762.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 30.100000000558794,
+            "age": 31.399999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10860.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 60.59999999962747,
+            "age": 63,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10942.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 58.799999999813735,
+            "age": 77.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10983.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 31.299999999813735,
+            "age": 36.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11094.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 64.29999999981374,
+            "age": 74.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11172.199999999255,
+            "delegate": "CPU",
+            "inferenceMs": 61.59999999962747,
+            "age": 71.3999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11259.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 63.60000000055879,
+            "age": 81.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11347.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 41.30000000074506,
+            "age": 82.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11412.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 53.60000000055879,
+            "age": 59.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11523.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 65.69999999925494,
+            "age": 77.29999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11616.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 74.70000000018626,
+            "age": 87.29999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11686.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 38,
+            "age": 66.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11763.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 67.70000000018626,
+            "age": 71.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11874.5,
+            "delegate": "CPU",
+            "inferenceMs": 70.79999999981374,
+            "age": 106.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11956.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 58.09999999962747,
+            "age": 76.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12018.199999999255,
+            "delegate": "CPU",
+            "inferenceMs": 33.40000000037253,
+            "age": 35.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12182.5,
+            "delegate": "CPU",
+            "inferenceMs": 90.40000000037253,
+            "age": 117.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12276.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 80.09999999962747,
+            "age": 89,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12369.5,
+            "delegate": "CPU",
+            "inferenceMs": 41.200000000186265,
+            "age": 71.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12424.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 25.59999999962747,
+            "age": 50.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12549.5,
+            "delegate": "CPU",
+            "inferenceMs": 59.89999999944121,
+            "age": 81.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12638.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 48.799999999813735,
+            "age": 84.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12726.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 45.200000000186265,
+            "age": 83.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12780,
+            "delegate": "CPU",
+            "inferenceMs": 24.800000000745058,
+            "age": 49.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12893.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 55.799999999813735,
+            "age": 68.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12974.5,
+            "delegate": "CPU",
+            "inferenceMs": 44.5,
+            "age": 75.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 13028.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 22,
+            "age": 49.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 13158.199999999255,
+            "delegate": "CPU",
+            "inferenceMs": 61.799999999813735,
+            "age": 85.19999999925494,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 13204,
+            "delegate": "CPU",
+            "inferenceMs": 35.59999999962747,
+            "age": 40.80000000074506,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 13274.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 26.59999999962747,
+            "age": 39.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 13404.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 47.09999999962747,
+            "age": 80.1000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 13533.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 70.59999999962747,
+            "age": 94.70000000018626,
+            "poses": 0
+          }
+        ],
+        "raf": [
+          5511.2,
+          5561.2,
+          5594.6,
+          5627.9,
+          5661.2,
+          5694.6,
+          5744.5,
+          5777.8,
+          5811.2,
+          5861.2,
+          5911.2,
+          5944.6,
+          5977.9,
+          6027.8,
+          6061.1,
+          6094.5,
+          6144.6,
+          6194.5,
+          6227.8,
+          6261.2,
+          6294.5,
+          6344.5,
+          6377.8,
+          6411.2,
+          6444.5,
+          6494.5,
+          6527.8,
+          6577.8,
+          6627.8,
+          6711.2,
+          6761.2,
+          6811.2,
+          6844.5,
+          6894.5,
+          6944.5,
+          7044.5,
+          7094.5,
+          7144.5,
+          7194.5,
+          7227.8,
+          7277.8,
+          7394.5,
+          7494.5,
+          7544.5,
+          7644.4,
+          7811.1,
+          7877.8,
+          7977.8,
+          8361.1,
+          8461.1,
+          8611.1,
+          8794.4,
+          8944.5,
+          9027.7,
+          9411,
+          9444.4,
+          9527.7,
+          9577.8,
+          9661,
+          9694.4,
+          9827.7,
+          9877.7,
+          9927.7,
+          9977.7,
+          10077.7,
+          10111,
+          10161,
+          10194.4,
+          10361,
+          10411.1,
+          10461,
+          10511,
+          10561,
+          10627.7,
+          10661,
+          10694.4,
+          10727.7,
+          10761,
+          10794.4,
+          10827.7,
+          10861,
+          10894.3,
+          10944.3,
+          10977.7,
+          11011,
+          11061,
+          11094.3,
+          11127.7,
+          11177.6,
+          11211,
+          11261,
+          11294.4,
+          11344.4,
+          11411,
+          11444.4,
+          11494.3,
+          11527.6,
+          11561,
+          11611,
+          11644.4,
+          11677.7,
+          11711,
+          11761,
+          11827.6,
+          11877.7,
+          11911,
+          11977.6,
+          12011,
+          12060.9,
+          12144.3,
+          12177.6,
+          12227.6,
+          12294.3,
+          12327.6,
+          12360.9,
+          12427.6,
+          12460.9,
+          12510.9,
+          12544.3,
+          12594.3,
+          12627.6,
+          12677.6,
+          12727.6,
+          12777.6,
+          12810.9,
+          12860.9,
+          12894.2,
+          12927.6,
+          12977.6,
+          13027.6,
+          13061,
+          13110.9,
+          13160.9,
+          13227.5,
+          13277.6,
+          13310.9,
+          13360.9,
+          13427.5,
+          13477.6,
+          13527.5
+        ],
+        "canvas2d": false,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 0,
+            "playersReady": false,
+            "shouldersReady": false,
+            "positionReady": false,
+            "fresh": false,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 48,
+          "fps": 12,
+          "playerStates": {
+            "p1": "WAITING",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": false,
+          "readinessReason": "NO_POSE",
+          "sampleAgeMs": 95,
+          "poseCount": 0,
+          "posePreviewCount": 0,
+          "freshnessMs": 130.29999999981374
+        }
+      },
+      "requests": [
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.js",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.wasm",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/pose_landmarker_lite.task",
+          "status": 200
+        }
+      ],
+      "remoteBlocked": [],
+      "errors": [],
+      "cleanup": true,
+      "cgroupBefore": {
+        "usage_usec": 5477551877,
+        "user_usec": 4965415069,
+        "system_usec": 512136808,
+        "nice_usec": 0,
+        "nr_periods": 22234,
+        "nr_throttled": 8743,
+        "throttled_usec": 169275683,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "cgroupAfter": {
+        "usage_usec": 5505985094,
+        "user_usec": 4987016962,
+        "system_usec": 518968132,
+        "nice_usec": 0,
+        "nr_periods": 22314,
+        "nr_throttled": 8782,
+        "throttled_usec": 169938265,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "cgroupDelta": {
+        "usage_usec": 28433217,
+        "user_usec": 21601893,
+        "system_usec": 6831324,
+        "nice_usec": 0,
+        "nr_periods": 80,
+        "nr_throttled": 39,
+        "throttled_usec": 662582,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "summary": {
+        "inferenceMs": {
+          "n": 74,
+          "p50": 50.19999999925494,
+          "p95": 92.19999999925494,
+          "max": 431.20000000018626
+        },
+        "resultAgeMs": {
+          "n": 74,
+          "p50": 76.20000000018626,
+          "p95": 157.69999999925494,
+          "max": 434.09999999962747
+        },
+        "resultsOver250": 1,
+        "resultHz": 9.195745103886853,
+        "rafHz": 17.3973556019481
+      }
+    },
+    {
+      "variant": "canvas-fallback",
+      "browser": "154.0.8037.57",
+      "initial": {
+        "at": 3389.0999999996275,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 0,
+            "playersReady": false,
+            "shouldersReady": false,
+            "positionReady": false,
+            "fresh": false,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 26,
+          "fps": 13,
+          "playerStates": {
+            "p1": "WAITING",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": false,
+          "readinessReason": "NO_POSE",
+          "sampleAgeMs": 26,
+          "poseCount": 0,
+          "posePreviewCount": 0,
+          "freshnessMs": 54.700000000186265
+        }
+      },
+      "seconds": 8.006600000000558,
+      "raw": {
+        "ended": 11395.700000000186,
+        "trace": [
+          {
+            "type": "result",
+            "at": 3434.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 25.200000000186265,
+            "age": 26.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3506.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 25.700000000186265,
+            "age": 26.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3585.7999999998137,
+            "delegate": "CPU",
+            "inferenceMs": 25.59999999962747,
+            "age": 27.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3658.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 25.5,
+            "age": 26.699999999254942,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3731.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 25.200000000186265,
+            "age": 26.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3805.5,
+            "delegate": "CPU",
+            "inferenceMs": 26.699999999254942,
+            "age": 27.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3882.5,
+            "delegate": "CPU",
+            "inferenceMs": 25.700000000186265,
+            "age": 30.600000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3954.2000000001863,
+            "delegate": "CPU",
+            "inferenceMs": 26.90000000037253,
+            "age": 28.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4028.7000000001863,
+            "delegate": "CPU",
+            "inferenceMs": 25.200000000186265,
+            "age": 26.800000000745058,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4109.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 25.700000000186265,
+            "age": 26.800000000745058,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4183.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 25.299999999813735,
+            "age": 26.399999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4256.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 24.90000000037253,
+            "age": 26.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4331.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 25.700000000186265,
+            "age": 27.600000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4404,
+            "delegate": "CPU",
+            "inferenceMs": 25.799999999813735,
+            "age": 27.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4475.5,
+            "delegate": "CPU",
+            "inferenceMs": 25.200000000186265,
+            "age": 26.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4553.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 30.40000000037253,
+            "age": 31.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4628.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 25.299999999813735,
+            "age": 26.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4702.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 25.199999999254942,
+            "age": 26,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4779.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 25.699999999254942,
+            "age": 26.899999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4854.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 25.700000000186265,
+            "age": 26.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4929,
+            "delegate": "CPU",
+            "inferenceMs": 25.799999999813735,
+            "age": 26.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5003.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 25.5,
+            "age": 26.800000000745058,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5081.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 25.90000000037253,
+            "age": 28.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5155.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 25.299999999813735,
+            "age": 26.699999999254942,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5228.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 25.5,
+            "age": 26.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5301.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 25.799999999813735,
+            "age": 27.199999999254942,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5428.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 84.69999999925494,
+            "age": 86.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5462.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 24.299999999813735,
+            "age": 25.399999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5794.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 25.899999999441206,
+            "age": 257.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5848.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 42.299999999813735,
+            "age": 48.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5917.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 31,
+            "age": 36.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5998.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 40.39999999944121,
+            "age": 47.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6079.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 49.200000000186265,
+            "age": 59.10000000055879,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6150.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 30.899999999441206,
+            "age": 48.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6279.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 64.70000000018626,
+            "age": 87.8999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6349.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 62.40000000037253,
+            "age": 65.69999999925494,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6541.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 186.20000000018626,
+            "age": 187.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6659.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 92.5,
+            "age": 94.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7160,
+            "delegate": "CPU",
+            "inferenceMs": 486.09999999962747,
+            "age": 492.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7237.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 43.10000000055879,
+            "age": 47.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7284.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 19.200000000186265,
+            "age": 23.100000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7362.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 16.799999999813735,
+            "age": 18.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7443.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 15.599999999627471,
+            "age": 17.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7524,
+            "delegate": "CPU",
+            "inferenceMs": 15.299999999813735,
+            "age": 16.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7635.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 18.59999999962747,
+            "age": 19.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7705,
+            "delegate": "CPU",
+            "inferenceMs": 16,
+            "age": 17.100000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7788.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 15.5,
+            "age": 16.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7870.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 15.800000000745058,
+            "age": 17.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7949.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 15.799999999813735,
+            "age": 16.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8032.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 16.09999999962747,
+            "age": 17.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8114.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 15.700000000186265,
+            "age": 17,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8196.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 15.899999999441206,
+            "age": 17,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8298.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 15.799999999813735,
+            "age": 17.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8381.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 16.100000000558794,
+            "age": 17.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8462.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 15.099999999627471,
+            "age": 16.899999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8542.5,
+            "delegate": "CPU",
+            "inferenceMs": 16.09999999962747,
+            "age": 17.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8624,
+            "delegate": "CPU",
+            "inferenceMs": 15.799999999813735,
+            "age": 17,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8708,
+            "delegate": "CPU",
+            "inferenceMs": 15.5,
+            "age": 16.600000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8787.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 15.100000000558794,
+            "age": 16.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8868.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 15.100000000558794,
+            "age": 16.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8948.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 15.5,
+            "age": 16.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9030.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 15.299999999813735,
+            "age": 17.399999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9115.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 19,
+            "age": 20.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9194,
+            "delegate": "CPU",
+            "inferenceMs": 15.599999999627471,
+            "age": 16.600000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9275.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 15.700000000186265,
+            "age": 16.899999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9355.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 15.400000000372529,
+            "age": 16.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9436.5,
+            "delegate": "CPU",
+            "inferenceMs": 15.200000000186265,
+            "age": 16.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9517.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 15.799999999813735,
+            "age": 16.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9597.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 15.299999999813735,
+            "age": 16.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9683.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 17,
+            "age": 18.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9773.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 23.200000000186265,
+            "age": 25.100000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9867.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 15.899999999441206,
+            "age": 18.399999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9948.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 17.5,
+            "age": 18.699999999254942,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10028.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 15.200000000186265,
+            "age": 16.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10108.5,
+            "delegate": "CPU",
+            "inferenceMs": 15.5,
+            "age": 16.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10192,
+            "delegate": "CPU",
+            "inferenceMs": 16.200000000186265,
+            "age": 17.100000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10273.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 15.5,
+            "age": 17.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10354.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 15.300000000745058,
+            "age": 16.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10437.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 14.700000000186265,
+            "age": 16.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10529.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 19.100000000558794,
+            "age": 23,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10605.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 15.600000000558794,
+            "age": 17.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10693.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 15.400000000372529,
+            "age": 16.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10775,
+            "delegate": "CPU",
+            "inferenceMs": 14.799999999813735,
+            "age": 16.100000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10892.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 14.400000000372529,
+            "age": 15.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10973.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 14.599999999627471,
+            "age": 15.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11055.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 14.900000000372529,
+            "age": 15.899999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11138.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 16,
+            "age": 17.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11214.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 19.40000000037253,
+            "age": 22.600000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11277.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 14.700000000186265,
+            "age": 16,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11358.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 14.800000000745058,
+            "age": 15.900000000372529,
+            "poses": 0
+          }
+        ],
+        "raf": [
+          3396.4,
+          3429.7,
+          3446.4,
+          3479.7,
+          3496.3,
+          3529.7,
+          3546.4,
+          3579.7,
+          3596.4,
+          3629.7,
+          3646.4,
+          3679.7,
+          3696.4,
+          3729.7,
+          3746.4,
+          3763,
+          3796.4,
+          3829.7,
+          3846.4,
+          3879.7,
+          3896.3,
+          3913,
+          3946.4,
+          3979.7,
+          3996.4,
+          4029.7,
+          4079.7,
+          4096.3,
+          4129.7,
+          4146.4,
+          4179.7,
+          4196.3,
+          4229.7,
+          4246.3,
+          4279.7,
+          4296.4,
+          4329.7,
+          4346.4,
+          4363,
+          4396.3,
+          4446.3,
+          4463,
+          4496.3,
+          4513,
+          4546.3,
+          4579.6,
+          4596.3,
+          4629.6,
+          4646.3,
+          4663,
+          4696.3,
+          4729.6,
+          4746.3,
+          4779.6,
+          4796.3,
+          4813,
+          4846.3,
+          4879.7,
+          4896.3,
+          4929.6,
+          4946.3,
+          4963,
+          4996.3,
+          5012.9,
+          5046.3,
+          5079.6,
+          5096.3,
+          5112.9,
+          5146.3,
+          5179.7,
+          5196.3,
+          5229.7,
+          5246.3,
+          5263,
+          5296.3,
+          5329.6,
+          5429.6,
+          5529.6,
+          5779.6,
+          5796.3,
+          5829.6,
+          5846.3,
+          5879.6,
+          5896.3,
+          5912.9,
+          5946.3,
+          5996.3,
+          6013,
+          6029.6,
+          6062.9,
+          6079.6,
+          6162.9,
+          6179.6,
+          6212.9,
+          6279.6,
+          6296.2,
+          6329.6,
+          6346.2,
+          6363,
+          6379.6,
+          6562.9,
+          6579.6,
+          6613,
+          6629.6,
+          6662.9,
+          6679.5,
+          6696.2,
+          7029.5,
+          7062.9,
+          7079.6,
+          7096.3,
+          7129.5,
+          7146.2,
+          7179.5,
+          7229.6,
+          7246.3,
+          7279.5,
+          7296.3,
+          7312.9,
+          7329.6,
+          7362.9,
+          7379.5,
+          7396.2,
+          7412.9,
+          7446.2,
+          7462.8,
+          7479.5,
+          7496.2,
+          7546.2,
+          7562.9,
+          7612.8,
+          7629.6,
+          7662.9,
+          7679.5,
+          7696.2,
+          7729.5,
+          7746.2,
+          7762.8,
+          7779.5,
+          7812.8,
+          7829.5,
+          7846.2,
+          7862.8,
+          7879.6,
+          7912.8,
+          7929.5,
+          7946.2,
+          7962.8,
+          8012.9,
+          8029.5,
+          8046.2,
+          8062.9,
+          8096.2,
+          8112.9,
+          8129.6,
+          8146.2,
+          8179.5,
+          8196.2,
+          8212.8,
+          8229.5,
+          8279.5,
+          8296.2,
+          8312.8,
+          8329.5,
+          8362.9,
+          8379.5,
+          8396.2,
+          8412.8,
+          8429.5,
+          8462.8,
+          8479.5,
+          8496.1,
+          8512.8,
+          8562.8,
+          8579.5,
+          8596.2,
+          8612.8,
+          8646.1,
+          8662.8,
+          8679.5,
+          8696.1,
+          8729.5,
+          8746.1,
+          8762.8,
+          8779.5,
+          8829.5,
+          8846.1,
+          8862.8,
+          8879.5,
+          8929.5,
+          8946.2,
+          8962.8,
+          8979.4,
+          9012.8,
+          9029.5,
+          9046.1,
+          9062.8,
+          9079.5,
+          9112.9,
+          9129.5,
+          9146.1,
+          9162.8,
+          9196.1,
+          9212.8,
+          9229.5,
+          9246.2,
+          9262.8,
+          9296.1,
+          9312.8,
+          9329.4,
+          9346.2,
+          9379.4,
+          9396.2,
+          9412.8,
+          9429.4,
+          9446.2,
+          9479.4,
+          9496.1,
+          9512.8,
+          9529.5,
+          9546.2,
+          9579.5,
+          9596.1,
+          9612.8,
+          9629.5,
+          9662.8,
+          9679.5,
+          9696.1,
+          9712.8,
+          9746.1,
+          9762.8,
+          9779.4,
+          9796.1,
+          9846.1,
+          9862.8,
+          9879.4,
+          9896.1,
+          9929.5,
+          9946.1,
+          9962.8,
+          9979.5,
+          9996.2,
+          10029.4,
+          10046.2,
+          10062.8,
+          10079.4,
+          10096.1,
+          10129.4,
+          10146.1,
+          10162.8,
+          10212.8,
+          10229.4,
+          10246.1,
+          10262.7,
+          10296.1,
+          10312.7,
+          10329.4,
+          10346.1,
+          10362.8,
+          10396.1,
+          10412.8,
+          10429.4,
+          10462.8,
+          10479.4,
+          10496.1,
+          10512.7,
+          10546.1,
+          10562.8,
+          10579.4,
+          10596.1,
+          10629.4,
+          10646.1,
+          10662.7,
+          10696.1,
+          10712.8,
+          10729.4,
+          10746.1,
+          10796.1,
+          10862.7,
+          10929.5,
+          10946.1,
+          10962.7,
+          10996.1,
+          11012.7,
+          11029.4,
+          11046.1,
+          11079.4,
+          11096.1,
+          11112.7,
+          11129.4,
+          11162.7,
+          11179.4,
+          11212.7,
+          11229.4,
+          11246,
+          11279.4,
+          11296,
+          11312.7,
+          11329.3,
+          11379.4
+        ],
+        "canvas2d": true,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 0,
+            "playersReady": false,
+            "shouldersReady": false,
+            "positionReady": false,
+            "fresh": false,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 16,
+          "fps": 13,
+          "playerStates": {
+            "p1": "WAITING",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": false,
+          "readinessReason": "NO_POSE",
+          "sampleAgeMs": 16,
+          "poseCount": 0,
+          "posePreviewCount": 0,
+          "freshnessMs": 53.5
+        }
+      },
+      "requests": [
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.js",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.wasm",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/pose_landmarker_lite.task",
+          "status": 200
+        }
+      ],
+      "remoteBlocked": [],
+      "errors": [],
+      "cleanup": true,
+      "cgroupBefore": {
+        "usage_usec": 5515725326,
+        "user_usec": 4993140387,
+        "system_usec": 522584939,
+        "nice_usec": 0,
+        "nr_periods": 22354,
+        "nr_throttled": 8784,
+        "throttled_usec": 169985239,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "cgroupAfter": {
+        "usage_usec": 5532261582,
+        "user_usec": 5003371603,
+        "system_usec": 528889978,
+        "nice_usec": 0,
+        "nr_periods": 22434,
+        "nr_throttled": 8784,
+        "throttled_usec": 169985239,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "cgroupDelta": {
+        "usage_usec": 16536256,
+        "user_usec": 10231216,
+        "system_usec": 6305039,
+        "nice_usec": 0,
+        "nr_periods": 80,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "summary": {
+        "inferenceMs": {
+          "n": 90,
+          "p50": 19,
+          "p95": 64.70000000018626,
+          "max": 486.09999999962747
+        },
+        "resultAgeMs": {
+          "n": 90,
+          "p50": 20.299999999813735,
+          "p95": 87.8999999994412,
+          "max": 492.70000000018626
+        },
+        "resultsOver250": 2,
+        "resultHz": 11.240726400718623,
+        "rafHz": 37.46908800239541
+      }
+    },
+    {
+      "variant": "canvas-fallback",
+      "browser": "154.0.8037.57",
+      "initial": {
+        "at": 3409.5,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 0,
+            "playersReady": false,
+            "shouldersReady": false,
+            "positionReady": false,
+            "fresh": false,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 18,
+          "fps": 12,
+          "playerStates": {
+            "p1": "WAITING",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": false,
+          "readinessReason": "NO_POSE",
+          "sampleAgeMs": 20,
+          "poseCount": 0,
+          "posePreviewCount": 0,
+          "freshnessMs": 82.59999999962747
+        }
+      },
+      "seconds": 8.014299999999814,
+      "raw": {
+        "ended": 11423.799999999814,
+        "trace": [
+          {
+            "type": "result",
+            "at": 3429.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 16.299999999813735,
+            "age": 17.899999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3509.7000000001863,
+            "delegate": "CPU",
+            "inferenceMs": 16.200000000186265,
+            "age": 17.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3589.4000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 15.399999999441206,
+            "age": 16.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3671.4000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 16,
+            "age": 17.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3753,
+            "delegate": "CPU",
+            "inferenceMs": 17,
+            "age": 18.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3853.5,
+            "delegate": "CPU",
+            "inferenceMs": 16.40000000037253,
+            "age": 17.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 3935.9000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 15.700000000186265,
+            "age": 16.800000000745058,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4017.7999999998137,
+            "delegate": "CPU",
+            "inferenceMs": 15.399999999441206,
+            "age": 16.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4099.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 16.09999999962747,
+            "age": 17.100000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4181.4000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 16,
+            "age": 17,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4261.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 16.300000000745058,
+            "age": 17.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4342.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 15.599999999627471,
+            "age": 18,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4424.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 16.799999999813735,
+            "age": 17.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4499.9000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 16.200000000186265,
+            "age": 17.100000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4580.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 15.600000000558794,
+            "age": 16.899999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4661.9000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 15.799999999813735,
+            "age": 17.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4742,
+            "delegate": "CPU",
+            "inferenceMs": 16.200000000186265,
+            "age": 17.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4823.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 15.599999999627471,
+            "age": 16.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4910,
+            "delegate": "CPU",
+            "inferenceMs": 20.700000000186265,
+            "age": 22.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4985.9000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 16.299999999813735,
+            "age": 17.600000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5065.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 15.700000000186265,
+            "age": 16.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5145.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 15.400000000372529,
+            "age": 16.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5228.9000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 16,
+            "age": 17.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5308.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 15.5,
+            "age": 16.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5396.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 20.90000000037253,
+            "age": 24.100000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5482.4000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 23.899999999441206,
+            "age": 25.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5592.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 33.700000000186265,
+            "age": 37.39999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5712.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 64.3999999994412,
+            "age": 82.8999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6247.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 123.59999999962747,
+            "age": 132.29999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6288.5,
+            "delegate": "CPU",
+            "inferenceMs": 26.40000000037253,
+            "age": 27.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6440.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 34.799999999813735,
+            "age": 95.19999999925494,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6544.9000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 42,
+            "age": 76.1000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6643.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 68.79999999981374,
+            "age": 78.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6693.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 44.5,
+            "age": 48.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6755.5,
+            "delegate": "CPU",
+            "inferenceMs": 31.300000000745058,
+            "age": 33.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6842.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 35.700000000186265,
+            "age": 39.39999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6934.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 58.59999999962747,
+            "age": 59.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7013.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 42.39999999944121,
+            "age": 43.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7083,
+            "delegate": "CPU",
+            "inferenceMs": 31.700000000186265,
+            "age": 32.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7345.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 27.199999999254942,
+            "age": 220.8999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7376.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 28.199999999254942,
+            "age": 29.600000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7634.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 55.30000000074506,
+            "age": 58.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7692,
+            "delegate": "CPU",
+            "inferenceMs": 31.600000000558794,
+            "age": 34.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7806.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 49.69999999925494,
+            "age": 54,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7896.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 36.59999999962747,
+            "age": 39.89999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7972.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 35.299999999813735,
+            "age": 40.89999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8044.4000000003725,
+            "delegate": "CPU",
+            "inferenceMs": 37.799999999813735,
+            "age": 40.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8120.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 38.299999999813735,
+            "age": 40.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8194.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 37.89999999944121,
+            "age": 40.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8267.900000000373,
+            "delegate": "CPU",
+            "inferenceMs": 37.09999999962747,
+            "age": 39.30000000074506,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8341,
+            "delegate": "CPU",
+            "inferenceMs": 37,
+            "age": 39.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8420.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 36.799999999813735,
+            "age": 39.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8500,
+            "delegate": "CPU",
+            "inferenceMs": 36.39999999944121,
+            "age": 39.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8573.400000000373,
+            "delegate": "CPU",
+            "inferenceMs": 37.299999999813735,
+            "age": 40,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8649.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 37.90000000037253,
+            "age": 40.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8723.400000000373,
+            "delegate": "CPU",
+            "inferenceMs": 33.89999999944121,
+            "age": 37.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8799.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 37.40000000037253,
+            "age": 39.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8876.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 39.60000000055879,
+            "age": 43,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8956.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 42.5,
+            "age": 44.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9027.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 36.5,
+            "age": 40,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9100.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 36.10000000055879,
+            "age": 38.39999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9175.5,
+            "delegate": "CPU",
+            "inferenceMs": 36.10000000055879,
+            "age": 38,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9250.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 37,
+            "age": 39.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9324.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 37.799999999813735,
+            "age": 40.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9400.5,
+            "delegate": "CPU",
+            "inferenceMs": 40.30000000074506,
+            "age": 42.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9463.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 26.299999999813735,
+            "age": 27.399999999441206,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9535.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 25.59999999962747,
+            "age": 26.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9629.400000000373,
+            "delegate": "CPU",
+            "inferenceMs": 25.700000000186265,
+            "age": 27.100000000558794,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9701.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 26.09999999962747,
+            "age": 26.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9775.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 26.09999999962747,
+            "age": 27.199999999254942,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9859.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 33.89999999944121,
+            "age": 39.89999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9937,
+            "delegate": "CPU",
+            "inferenceMs": 36.90000000037253,
+            "age": 39.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10017.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 41.30000000074506,
+            "age": 44.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10092.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 39.5,
+            "age": 44.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10163.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 37.5,
+            "age": 40.60000000055879,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10237.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 36.10000000055879,
+            "age": 38.39999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10317.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 29.40000000037253,
+            "age": 40.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10393.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 44.59999999962747,
+            "age": 45.89999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10473,
+            "delegate": "CPU",
+            "inferenceMs": 37.40000000037253,
+            "age": 40.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10545.900000000373,
+            "delegate": "CPU",
+            "inferenceMs": 33.10000000055879,
+            "age": 41.80000000074506,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10616.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 37.799999999813735,
+            "age": 40.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10709.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 38.09999999962747,
+            "age": 40.10000000055879,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10786.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 42.799999999813735,
+            "age": 45,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10875,
+            "delegate": "CPU",
+            "inferenceMs": 36.200000000186265,
+            "age": 39.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10952.400000000373,
+            "delegate": "CPU",
+            "inferenceMs": 32.299999999813735,
+            "age": 35.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11021.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 34.89999999944121,
+            "age": 36.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11095.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 37,
+            "age": 39.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11170.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 39.200000000186265,
+            "age": 41.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11243.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 35.5,
+            "age": 42.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11315.900000000373,
+            "delegate": "CPU",
+            "inferenceMs": 35.39999999944121,
+            "age": 42,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11392.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 37.80000000074506,
+            "age": 39.69999999925494,
+            "poses": 0
+          }
+        ],
+        "raf": [
+          3399.1,
+          3415.7,
+          3449.1,
+          3465.7,
+          3482.4,
+          3499,
+          3532.4,
+          3549.1,
+          3565.7,
+          3582.4,
+          3599,
+          3632.4,
+          3649.1,
+          3665.8,
+          3682.4,
+          3699.1,
+          3732.4,
+          3749,
+          3765.8,
+          3782.4,
+          3832.4,
+          3849,
+          3865.7,
+          3915.7,
+          3932.4,
+          3949,
+          3965.7,
+          3999,
+          4015.7,
+          4032.4,
+          4049,
+          4082.3,
+          4099.1,
+          4115.7,
+          4132.4,
+          4149.1,
+          4182.4,
+          4199,
+          4215.7,
+          4232.4,
+          4249.1,
+          4282.4,
+          4299,
+          4315.7,
+          4332.4,
+          4382.3,
+          4399.1,
+          4415.7,
+          4449,
+          4482.4,
+          4499.1,
+          4515.7,
+          4532.4,
+          4549,
+          4582.4,
+          4599.1,
+          4615.7,
+          4632.3,
+          4649.1,
+          4682.3,
+          4699.1,
+          4715.7,
+          4732.4,
+          4782.3,
+          4799.1,
+          4815.7,
+          4832.4,
+          4865.7,
+          4882.3,
+          4899,
+          4915.7,
+          4932.3,
+          4965.7,
+          4982.4,
+          4999,
+          5015.7,
+          5032.3,
+          5065.7,
+          5082.3,
+          5099,
+          5115.7,
+          5165.7,
+          5182.3,
+          5199,
+          5215.7,
+          5249,
+          5265.6,
+          5282.4,
+          5299,
+          5315.6,
+          5349,
+          5365.7,
+          5382.3,
+          5432.3,
+          5449,
+          5465.6,
+          5499,
+          5515.7,
+          5549,
+          5582.3,
+          5599,
+          5615.6,
+          5649,
+          6099,
+          6232.3,
+          6249,
+          6332.2,
+          6365.6,
+          6448.9,
+          6548.9,
+          6582.2,
+          6632.3,
+          6665.7,
+          6698.9,
+          6715.6,
+          6748.9,
+          6765.6,
+          6798.9,
+          6815.6,
+          6865.6,
+          6882.2,
+          6965.6,
+          6982.2,
+          6998.9,
+          7015.6,
+          7048.9,
+          7065.6,
+          7098.9,
+          7115.6,
+          7298.9,
+          7332.3,
+          7365.5,
+          7382.3,
+          7565.6,
+          7615.6,
+          7649,
+          7682.2,
+          7698.9,
+          7748.9,
+          7765.6,
+          7798.9,
+          7848.9,
+          7882.2,
+          7898.9,
+          7915.5,
+          7948.9,
+          7982.2,
+          7998.9,
+          8032.2,
+          8048.9,
+          8065.5,
+          8098.9,
+          8132.2,
+          8148.9,
+          8165.5,
+          8198.9,
+          8215.5,
+          8248.8,
+          8265.5,
+          8298.8,
+          8315.5,
+          8348.9,
+          8365.5,
+          8432.2,
+          8448.9,
+          8482.2,
+          8498.9,
+          8532.2,
+          8548.9,
+          8582.2,
+          8598.9,
+          8632.2,
+          8648.9,
+          8682.2,
+          8698.9,
+          8732.2,
+          8748.9,
+          8782.2,
+          8798.9,
+          8832.2,
+          8848.8,
+          8882.2,
+          8898.9,
+          8932.2,
+          8965.5,
+          8982.2,
+          8998.8,
+          9032.2,
+          9048.8,
+          9082.1,
+          9115.5,
+          9132.2,
+          9182.2,
+          9198.8,
+          9232.2,
+          9248.8,
+          9282.2,
+          9298.9,
+          9332.2,
+          9348.8,
+          9382.2,
+          9432.2,
+          9465.5,
+          9482.1,
+          9498.8,
+          9532.1,
+          9548.8,
+          9598.8,
+          9615.5,
+          9648.8,
+          9665.5,
+          9698.8,
+          9715.5,
+          9732.2,
+          9765.5,
+          9815.5,
+          9832.1,
+          9865.5,
+          9882.2,
+          9915.4,
+          9948.9,
+          9965.5,
+          9998.8,
+          10015.5,
+          10032.2,
+          10065.5,
+          10098.8,
+          10115.4,
+          10148.8,
+          10165.5,
+          10182.1,
+          10215.5,
+          10248.8,
+          10265.5,
+          10315.4,
+          10332.1,
+          10365.5,
+          10398.8,
+          10415.4,
+          10448.8,
+          10482.2,
+          10498.8,
+          10515.4,
+          10548.8,
+          10565.4,
+          10598.8,
+          10615.5,
+          10665.4,
+          10682.1,
+          10715.4,
+          10732.2,
+          10765.5,
+          10782.1,
+          10832.1,
+          10848.8,
+          10882.1,
+          10898.8,
+          10932.1,
+          10948.8,
+          10982.1,
+          10998.8,
+          11032.1,
+          11048.8,
+          11082.1,
+          11098.8,
+          11115.4,
+          11148.8,
+          11165.5,
+          11198.7,
+          11215.5,
+          11248.7,
+          11265.4,
+          11315.4,
+          11332.1,
+          11365.4
+        ],
+        "canvas2d": true,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 0,
+            "playersReady": false,
+            "shouldersReady": false,
+            "positionReady": false,
+            "fresh": false,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 37,
+          "fps": 13,
+          "playerStates": {
+            "p1": "WAITING",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": false,
+          "readinessReason": "NO_POSE",
+          "sampleAgeMs": 40,
+          "poseCount": 0,
+          "posePreviewCount": 0,
+          "freshnessMs": 71.3999999994412
+        }
+      },
+      "requests": [
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.js",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.wasm",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/pose_landmarker_lite.task",
+          "status": 200
+        }
+      ],
+      "remoteBlocked": [],
+      "errors": [],
+      "cleanup": true,
+      "cgroupBefore": {
+        "usage_usec": 5541191025,
+        "user_usec": 5008997395,
+        "system_usec": 532193630,
+        "nice_usec": 0,
+        "nr_periods": 22473,
+        "nr_throttled": 8785,
+        "throttled_usec": 169991232,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "cgroupAfter": {
+        "usage_usec": 5558269952,
+        "user_usec": 5019440625,
+        "system_usec": 538829326,
+        "nice_usec": 0,
+        "nr_periods": 22553,
+        "nr_throttled": 8785,
+        "throttled_usec": 169991232,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "cgroupDelta": {
+        "usage_usec": 17078927,
+        "user_usec": 10443230,
+        "system_usec": 6635696,
+        "nice_usec": 0,
+        "nr_periods": 80,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "summary": {
+        "inferenceMs": {
+          "n": 91,
+          "p50": 35.299999999813735,
+          "p95": 55.30000000074506,
+          "max": 123.59999999962747
+        },
+        "resultAgeMs": {
+          "n": 91,
+          "p50": 39.200000000186265,
+          "p95": 78.59999999962747,
+          "max": 220.8999999994412
+        },
+        "resultsOver250": 0,
+        "resultHz": 11.354703467552016,
+        "rafHz": 34.31366432501982
+      }
+    },
+    {
+      "variant": "baseline",
+      "browser": "154.0.8037.57",
+      "initial": {
+        "at": 4467.200000000186,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 0,
+            "playersReady": false,
+            "shouldersReady": false,
+            "positionReady": false,
+            "fresh": false,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 59,
+          "fps": 13,
+          "playerStates": {
+            "p1": "WAITING",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": false,
+          "readinessReason": "NO_POSE",
+          "sampleAgeMs": 68,
+          "poseCount": 0,
+          "posePreviewCount": 0,
+          "freshnessMs": 69
+        }
+      },
+      "seconds": 8.0075,
+      "raw": {
+        "ended": 12474.700000000186,
+        "trace": [
+          {
+            "type": "result",
+            "at": 4547.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 68.09999999962747,
+            "age": 75.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4619.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 34,
+            "age": 67.1000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4700.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 54.10000000055879,
+            "age": 75.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4772.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 50.700000000186265,
+            "age": 67.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4849.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 63,
+            "age": 70.8999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 4922.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 34.59999999962747,
+            "age": 68.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5005,
+            "delegate": "CPU",
+            "inferenceMs": 47.90000000037253,
+            "age": 77.1000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5076.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 53.700000000186265,
+            "age": 66.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5133,
+            "delegate": "CPU",
+            "inferenceMs": 49.89999999944121,
+            "age": 50.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5231.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 50.89999999944121,
+            "age": 57.799999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5336.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 60,
+            "age": 68.79999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5389.5,
+            "delegate": "CPU",
+            "inferenceMs": 46.59999999962747,
+            "age": 48.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5547.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 105.20000000018626,
+            "age": 115.79999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 5897.5,
+            "delegate": "CPU",
+            "inferenceMs": 56,
+            "age": 112.1000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6039.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 48.40000000037253,
+            "age": 58,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6229.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 50.19999999925494,
+            "age": 130.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6450.5,
+            "delegate": "CPU",
+            "inferenceMs": 126.09999999962747,
+            "age": 215.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6638.5,
+            "delegate": "CPU",
+            "inferenceMs": 140.79999999981374,
+            "age": 183.29999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 6787.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 139.5,
+            "age": 141.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7263.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 449.09999999962747,
+            "age": 452.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7392.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 74.20000000018626,
+            "age": 116.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7469.0999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 58.59999999962747,
+            "age": 71.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7545.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 65.30000000074506,
+            "age": 71.30000000074506,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7584.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 33.5,
+            "age": 34.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7702.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 57.40000000037253,
+            "age": 70.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7780.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 60.60000000055879,
+            "age": 71.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7851.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 44.5,
+            "age": 65.3999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 7927.5999999996275,
+            "delegate": "CPU",
+            "inferenceMs": 52.700000000186265,
+            "age": 70,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8004.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 40.59999999962747,
+            "age": 72.1000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8079.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 48,
+            "age": 69.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8123.5,
+            "delegate": "CPU",
+            "inferenceMs": 38.10000000055879,
+            "age": 39.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8241.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 61.799999999813735,
+            "age": 72.1000000005588,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8301.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 54.299999999813735,
+            "age": 55.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8406.5,
+            "delegate": "CPU",
+            "inferenceMs": 56.89999999944121,
+            "age": 71.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8447.5,
+            "delegate": "CPU",
+            "inferenceMs": 33.5,
+            "age": 35.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8567,
+            "delegate": "CPU",
+            "inferenceMs": 61.299999999813735,
+            "age": 68.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8650.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 48,
+            "age": 77.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8732.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 57.59999999962747,
+            "age": 71.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8774.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 33.5,
+            "age": 35.700000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8897.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 61.10000000055879,
+            "age": 74.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 8963.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 58.5,
+            "age": 64.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9045.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 61.09999999962747,
+            "age": 76,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9112.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 32.59999999962747,
+            "age": 41,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9213.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 52,
+            "age": 59.299999999813735,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9305.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 63.60000000055879,
+            "age": 81.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9379.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 57.799999999813735,
+            "age": 72.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9417,
+            "delegate": "CPU",
+            "inferenceMs": 30.299999999813735,
+            "age": 32.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9533.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 64.40000000037253,
+            "age": 71.30000000074506,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9611.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 64.59999999962747,
+            "age": 71.8999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9684.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 61.80000000074506,
+            "age": 67.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9732,
+            "delegate": "CPU",
+            "inferenceMs": 37.799999999813735,
+            "age": 42.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9853.5,
+            "delegate": "CPU",
+            "inferenceMs": 65.69999999925494,
+            "age": 72.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 9927.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 44.5,
+            "age": 68.3999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10006.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 40.39999999944121,
+            "age": 73.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10078.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 46.299999999813735,
+            "age": 65.59999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10174.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 60.299999999813735,
+            "age": 69,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10254.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 67.70000000018626,
+            "age": 74.79999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10292.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 30.09999999962747,
+            "age": 32,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10413.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 51.09999999962747,
+            "age": 73.5,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10498.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 57.5,
+            "age": 79.30000000074506,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10590.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 58.200000000186265,
+            "age": 71.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10671.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 72,
+            "age": 74.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10752.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 46.799999999813735,
+            "age": 76.29999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10800.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 39.200000000186265,
+            "age": 41.200000000186265,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10916.799999999814,
+            "delegate": "CPU",
+            "inferenceMs": 47.200000000186265,
+            "age": 63.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 10990.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 35.69999999925494,
+            "age": 67,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11065.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 60.200000000186265,
+            "age": 68.90000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11141.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 55.89999999944121,
+            "age": 70.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11214.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 45.200000000186265,
+            "age": 66.79999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11256.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 29.700000000186265,
+            "age": 32.89999999944121,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11369.700000000186,
+            "delegate": "CPU",
+            "inferenceMs": 62.59999999962747,
+            "age": 68,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11452.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 54.10000000055879,
+            "age": 78.19999999925494,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11533.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 63.700000000186265,
+            "age": 75.70000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11585.200000000186,
+            "delegate": "CPU",
+            "inferenceMs": 40.40000000037253,
+            "age": 46.60000000055879,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11732.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 91,
+            "age": 125.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11814.099999999627,
+            "delegate": "CPU",
+            "inferenceMs": 62.799999999813735,
+            "age": 75.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11860.899999999441,
+            "delegate": "CPU",
+            "inferenceMs": 34.39999999944121,
+            "age": 41,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 11973.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 61.5,
+            "age": 64.8999999994412,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12050.299999999814,
+            "delegate": "CPU",
+            "inferenceMs": 60.59999999962747,
+            "age": 72.09999999962747,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12126.399999999441,
+            "delegate": "CPU",
+            "inferenceMs": 52.39999999944121,
+            "age": 70.79999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12165.5,
+            "delegate": "CPU",
+            "inferenceMs": 31.100000000558794,
+            "age": 33.40000000037253,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12281.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 59.60000000055879,
+            "age": 66.79999999981374,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12356.5,
+            "delegate": "CPU",
+            "inferenceMs": 64.1000000005588,
+            "age": 68.20000000018626,
+            "poses": 0
+          },
+          {
+            "type": "result",
+            "at": 12463.599999999627,
+            "delegate": "CPU",
+            "inferenceMs": 82.5,
+            "age": 100.3999999994412,
+            "poses": 0
+          }
+        ],
+        "raf": [
+          4468,
+          4501.4,
+          4551.4,
+          4584.7,
+          4618.1,
+          4651.3,
+          4701.4,
+          4734.7,
+          4768,
+          4801.3,
+          4851.4,
+          4884.7,
+          4918,
+          4951.4,
+          5001.3,
+          5034.7,
+          5068,
+          5134.7,
+          5168,
+          5201.3,
+          5234.6,
+          5251.3,
+          5301.3,
+          5334.7,
+          5401.4,
+          5418,
+          5468,
+          5768,
+          5967.9,
+          6084.6,
+          6217.9,
+          6318,
+          6434.6,
+          6567.9,
+          6634.6,
+          6701.3,
+          6801.3,
+          6868,
+          7134.6,
+          7267.9,
+          7334.6,
+          7384.5,
+          7417.9,
+          7467.9,
+          7501.2,
+          7534.5,
+          7584.6,
+          7617.9,
+          7651.3,
+          7701.2,
+          7734.6,
+          7784.5,
+          7817.9,
+          7851.2,
+          7884.5,
+          7917.9,
+          7951.2,
+          8001.2,
+          8034.6,
+          8067.9,
+          8117.8,
+          8151.2,
+          8201.2,
+          8234.6,
+          8301.3,
+          8317.8,
+          8367.9,
+          8401.2,
+          8451.2,
+          8484.5,
+          8534.5,
+          8567.9,
+          8601.2,
+          8651.2,
+          8701.2,
+          8734.5,
+          8767.8,
+          8817.8,
+          8851.2,
+          8884.5,
+          8917.8,
+          8967.8,
+          9001.2,
+          9067.9,
+          9117.9,
+          9151.1,
+          9184.5,
+          9217.8,
+          9251.2,
+          9301.2,
+          9334.5,
+          9367.8,
+          9417.8,
+          9451.2,
+          9501.2,
+          9534.5,
+          9567.8,
+          9601.1,
+          9634.5,
+          9684.5,
+          9734.5,
+          9767.8,
+          9817.8,
+          9851.1,
+          9884.5,
+          9917.8,
+          9967.8,
+          10001.2,
+          10034.5,
+          10101.1,
+          10134.4,
+          10167.8,
+          10201.1,
+          10251.1,
+          10284.4,
+          10334.5,
+          10367.8,
+          10417.8,
+          10451.1,
+          10517.7,
+          10551.1,
+          10584.4,
+          10617.7,
+          10667.7,
+          10701.1,
+          10751.1,
+          10817.8,
+          10851.1,
+          10884.4,
+          10917.8,
+          10951.1,
+          10984.5,
+          11017.7,
+          11067.7,
+          11101.1,
+          11134.5,
+          11167.8,
+          11217.7,
+          11251.1,
+          11284.5,
+          11334.4,
+          11367.7,
+          11401.1,
+          11451.1,
+          11484.4,
+          11534.4,
+          11584.4,
+          11651.1,
+          11701.1,
+          11734.4,
+          11767.7,
+          11817.7,
+          11851.1,
+          11901,
+          11934.4,
+          11967.7,
+          12001.1,
+          12051.1,
+          12084.4,
+          12117.8,
+          12167.7,
+          12201,
+          12251.1,
+          12284.4,
+          12317.7,
+          12351,
+          12384.4,
+          12434.4
+        ],
+        "canvas2d": false,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 0,
+            "playersReady": false,
+            "shouldersReady": false,
+            "positionReady": false,
+            "fresh": false,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 60,
+          "fps": 13,
+          "playerStates": {
+            "p1": "WAITING",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": false,
+          "readinessReason": "NO_POSE",
+          "sampleAgeMs": 100,
+          "poseCount": 0,
+          "posePreviewCount": 0,
+          "freshnessMs": 111.69999999925494
+        }
+      },
+      "requests": [
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.js",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.wasm",
+          "status": 200
+        },
+        {
+          "url": "http://127.0.0.1:4173/mediapipe/pose_landmarker_lite.task",
+          "status": 200
+        }
+      ],
+      "remoteBlocked": [],
+      "errors": [],
+      "cleanup": true,
+      "cgroupBefore": {
+        "usage_usec": 5576347880,
+        "user_usec": 5033338400,
+        "system_usec": 543009480,
+        "nice_usec": 0,
+        "nr_periods": 22603,
+        "nr_throttled": 8811,
+        "throttled_usec": 170554240,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "cgroupAfter": {
+        "usage_usec": 5605976092,
+        "user_usec": 5056331712,
+        "system_usec": 549644380,
+        "nice_usec": 0,
+        "nr_periods": 22683,
+        "nr_throttled": 8862,
+        "throttled_usec": 171438118,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "cgroupDelta": {
+        "usage_usec": 29628212,
+        "user_usec": 22993312,
+        "system_usec": 6634900,
+        "nice_usec": 0,
+        "nr_periods": 80,
+        "nr_throttled": 51,
+        "throttled_usec": 883878,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "summary": {
+        "inferenceMs": {
+          "n": 84,
+          "p50": 56,
+          "p95": 105.20000000018626,
+          "max": 449.09999999962747
+        },
+        "resultAgeMs": {
+          "n": 84,
+          "p50": 70.70000000018626,
+          "p95": 130.70000000018626,
+          "max": 452.20000000018626
+        },
+        "resultsOver250": 1,
+        "resultHz": 10.490165469871995,
+        "rafHz": 20.98033093974399
+      }
+    }
+  ],
+  "complete": true,
+  "wallSeconds": 51.197301709
+}

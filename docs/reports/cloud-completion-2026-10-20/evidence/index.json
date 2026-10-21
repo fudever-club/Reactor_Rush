@@ -1,0 +1,138 @@
+{
+  "files": [
+    {
+      "path": "archive.json",
+      "bytes": 268,
+      "sha256": "d1835739a9550c91e0d59c01873c06cd4c83ec6cbd8dbac48f3516f6c3379f82"
+    },
+    {
+      "path": "baseline-before.json",
+      "bytes": 23742,
+      "sha256": "4cf676953d8128d64ecf782231cf3687915c32619f61410962c9a2dba04dfcc6"
+    },
+    {
+      "path": "build.log",
+      "bytes": 1577,
+      "sha256": "5e11d517d75f76e79d07ccf377a2e0531775e2c110ea4a6c299d6057ccad378b"
+    },
+    {
+      "path": "camera-matrix.json",
+      "bytes": 7595,
+      "sha256": "35824d1e76701cbf85f7e9827dc34fb626094e45c69e72698630e1a89e7cbf9f"
+    },
+    {
+      "path": "closeout-checks.json",
+      "bytes": 267,
+      "sha256": "ef3551754bbc1987514619681343d4bb17266f01ba923ba546babd3a80386153"
+    },
+    {
+      "path": "current-checkout-baseline.json",
+      "bytes": 40809,
+      "sha256": "aa7353c4496cd3922699c5312f35510356dc5cf49901c8754c8b345ba984df0d"
+    },
+    {
+      "path": "delayed-pose-failure.json",
+      "bytes": 3460,
+      "sha256": "595285ffe3de8e68ef692f18f07c17af5a15f31b578ec513cc57c38b0c06b3b6"
+    },
+    {
+      "path": "endurance.json",
+      "bytes": 16451,
+      "sha256": "4b28b709b91ba08c4ae4c188f634ea3ee2298ff63eb65c7e30bbbadfa1d3b9d0"
+    },
+    {
+      "path": "field-readiness.json",
+      "bytes": 643,
+      "sha256": "7ed216bc7349e9968fce734b9cb6b16582892073f7d261d4cbd6b0ccffb3c02a"
+    },
+    {
+      "path": "followup-suites.json",
+      "bytes": 562,
+      "sha256": "e54fa932ca7cccfe6efa785f8ee87c2de90d22e27a253cf62dc84598398628b6"
+    },
+    {
+      "path": "hand-movement.json",
+      "bytes": 1111,
+      "sha256": "a79519701e4f2fe04cc3ddac77f186e562801251a2af1a6d5e066cf6d3b477bd"
+    },
+    {
+      "path": "lifecycle.json",
+      "bytes": 1153,
+      "sha256": "4b68b81c1aea8744f21bfc7b2de80f7ecfec500973b34fac62feae139b7510c7"
+    },
+    {
+      "path": "native-permission.json",
+      "bytes": 1491,
+      "sha256": "00fc30f5003375d78565fc717878e86d9442d2d4ca3404f0d39877db7df43cce"
+    },
+    {
+      "path": "node-tests.log",
+      "bytes": 16561,
+      "sha256": "84409063113945667ab80cb242c0418fecea99c80b7c4973c591791fa840764e"
+    },
+    {
+      "path": "pointer-targets.json",
+      "bytes": 655,
+      "sha256": "bb4769c353fb0bded024634c594b94629cb198aa27af28777233286b3b71b3fb"
+    },
+    {
+      "path": "pose-coop.cpuprofile",
+      "bytes": 281409,
+      "sha256": "17c569a41b34cad1c0b75775996f0ab4d977906d7bd1baa762b8db81f9385fd4"
+    },
+    {
+      "path": "pose-profile-long.json",
+      "bytes": 277944,
+      "sha256": "5804710098c8ac5c69c933711db64dd440db72438c24183714d80ab1caae795e"
+    },
+    {
+      "path": "pose-profile-short.json",
+      "bytes": 110070,
+      "sha256": "d84f7b77a77f776766c17cd6f4404c4595bbe30dd08eaa16f65ac1967adcdf19"
+    },
+    {
+      "path": "pose-recovery.json",
+      "bytes": 3598,
+      "sha256": "ff3abb405baaeff2a2f520c287b358c5378d65ba4e73d598d9d30c08e2b42246"
+    },
+    {
+      "path": "preservation-audit.json",
+      "bytes": 7657,
+      "sha256": "19eede5fc9a595b939275a586635f43e342fce14ef62f0e8780919302427b9f8"
+    },
+    {
+      "path": "preview-old-fixture-failure.json",
+      "bytes": 1380,
+      "sha256": "9b13a103c4704cdb92a97a666e2091ffc0e2319cf42823bdde5d780478c2666c"
+    },
+    {
+      "path": "production-suites.json",
+      "bytes": 2789,
+      "sha256": "55c922936866a799d4598cfceac3e7ada44dc1ec022d148a06044ea9a20e16d8"
+    },
+    {
+      "path": "profile-pose-long.mjs",
+      "bytes": 4119,
+      "sha256": "7d424a6a176b446fb1fe3c7838d289f2e0318a0837cebde1f460cfd66d59462d"
+    },
+    {
+      "path": "sdk-cold-1.json",
+      "bytes": 5131,
+      "sha256": "f61aaea4ce5acee4044b338770e2adbdbcd19b935cb9ad8cac37e9f8b8ae5fda"
+    },
+    {
+      "path": "sdk-cold-2.json",
+      "bytes": 5143,
+      "sha256": "99946f06de11dd84105843e56476fccb299f9659773f6a8a364c817a0b0f3f80"
+    },
+    {
+      "path": "sdk-cold-3.json",
+      "bytes": 4976,
+      "sha256": "aabeac733bc7d0a77761ecbeff0ae8a041ee66e2f4a1dd5872287eaaccd1ea47"
+    }
+  ],
+  "excludes": [
+    "this index itself"
+  ],
+  "generated_utc": "2026-10-20T17:25:35.263708+00:00"
+}

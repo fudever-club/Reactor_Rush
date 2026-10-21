@@ -1,0 +1,7 @@
+{
+  "path": "/var/tmp/reactor-rush-completion-20261020T163138Z/Reactor-Rush-Booth-Candidate.zip",
+  "bytes": 23381155,
+  "sha256": "bbbfa5f196e7ef5e9999ab9b6169db20cfc406a2f0a67592d3fc275b51c048b4",
+  "payload_matches_final_build": true,
+  "release_certified": false
+}

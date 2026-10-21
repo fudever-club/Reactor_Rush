@@ -1,0 +1,651 @@
+{
+  "browser": "154.0.8037.57",
+  "method": "Synthetic camera, fake worker and bitmap; actual production60s timer, results/replay and resource lifecycle. Not physical endurance, SDK inference, render FPS or body latency.",
+  "results": [
+    {
+      "id": "cycle-1",
+      "scheme": "H0",
+      "status": "PASS",
+      "scope": "fresh-page camera opt-in/calibration/start/stop and resource teardown"
+    },
+    {
+      "id": "cycle-2",
+      "scheme": "P1",
+      "status": "PASS",
+      "scope": "fresh-page camera opt-in/calibration/start/stop and resource teardown"
+    },
+    {
+      "id": "cycle-3",
+      "scheme": "P2",
+      "status": "PASS",
+      "scope": "fresh-page camera opt-in/calibration/start/stop and resource teardown"
+    },
+    {
+      "id": "cycle-4",
+      "scheme": "H0",
+      "status": "PASS",
+      "scope": "fresh-page camera opt-in/calibration/start/stop and resource teardown"
+    },
+    {
+      "id": "cycle-5",
+      "scheme": "P1",
+      "status": "PASS",
+      "scope": "fresh-page camera opt-in/calibration/start/stop and resource teardown"
+    },
+    {
+      "id": "cycle-6",
+      "scheme": "P2",
+      "status": "PASS",
+      "scope": "fresh-page camera opt-in/calibration/start/stop and resource teardown"
+    },
+    {
+      "id": "cycle-7",
+      "scheme": "H0",
+      "status": "PASS",
+      "scope": "fresh-page camera opt-in/calibration/start/stop and resource teardown"
+    },
+    {
+      "id": "cycle-8",
+      "scheme": "P1",
+      "status": "PASS",
+      "scope": "fresh-page camera opt-in/calibration/start/stop and resource teardown"
+    },
+    {
+      "id": "cycle-9",
+      "scheme": "P2",
+      "status": "PASS",
+      "scope": "fresh-page camera opt-in/calibration/start/stop and resource teardown"
+    },
+    {
+      "id": "cycle-10",
+      "scheme": "H0",
+      "status": "PASS",
+      "scope": "fresh-page camera opt-in/calibration/start/stop and resource teardown"
+    },
+    {
+      "id": "round-1",
+      "scheme": "H0",
+      "coop": false,
+      "status": "PASS",
+      "wallSeconds": 64.27070227000002,
+      "before": {
+        "time": 59983.333333333336,
+        "heap": 18372292
+      },
+      "after": {
+        "time": 0,
+        "players": {
+          "p1": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          },
+          "p2": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          }
+        },
+        "cameraMode": true,
+        "metrics": {
+          "delegate": "CPU",
+          "inferenceMs": 12,
+          "fps": 14,
+          "recalibrationRequired": false,
+          "waitingForHand": false,
+          "moveThreshold": 0.08,
+          "handMovementZones": [
+            {
+              "player": "p1",
+              "neutralX": 0.5,
+              "currentX": 0.5,
+              "slotLeft": 0,
+              "slotRight": 1,
+              "leftTrigger": 0.42,
+              "rightTrigger": 0.58,
+              "stopLeft": 0.456,
+              "stopRight": 0.544,
+              "moveAxis": 0,
+              "catch": false
+            }
+          ]
+        },
+        "workers": 1,
+        "heap": 26834183,
+        "team": 0
+      }
+    },
+    {
+      "id": "round-2",
+      "scheme": "H0",
+      "coop": false,
+      "status": "PASS",
+      "wallSeconds": 62.913092948999996,
+      "before": {
+        "time": 59970.03,
+        "heap": 30755322
+      },
+      "after": {
+        "time": 0,
+        "players": {
+          "p1": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          },
+          "p2": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          }
+        },
+        "cameraMode": true,
+        "metrics": {
+          "delegate": "CPU",
+          "inferenceMs": 12,
+          "fps": 11,
+          "recalibrationRequired": false,
+          "waitingForHand": false,
+          "moveThreshold": 0.08,
+          "handMovementZones": [
+            {
+              "player": "p1",
+              "neutralX": 0.5,
+              "currentX": 0.5,
+              "slotLeft": 0,
+              "slotRight": 1,
+              "leftTrigger": 0.42,
+              "rightTrigger": 0.58,
+              "stopLeft": 0.456,
+              "stopRight": 0.544,
+              "moveAxis": 0,
+              "catch": false
+            }
+          ]
+        },
+        "workers": 1,
+        "heap": 29839031,
+        "team": 0
+      }
+    },
+    {
+      "id": "round-3",
+      "scheme": "P1",
+      "coop": true,
+      "status": "PASS",
+      "wallSeconds": 64.556042805,
+      "before": {
+        "time": 59966.66666666667,
+        "heap": 19076802
+      },
+      "after": {
+        "time": 0,
+        "players": {
+          "p1": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          },
+          "p2": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          }
+        },
+        "cameraMode": true,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 2,
+            "playersReady": true,
+            "shouldersReady": true,
+            "positionReady": true,
+            "fresh": true,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 12,
+          "fps": 10,
+          "playerStates": {
+            "p1": "RECALIBRATE",
+            "p2": "RECALIBRATE"
+          },
+          "recalibrationRequired": true,
+          "readinessReason": "READY_TO_CALIBRATE",
+          "sampleAgeMs": 110,
+          "poseCount": 2,
+          "posePreviewCount": 2,
+          "freshnessMs": 114.70000000018626,
+          "ambiguityReason": "tracking-lost"
+        },
+        "workers": 1,
+        "heap": 19990761,
+        "team": 0
+      }
+    },
+    {
+      "id": "round-4",
+      "scheme": "P1",
+      "coop": true,
+      "status": "PASS",
+      "wallSeconds": 63.71633949399998,
+      "before": {
+        "time": 59976.71,
+        "heap": 21023540
+      },
+      "after": {
+        "time": 0,
+        "players": {
+          "p1": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          },
+          "p2": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          }
+        },
+        "cameraMode": true,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 2,
+            "detectedPlayers": 2,
+            "playersReady": true,
+            "shouldersReady": true,
+            "positionReady": true,
+            "fresh": true,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 12,
+          "fps": 14,
+          "playerStates": {
+            "p1": "RECALIBRATE",
+            "p2": "RECALIBRATE"
+          },
+          "recalibrationRequired": true,
+          "readinessReason": "READY_TO_CALIBRATE",
+          "sampleAgeMs": 24,
+          "poseCount": 2,
+          "posePreviewCount": 2,
+          "freshnessMs": 60.5,
+          "ambiguityReason": "tracking-lost"
+        },
+        "workers": 1,
+        "heap": 22211044,
+        "team": 0
+      }
+    },
+    {
+      "id": "round-5",
+      "scheme": "P2",
+      "coop": false,
+      "status": "PASS",
+      "wallSeconds": 62.27031910199998,
+      "before": {
+        "time": 59933.33333333334,
+        "heap": 18529801
+      },
+      "after": {
+        "time": 0,
+        "players": {
+          "p1": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          },
+          "p2": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          }
+        },
+        "cameraMode": true,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 1,
+            "detectedPlayers": 1,
+            "playersReady": true,
+            "shouldersReady": true,
+            "positionReady": true,
+            "fresh": true,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 12,
+          "fps": 13,
+          "playerStates": {
+            "p1": "RECALIBRATE",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": true,
+          "readinessReason": "READY_TO_CALIBRATE",
+          "sampleAgeMs": 21,
+          "poseCount": 1,
+          "posePreviewCount": 1,
+          "freshnessMs": 25.700000000186265,
+          "ambiguityReason": "tracking-lost"
+        },
+        "workers": 1,
+        "heap": 16925216,
+        "team": 0
+      }
+    },
+    {
+      "id": "round-6",
+      "scheme": "P2",
+      "coop": false,
+      "status": "PASS",
+      "wallSeconds": 60.19068852300005,
+      "before": {
+        "time": 59973.380000000005,
+        "heap": 18955345
+      },
+      "after": {
+        "time": 0,
+        "players": {
+          "p1": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          },
+          "p2": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          }
+        },
+        "cameraMode": true,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 1,
+            "detectedPlayers": 1,
+            "playersReady": true,
+            "shouldersReady": true,
+            "positionReady": true,
+            "fresh": true,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 12,
+          "fps": 14,
+          "playerStates": {
+            "p1": "RECALIBRATE",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": true,
+          "readinessReason": "READY_TO_CALIBRATE",
+          "sampleAgeMs": 20,
+          "poseCount": 1,
+          "posePreviewCount": 1,
+          "freshnessMs": 50.39999999944121,
+          "ambiguityReason": "tracking-lost"
+        },
+        "workers": 1,
+        "heap": 20424283,
+        "team": 0
+      }
+    },
+    {
+      "id": "round-7",
+      "scheme": "H0",
+      "coop": true,
+      "status": "PASS",
+      "wallSeconds": 60.950736463000005,
+      "before": {
+        "time": 59983.34,
+        "heap": 18049450
+      },
+      "after": {
+        "time": 0,
+        "players": {
+          "p1": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          },
+          "p2": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          }
+        },
+        "cameraMode": true,
+        "metrics": {
+          "delegate": "CPU",
+          "inferenceMs": 12,
+          "fps": 11,
+          "recalibrationRequired": false,
+          "waitingForHand": false,
+          "moveThreshold": 0.08,
+          "handMovementZones": [
+            {
+              "player": "p1",
+              "neutralX": 0.25,
+              "currentX": 0.25,
+              "slotLeft": 0,
+              "slotRight": 0.46499999999999997,
+              "leftTrigger": 0.16999999999999998,
+              "rightTrigger": 0.33,
+              "stopLeft": 0.206,
+              "stopRight": 0.294,
+              "moveAxis": 0,
+              "catch": false
+            },
+            {
+              "player": "p2",
+              "neutralX": 0.75,
+              "currentX": 0.75,
+              "slotLeft": 0.535,
+              "slotRight": 1,
+              "leftTrigger": 0.67,
+              "rightTrigger": 0.83,
+              "stopLeft": 0.706,
+              "stopRight": 0.794,
+              "moveAxis": 0,
+              "catch": false
+            }
+          ]
+        },
+        "workers": 1,
+        "heap": 28526680,
+        "team": 0
+      }
+    },
+    {
+      "id": "round-8",
+      "scheme": "H0",
+      "coop": true,
+      "status": "PASS",
+      "wallSeconds": 61.20551861099998,
+      "before": {
+        "time": 59998.35,
+        "heap": 33405771
+      },
+      "after": {
+        "time": 0,
+        "players": {
+          "p1": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          },
+          "p2": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          }
+        },
+        "cameraMode": true,
+        "metrics": {
+          "delegate": "CPU",
+          "inferenceMs": 12,
+          "fps": 11,
+          "recalibrationRequired": false,
+          "waitingForHand": false,
+          "moveThreshold": 0.08,
+          "handMovementZones": [
+            {
+              "player": "p1",
+              "neutralX": 0.25,
+              "currentX": 0.25,
+              "slotLeft": 0,
+              "slotRight": 0.46499999999999997,
+              "leftTrigger": 0.16999999999999998,
+              "rightTrigger": 0.33,
+              "stopLeft": 0.206,
+              "stopRight": 0.294,
+              "moveAxis": 0,
+              "catch": false
+            },
+            {
+              "player": "p2",
+              "neutralX": 0.75,
+              "currentX": 0.75,
+              "slotLeft": 0.535,
+              "slotRight": 1,
+              "leftTrigger": 0.67,
+              "rightTrigger": 0.83,
+              "stopLeft": 0.706,
+              "stopRight": 0.794,
+              "moveAxis": 0,
+              "catch": false
+            }
+          ]
+        },
+        "workers": 1,
+        "heap": 19438935,
+        "team": 0
+      }
+    },
+    {
+      "id": "round-9",
+      "scheme": "P1",
+      "coop": false,
+      "status": "PASS",
+      "wallSeconds": 60.57802334000007,
+      "before": {
+        "time": 59950.00000000001,
+        "heap": 18651295
+      },
+      "after": {
+        "time": 0,
+        "players": {
+          "p1": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          },
+          "p2": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          }
+        },
+        "cameraMode": true,
+        "metrics": {
+          "poseCalibration": {
+            "state": "saved",
+            "cameraReady": true,
+            "expectedPlayers": 1,
+            "detectedPlayers": 1,
+            "playersReady": true,
+            "shouldersReady": true,
+            "positionReady": true,
+            "fresh": true,
+            "stableSamples": 3,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 12,
+          "fps": 14,
+          "playerStates": {
+            "p1": "ACCEPTED_IDLE",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": false,
+          "readinessReason": "ACCEPTED",
+          "sampleAgeMs": 24,
+          "poseCount": 1,
+          "posePreviewCount": 1,
+          "freshnessMs": 113.6000000005588
+        },
+        "workers": 1,
+        "heap": 15499824,
+        "team": 0
+      }
+    },
+    {
+      "id": "round-10",
+      "scheme": "P1",
+      "coop": false,
+      "status": "PASS",
+      "wallSeconds": 61.17632676700002,
+      "before": {
+        "time": 59990.060000000005,
+        "heap": 17104935
+      },
+      "after": {
+        "time": 0,
+        "players": {
+          "p1": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          },
+          "p2": {
+            "score": 0,
+            "combo": 0,
+            "bestCombo": 0
+          }
+        },
+        "cameraMode": true,
+        "metrics": {
+          "poseCalibration": {
+            "state": "idle",
+            "cameraReady": true,
+            "expectedPlayers": 1,
+            "detectedPlayers": 1,
+            "playersReady": true,
+            "shouldersReady": true,
+            "positionReady": true,
+            "fresh": true,
+            "stableSamples": 0,
+            "requiredSamples": 3
+          },
+          "delegate": "CPU",
+          "inferenceMs": 12,
+          "fps": 13,
+          "playerStates": {
+            "p1": "RECALIBRATE",
+            "p2": "WAITING"
+          },
+          "recalibrationRequired": true,
+          "readinessReason": "READY_TO_CALIBRATE",
+          "sampleAgeMs": 33,
+          "poseCount": 1,
+          "posePreviewCount": 1,
+          "freshnessMs": 36,
+          "ambiguityReason": "tracking-lost"
+        },
+        "workers": 1,
+        "heap": 28830403,
+        "team": 0
+      }
+    }
+  ]
+}

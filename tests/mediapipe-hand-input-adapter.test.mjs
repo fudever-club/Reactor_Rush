@@ -524,3 +524,59 @@ test('a calibrated Hand may start while moving near the edge; only recentering r
  const {adapter,worker}=createAdapter();adapter.setSoloMode(true);await adapter.start();worker.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.5)]}});adapter.calibrate();
  worker.emit('message',{data:{type:'result',timestamp:10,hands:[makeLandmarks(.08)]}});assert.equal(adapter.canCalibrate(),false);assert.equal(adapter.canStart(),true);assert.equal(adapter.read().p1.moveAxis,1);adapter.stop();
 });
+
+
+test('repeated start is idempotent and leaves only one owned camera session', async () => {
+  const {adapter,calls}=createAdapter();
+  try {
+    await adapter.start(); await adapter.start();
+    assert.equal(calls.camera,1); assert.equal(calls.worker,1);
+  } finally { adapter.stop(); }
+});
+
+test('stop permits immediate restart while an obsolete permission request is pending', async () => {
+  const requests=[]; const workers=[];
+  const {adapter}=createAdapter({getUserMedia:()=>new Promise(resolve=>requests.push(resolve)),
+    createWorker:()=>{const worker=new FakeWorker();workers.push(worker);return worker;}});
+  const old=fakeStream(); const current=fakeStream();
+  const first=adapter.start();adapter.stop();const second=adapter.start();
+  try {
+    assert.equal(requests.length,2);
+    requests[1](current.stream);await second;
+    requests[0](old.stream);await first;
+    assert.equal(old.track.stopped,true);assert.equal(current.track.stopped,false);
+    assert.equal(adapter.currentStatus,'ready');assert.equal(workers.length,1);
+  } finally { for(const resolve of requests)resolve(old.stream);adapter.stop();await Promise.allSettled([first,second]); }
+});
+
+test('cancelled CPU recovery cannot fail or stop an immediately restarted camera session', async () => {
+  const workers=[new FakeWorker(true,'GPU'),new FakeWorker(false,'CPU'),new FakeWorker(true,'GPU')];
+  const {adapter,video,calls,clock}=createAdapter({createWorker:()=>workers.shift(),createBitmap:async()=>({close(){}})});
+  await adapter.start();video.readyState=2;video.currentTime=1;clock.now=100;calls.frameCallback();
+  await Promise.resolve();await Promise.resolve();await Promise.resolve();
+  clock.now=2201;video.currentTime=2;calls.frameCallback();
+  assert.equal(adapter.currentStatus,'loading-model');
+  adapter.stop();await adapter.start();
+  try {assert.equal(adapter.currentStatus,'ready');assert.equal(calls.camera,2);assert.equal(calls.worker,3);}
+  finally {adapter.stop();}
+});
+
+
+test('obsolete video playback rejection cannot fail a restarted session', async () => {
+  const {adapter,video}=createAdapter();
+  let rejectPlayback;video.play=()=>new Promise((_,reject)=>{rejectPlayback=reject;});
+  const first=adapter.start();await new Promise(resolve=>setImmediate(resolve));
+  adapter.stop();video.play=async()=>{};await adapter.start();
+  try{rejectPlayback(Error('obsolete playback'));await first;assert.equal(adapter.currentStatus,'ready');}
+  finally{adapter.stop();}
+});
+
+test('start during CPU recovery does not allocate another stream or replace the fallback worker',async()=>{
+  const gpu=new FakeWorker(true,'GPU');const cpu=new FakeWorker(false,'CPU');let count=0;
+  const {adapter,video,calls,clock}=createAdapter({createWorker:()=>count++===0?gpu:cpu,createBitmap:async()=>({close(){}})});
+  await adapter.start();video.readyState=2;video.currentTime=1;clock.now=100;calls.frameCallback();
+  await new Promise(resolve=>setImmediate(resolve));clock.now=2201;video.currentTime=2;calls.frameCallback();
+  const repeated=adapter.start();await new Promise(resolve=>setImmediate(resolve));
+  try{assert.equal(calls.camera,1);assert.equal(calls.worker,2);cpu.emit('message',{data:{type:'ready',delegate:'CPU'}});await repeated;await new Promise(resolve=>setImmediate(resolve));assert.equal(adapter.currentStatus,'ready');}
+  finally{adapter.stop();await Promise.allSettled([repeated]);}
+});

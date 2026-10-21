@@ -1,0 +1,316 @@
+{
+  "protected_files": 77,
+  "all_unchanged": true,
+  "changed_protected": [],
+  "head_unchanged": true,
+  "files": [
+    {
+      "path": "ART_BIBLE.md",
+      "unchanged": true
+    },
+    {
+      "path": "DESIGN.md",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/animations.json",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/antenna-stem.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/antenna-tip.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/chest-core.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/energy-orb.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/face-catch.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/face-idle.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/foot-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/foot-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/hand-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/hand-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/head-shell.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/lower-arm-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/lower-arm-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/neck.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/side-sensor.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/spring-leg-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/spring-leg-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/torso.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/upper-arm-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/upper-arm-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/upper-leg-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/upper-leg-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/rig.json",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p1-cyan/source/rig.svg",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/animations.json",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/activation-ring.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/chest-core.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/energy-orb.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/face-activate.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/face-catch.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/face-idle.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/foot-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/foot-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/hand-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/hand-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/head-shell.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/lower-arm-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/lower-arm-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/lower-leg-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/lower-leg-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/neck.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/sensor-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/sensor-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/torso.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/upper-arm-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/upper-arm-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/upper-leg-left.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/upper-leg-right.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/rig.json",
+      "unchanged": true
+    },
+    {
+      "path": "assets/characters/p2-pink/source/rig.svg",
+      "unchanged": true
+    },
+    {
+      "path": "assets/concepts/robots/direction-a-action-pose-references.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/concepts/robots/direction-a-orbital-buddy.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/concepts/robots/direction-a-refined-model-sheet.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/concepts/robots/direction-b-vector-sprinters.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets/concepts/robots/direction-c-instrument-critters.png",
+      "unchanged": true
+    },
+    {
+      "path": "assets_manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "package-lock.json",
+      "unchanged": true
+    },
+    {
+      "path": "package.json",
+      "unchanged": true
+    },
+    {
+      "path": "public/assets_manifest.json",
+      "unchanged": true
+    },
+    {
+      "path": "public/mediapipe/NOTICE.md",
+      "unchanged": true
+    },
+    {
+      "path": "public/mediapipe/hand_landmarker.task",
+      "unchanged": true
+    },
+    {
+      "path": "public/mediapipe/pose_landmarker_lite.task",
+      "unchanged": true
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_internal.js",
+      "unchanged": true
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_internal.wasm",
+      "unchanged": true
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_module_internal.js",
+      "unchanged": true
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_module_internal.wasm",
+      "unchanged": true
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_nosimd_internal.js",
+      "unchanged": true
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_nosimd_internal.wasm",
+      "unchanged": true
+    },
+    {
+      "path": "src/gameplay/accessibility-cues.ts",
+      "unchanged": true
+    },
+    {
+      "path": "src/gameplay/core.ts",
+      "unchanged": true
+    },
+    {
+      "path": "src/main.ts",
+      "unchanged": true
+    },
+    {
+      "path": "src/rig.ts",
+      "unchanged": true
+    },
+    {
+      "path": "src/workers/hand-landmarker.worker.ts",
+      "unchanged": true
+    },
+    {
+      "path": "src/workers/pose-landmarker.worker.ts",
+      "unchanged": true
+    }
+  ]
+}

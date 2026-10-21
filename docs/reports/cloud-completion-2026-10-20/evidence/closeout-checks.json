@@ -1,0 +1,10 @@
+{
+  "source_hashes_match_rebaseline": true,
+  "source_files_checked": 164,
+  "local_markdown_targets": 38,
+  "broken_local_links": [],
+  "gates_G0_G10_complete": true,
+  "diff_whitespace": "PASS",
+  "physical_measurements": "NOT_RUN",
+  "release_authorized": false
+}

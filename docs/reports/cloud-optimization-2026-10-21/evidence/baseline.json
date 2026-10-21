@@ -1,0 +1,784 @@
+{
+  "utc": "2026-10-20T17:27:58.831347+00:00",
+  "root": "/workspace/Reactor_Rush",
+  "head": "e027110c27014309ead783563c9b4ba7e2e0b77d",
+  "git_status": " M README.md\n M docs/gameplay/camera-input-integration.md\n M docs/gameplay/energy-catch-mvp.md\n M index.html\n M src/adapters/mediapipe-hand-input-adapter.ts\n M src/adapters/mediapipe-pose-input-adapter.ts\n M src/game-style.css\n M tests/browser/camera-smoke.mjs\n M tests/browser/hand-movement-smoke.mjs\n M tests/browser/pose-calibration-smoke.mjs\n M tests/browser/pose-recovery-smoke.mjs\n M tests/browser/pose-sdk-smoke.mjs\n M tests/mediapipe-hand-input-adapter.test.mjs\n M tests/mediapipe-pose-input-adapter.test.mjs\n?? docs/operations/\n?? docs/reports/cloud-completion-2026-10-20/\n?? docs/superpowers/plans/2026-10-20-wp02-handoff-proposal.md\n?? scripts/field-evidence.mjs\n?? scripts/package-booth.mjs\n?? scripts/serve-build.mjs\n?? tests/booth-package.test.mjs\n?? tests/browser/camera-lifecycle-smoke.mjs\n?? tests/browser/endurance-smoke.mjs\n?? tests/browser/fixtures.mjs\n?? tests/browser/launch.mjs\n?? tests/browser/native-permission-smoke.mjs\n?? tests/browser/results-controls-smoke.mjs\n?? tests/field-evidence.test.mjs\n",
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "c38423062fd43190411b48f82911e65d71fdf1777f908b9786e317cc00ea4c20"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "18ec77e9c7441d1cc6c638cffe3d307459efbbb37584219835a9501b5c760e31"
+    },
+    {
+      "path": "ART_BIBLE.md",
+      "sha256": "6ab1cd54947666e5a953dbd718424f6d679cb7e5701ded2ecbb9dc74c953dd5b"
+    },
+    {
+      "path": "DESIGN.md",
+      "sha256": "117a81296bb845aef89d3be6e821a17f7aecd9eccd075608266a3762e3ddc3df"
+    },
+    {
+      "path": "README.md",
+      "sha256": "1a6a39face3d10097f4b97d98f137ebb1f7e8e0188950f0c4546730402c40e76"
+    },
+    {
+      "path": "Reactor_Rush_WP01_Implementation_Plan.md",
+      "sha256": "64e5b77ca30bf214e3fae05a5b8c643d5ddd66ab6a934a0a2e90c90679246509"
+    },
+    {
+      "path": "animation-test.html",
+      "sha256": "f9939fd959021d997552f34a29115099c8af6245e3a3c95c97538cabe6b03ca7"
+    },
+    {
+      "path": "assets_manifest.json",
+      "sha256": "927d74808ba2f1199e88d62e98080259469ac3327c068012b1fba68992121905"
+    },
+    {
+      "path": "index.html",
+      "sha256": "129e6ad8622f95a02ccdd3717203406823823d45802fe9fb9ed4d1d2125e8824"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "4613557f4acdf5c75dcece1458cbb8b284952f059e56180236b6bfe1f1040e9f"
+    },
+    {
+      "path": "package.json",
+      "sha256": "9fef567c71f511f4f894f08c17f19b1559756901dcae2cfdf2a5557a6efce0c2"
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "a141513296d9471a425435e7b032c783378903950edd83dab66244ee9a33788d"
+    },
+    {
+      "path": "vite.config.ts",
+      "sha256": "6710d5d898767383b8467c9695b9f3423bad3c7ef2486476c4300c1604646358"
+    },
+    {
+      "path": "public/assets_manifest.json",
+      "sha256": "927d74808ba2f1199e88d62e98080259469ac3327c068012b1fba68992121905"
+    },
+    {
+      "path": "scripts/export-sprites.mjs",
+      "sha256": "2ecb4b2b8216a21cded1a68f56d824eb6df9e7c1e9b3015c1d3d9ca6c5ff4bf1"
+    },
+    {
+      "path": "scripts/serve-build.mjs",
+      "sha256": "ca85bade6a23c2bc23c06be3457b6220c7a81529b0a473e837a868590cace9ca"
+    },
+    {
+      "path": "scripts/package-booth.mjs",
+      "sha256": "bd01f6259b6d9bdd43c4f3e685d856fa1f61c0b6aaeb593c061dd799e404c3b8"
+    },
+    {
+      "path": "scripts/field-evidence.mjs",
+      "sha256": "acb1599dbc5931d3a8942c2da4762e58308951d50e72eb49aef480455683dd8d"
+    },
+    {
+      "path": "src/animation-test.ts",
+      "sha256": "683a4b992fb51212b1225f8eae0818e475a5575515c6d5fc513c6e8ca51edded"
+    },
+    {
+      "path": "src/game-style.css",
+      "sha256": "7a1a7fdc9a4bf98c3e012a00acf7df07160ce9d86f0e9eed09463cac89d47530"
+    },
+    {
+      "path": "src/main.ts",
+      "sha256": "031882dd6102e1bed9a423f525592704a05dc7adbf5b187f0b35259b9c578de4"
+    },
+    {
+      "path": "src/rig.ts",
+      "sha256": "b2803cc3ea27fd75a0eebc72273db3c142cbf73aeb2c813f4d5f4553ab4dbdf8"
+    },
+    {
+      "path": "src/style.css",
+      "sha256": "afc5a7c606af84a067eaf14c204f5191425dadb7d7194457f6e12cdcafd15934"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "sha256": "8fe0789ba5f059f5d9dc0e5c5b638b404388ad3f830cd76f2304d5beb4e3768d"
+    },
+    {
+      "path": "tests/accessibility-cues.test.mjs",
+      "sha256": "a9e2b8ba497929eac221610868c0c72f9702b3def2ed241df5fe5e239d67d858"
+    },
+    {
+      "path": "tests/camera-ui.test.mjs",
+      "sha256": "5a1caa2a465258a3d1eb5233cce7436b914a8e634993a8ed01921011bc57dcd2"
+    },
+    {
+      "path": "tests/gameplay-core.test.mjs",
+      "sha256": "450ea27195c4e3afc6d339f34b4351ce47a37f0a9281b0a7047d2fd96274ac20"
+    },
+    {
+      "path": "tests/hand-input-mapper.test.mjs",
+      "sha256": "4e498ce36e75c6ec5c1aaf10b4571d820df19261e6b05b4e98619386d30310b2"
+    },
+    {
+      "path": "tests/keyboard-input-adapter.test.mjs",
+      "sha256": "466d2679e43af25e54348d0546c0633ce43100b62f8f17c4ba052015e8e04425"
+    },
+    {
+      "path": "tests/mediapipe-hand-input-adapter.test.mjs",
+      "sha256": "7809207c2ad93e3904d8e0bdf81bc2c97bbfb4c0fb6b461525a17bab0cc4cdb8"
+    },
+    {
+      "path": "tests/mediapipe-pose-input-adapter.test.mjs",
+      "sha256": "f65a54ce0c0aeacf39f414b7d4d36a0b360e2586430016682435618e0b5564bf"
+    },
+    {
+      "path": "tests/pose-input-mapper.test.mjs",
+      "sha256": "3836332ed16fb465eac5e7dbb54063e21629358f76fa1122dc2061c65490204a"
+    },
+    {
+      "path": "tests/production-assets.test.mjs",
+      "sha256": "83e20c406225c9de5ef3ff8adf81482d7ead2e49464e4e89f8e0009601317b70"
+    },
+    {
+      "path": "tests/field-evidence.test.mjs",
+      "sha256": "38f7ba8e5e0ffa06b0f3aa0941ee3384cb9542b9b90dc5dd3fd01752efe5ee9e"
+    },
+    {
+      "path": "tests/booth-package.test.mjs",
+      "sha256": "52ab4157e876fe824645ad6923d333f06fe4f3fc707fa0620165345f2c4dc47f"
+    },
+    {
+      "path": ".agents/skills/reactor-rush-asset-qa/SKILL.md",
+      "sha256": "d7ce14f3ac64f5389864a146c4ba272eb1ae4d2ee530d24d40d7ec3b0da3b21d"
+    },
+    {
+      "path": ".agents/skills/reactor-rush-parallel-workflow/SKILL.md",
+      "sha256": "058d44ed0e50093ac8be7cada7bebe5556bcccfe86e5e1e6b51d040396e08803"
+    },
+    {
+      "path": ".agents/skills/reactor-rush-stitch-design/SKILL.md",
+      "sha256": "f3d0f45fd6eca8532a4a8622b94149825005466d2cfeaf038a1c16784c9332fd"
+    },
+    {
+      "path": "assets/characters/p1-cyan/animations.json",
+      "sha256": "3d6f234f9f0bd66aa8b5369f2d36e5597311098e33351baebaf8b616f180c6ed"
+    },
+    {
+      "path": "assets/characters/p1-cyan/rig.json",
+      "sha256": "b3c343c8df1dcaba7076be49f35e20ac8549bc4c300649f53c0b442913ea6162"
+    },
+    {
+      "path": "assets/characters/p2-pink/animations.json",
+      "sha256": "a51ddf95e8b37db0d1b0133fbb538be08b206c713d79277b583170590004e4f4"
+    },
+    {
+      "path": "assets/characters/p2-pink/rig.json",
+      "sha256": "9b28243d2211d6337d7995e6f30fcabf2a21a1bd71e17d65580384f43c99225f"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/antenna-stem.png",
+      "sha256": "36ae5eb28e0e7e62f228a05423cf4d5599668069a168f84d1b451771dafae25e"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/antenna-tip.png",
+      "sha256": "4fab91127a10b9205f6d52ed6bbcf53bb61ffd542cd23237cd5fca905be90600"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/chest-core.png",
+      "sha256": "9232209315df50a44786799fd6d3a57e8f537801998c5ddfbdcd107fbeacaa51"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/energy-orb.png",
+      "sha256": "5ea71db157f2edc00f69fec3c80720c1ee805935e6093851b6bc72cc0208d6c7"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/face-catch.png",
+      "sha256": "0527c655c3cce55c850c3779a5f35519f1dc96fbe346a96106b27582a941882a"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/face-idle.png",
+      "sha256": "21656aa4611ebf00f93e7759a5046612b437d069cbe1c1dd3ae9a2fe8db83d1e"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/foot-left.png",
+      "sha256": "3aedb02ec831243838c8dd5175fbc878ab1282f644a9e9e19bbfcd015bd855d7"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/foot-right.png",
+      "sha256": "0dc3db042077477a30d5343acb3944cd249ee6030d08bb6c741241a146ac449f"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/hand-left.png",
+      "sha256": "e69f67dd1a41dbe775b046cb923be83d62edb0c6f7acf4b3b08b2aad65248426"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/hand-right.png",
+      "sha256": "468cfb58f4bccffffb073978bf05dcaba72433e54571d474c615deed7083ea2a"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/head-shell.png",
+      "sha256": "e1bf3426a6cc9848839478daf604b65b4da8f4dd74a173a8cca40084fae60327"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/lower-arm-left.png",
+      "sha256": "39c04aea15a823f7488b2ed8989ea35f9c201bf8be72d303372a3e892b297632"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/lower-arm-right.png",
+      "sha256": "c29c4e78618a014ef21f20752b962fc5b09669b00f0e123ea3f618a668e2aacc"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/neck.png",
+      "sha256": "d4ce37e8ebec7738a53cad2d998d79b7195aaa0a9d920194de482e89a57887f9"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/side-sensor.png",
+      "sha256": "64c54f432c6a5c627a59377b86933a5f9638b28706e38bff4c06da90881816dd"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/spring-leg-left.png",
+      "sha256": "495d2ddb17902174049afd6f453428e1da5c3f278b7d6b44978437465b829ec7"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/spring-leg-right.png",
+      "sha256": "60cffd904d44980736b1ff29d435a47cbd2410890b7289dae36cd0b6763bba8d"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/torso.png",
+      "sha256": "c521f12c19fddb21d0da099bda112d0c6fa4ed99d4c7e8504dbf57b86106fc51"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/upper-arm-left.png",
+      "sha256": "52a895b9873a616815df3240722b16ab5a69b7a0da02dbc1eb51bacc51216570"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/upper-arm-right.png",
+      "sha256": "e9903ec32055cba726038f50ec319c97090fc330a858765f6656c979964f3765"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/upper-leg-left.png",
+      "sha256": "6875ae160a3eb397055a04ee734e1ed99b4bcb61eb94b693a9c8af581bc80585"
+    },
+    {
+      "path": "assets/characters/p1-cyan/parts/upper-leg-right.png",
+      "sha256": "fa5956566171204a559fb27d0b20f9a90689fde691b4168d0e12b0089e867bf5"
+    },
+    {
+      "path": "assets/characters/p1-cyan/source/rig.svg",
+      "sha256": "a75a62b717dee06ba4bd58c5fbfcaa0629eae4ba675fa8150572d40f0df1ebb4"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/activation-ring.png",
+      "sha256": "833e69c56ff5783f42276be5f6d20441ec421adf128be606ba143a5c442a98d7"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/chest-core.png",
+      "sha256": "558b76d164c08ef4126478e2c0261c64861f23041bd79b320d982f1c6f796794"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/energy-orb.png",
+      "sha256": "0100d4ecc653c5206bfff5880d18399fa32f4ac2c2e7fab80759fa7849a8f089"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/face-activate.png",
+      "sha256": "3776cc5d776b8cee676fff1f1396332542ff23b2ba174215a00393c3c51d5ed6"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/face-catch.png",
+      "sha256": "b936a0b3c5b150f1f82ce327d83137693d48784473bb6dc5886c0d5c2417b454"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/face-idle.png",
+      "sha256": "e82dbb018d6569fd6d973870a158f501a6f33e555fc56ca8226b28779f7f6c34"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/foot-left.png",
+      "sha256": "d8479b8de9169bc9de1ca3ba5de958276bb1e3e55f4a188e46c5ccb9d1f2d2d6"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/foot-right.png",
+      "sha256": "b1738731cc9e91b0597d333f70ec4de989f8cc92f2a622fcbcc86482b7d5df5b"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/hand-left.png",
+      "sha256": "d207f2df58993eb9f07739c4851acad66471e1274d4da77180dd04a9e09aca6f"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/hand-right.png",
+      "sha256": "b1a3c2e1d950e65e09508452414f41177037160118026b55bf30e2d6b29ee9b0"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/head-shell.png",
+      "sha256": "6e02b9a4ea6b16a4d4f816413ae9b41f579de4e15f61e01c47bdbf5727804b4b"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/lower-arm-left.png",
+      "sha256": "dd4bb568b92b39bfc605704df02b0275bbe3836c2c5e3a8953e67bae5d01bffd"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/lower-arm-right.png",
+      "sha256": "68265d3b9476e76dd544c8bbd1ba322f73a8997a5d33b2bbc2be2503d6995c5e"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/lower-leg-left.png",
+      "sha256": "55f7016b40418ed8d766a4f7ce8d87a387316978b40ea7e32ce762e3becaa308"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/lower-leg-right.png",
+      "sha256": "c8cf002f1b1d7198efdab91622e06ece322cdba50a9b0073d13cb2b6c6adea85"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/neck.png",
+      "sha256": "5a20ee21ffeacc041308bf3eca26d67893ba7ec078f4f5b79d1bb658a171bb56"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/sensor-left.png",
+      "sha256": "0980c06a59c25302e168736ce3b74c82010a82cabbfa1380c83099ac214dcbe3"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/sensor-right.png",
+      "sha256": "0980c06a59c25302e168736ce3b74c82010a82cabbfa1380c83099ac214dcbe3"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/torso.png",
+      "sha256": "8b1e1d36e87836b0ccac239442f889edf81aa81c27001be9875821bfaeeeeba9"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/upper-arm-left.png",
+      "sha256": "dec929a387bc0f2fcc950231f8b197a9df884da40b813d85ac0f8b4878b5e5d2"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/upper-arm-right.png",
+      "sha256": "7b8f6fb2a5aaaa9233fe7cd66bc73d4f13f980b2de72aa6f75eeefbbc6af9359"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/upper-leg-left.png",
+      "sha256": "67c42fc370044fd1a2213fcba0b72978ca9c1e39ce25d8fc816f883d832de121"
+    },
+    {
+      "path": "assets/characters/p2-pink/parts/upper-leg-right.png",
+      "sha256": "0899214be349dd3e83271cb41d90acc6f7e1142866f6b4814eaa728428bcbeb2"
+    },
+    {
+      "path": "assets/characters/p2-pink/source/rig.svg",
+      "sha256": "a38811e4acb152e5838cb53a7a608bbc099858025e6fb16693f6dd9bb67edfc1"
+    },
+    {
+      "path": "assets/concepts/robots/direction-a-action-pose-references.png",
+      "sha256": "93c4568f9133167f5ac24795a715ef7755b8ba2fd79f16c1bc2c9771c5179db6"
+    },
+    {
+      "path": "assets/concepts/robots/direction-a-orbital-buddy.png",
+      "sha256": "a97b3762920a130ea4dfd9e0b657002ac9075f8a734ee8559e2bb7fd61066df8"
+    },
+    {
+      "path": "assets/concepts/robots/direction-a-refined-model-sheet.png",
+      "sha256": "8084f594db654ca78b04dba5d6cae822e65c8b14a71198a2d27e88d9557abd13"
+    },
+    {
+      "path": "assets/concepts/robots/direction-b-vector-sprinters.png",
+      "sha256": "8a40ce3851e7d7960ac8a2d6e5082eec6e82c1cdc0195926812de0c65cc74d28"
+    },
+    {
+      "path": "assets/concepts/robots/direction-c-instrument-critters.png",
+      "sha256": "d11c94359c13d4d22052391a2685aaf0db946b37d2a98e47b63cbe37a216cf79"
+    },
+    {
+      "path": "docs/art/animation-production-report.md",
+      "sha256": "e35bcf869273480d7a9d05a2ba08c2b75c31bcc1c24b666a5f43747abe7bb0af"
+    },
+    {
+      "path": "docs/art/direction-a-character-handoff.html",
+      "sha256": "6a137d6b9c2eea1d18b9a36e2ad900d849444a89e72a424e4862d93b2a5e96c9"
+    },
+    {
+      "path": "docs/art/phaser-animation-integration.md",
+      "sha256": "3db970b411e5c0c3925bae20c459abf405efcc6e9927e2175c0b197efcb01b74"
+    },
+    {
+      "path": "docs/art/visual-reference-board.html",
+      "sha256": "850a61ccb47878fe6183725b73b5b5b509ee6254b2563e4c19f9b140ff7d2fb0"
+    },
+    {
+      "path": "docs/design/asset-coverage-and-handoff.md",
+      "sha256": "06d2f77f6dc15a7033b6c69a0e9f8d60dee54b095dbf6600197e8283880d973a"
+    },
+    {
+      "path": "docs/design/energy-catch-hud-stitch.html",
+      "sha256": "9067dce827a681fec7d0ba11ab0da5c180a22c75c3afd2a54a7cb0bfcf11a3e5"
+    },
+    {
+      "path": "docs/design/energy-catch-hud-stitch.md",
+      "sha256": "0788b3f0d027c50211f0d5201cabc846c68d853cfef9f6587d97c4097b011ae0"
+    },
+    {
+      "path": "docs/design/screen-flow-and-round-map.md",
+      "sha256": "6376297234846f52b261c72c3cf58bb114b3c908f3020c882b25e72b362595ca"
+    },
+    {
+      "path": "docs/design/visual-production-roadmap.md",
+      "sha256": "3d89ce2ddcc089ce59d92b49da5a7ebac2bcbc9e2c4f59da43e9fe3d4f915f1c"
+    },
+    {
+      "path": "docs/gameplay/camera-input-integration.md",
+      "sha256": "e441bdf1b98b113a41e5a4c9dfc56b0a5f88c58ff0621a2d90f30744d2bf58da"
+    },
+    {
+      "path": "docs/gameplay/cv-01-physical-benchmark-procedure.md",
+      "sha256": "0886886f0f0b5a5e872a4842a3fc2fad5a56975a20b4d603fcd007a4f7344d85"
+    },
+    {
+      "path": "docs/gameplay/cv-02-physical-benchmark-procedure.md",
+      "sha256": "615bfd1d6634abf091494bf783b4e1213460ece3217419304a6e6941392243e1"
+    },
+    {
+      "path": "docs/gameplay/energy-catch-mvp.md",
+      "sha256": "ae39694139e7e4247e215b973be065d0a1756ccb4025a601a43f4117ba01d13c"
+    },
+    {
+      "path": "docs/operations/booth-local.md",
+      "sha256": "9dc168a976f9da26875b88592eedbe02d778ec4c4784141b6f393c8a521e5ac6"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/FIELD-01.md",
+      "sha256": "493eb558057e0fe85badcc099c575d73d8b3500672cd4f2186270f48cef7e952"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/HAND-FREEZE-FIX.md",
+      "sha256": "6fbf7cef35862a478d77071adddf1a87b3b9ff0b1d5bd1c5171fd59f0944753a"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/HAND-MOVEMENT-FIX.md",
+      "sha256": "4a8d9017b58350cfa40020b9db668249aa58c05fbfa956b0c44d85a57bc9c702"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/POSE-CALIBRATION-UX-2026-10-20.md",
+      "sha256": "3991b8d595dd1d58de16ed9fc4264044b691aafc5e4d9133b41af1fcde31fd19"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/POSE-RECOVERY-FIX.md",
+      "sha256": "c10e7cb688836437954a64de55daf2fb05f45056152846c34da33fde74cb95dd"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/REPORT.md",
+      "sha256": "d880756942d29d67e266b58b0cca61d96a8339a9dfcdd8858f10a914bd9b3c61"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/baseline.json",
+      "sha256": "51e8e2ad1446e6d44403655326210489f94696a94c0f76b87b0210b16ca77446"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/field-metrics.csv",
+      "sha256": "056d98de9be3565390d211bda07cc56e548326bb968d4dc99693cf8d02edee8a"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/field-observations.csv",
+      "sha256": "78748bef38c31bebed8d84fe94b2cd03b029d560559a790611894448b6fa2764"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/gate-report.json",
+      "sha256": "4f4034b1bb360fa86c4ee8353bf1888985431e8b92bcb00ae70584d60f52d1ab"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/preservation-audit.json",
+      "sha256": "b4c5efcc90c059d8979cc1d7d27367f37dc5a756c783c588694f34c06fc40627"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/independent-review.md",
+      "sha256": "05806b2c3edbf9dcb05978666e2074391f9081f210dc5a61dbe705ef991b439f"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/status.json",
+      "sha256": "246943f32e107c68e9b6adeb5b859bc12afa1281804776802d30d759dbbbe862"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/REPORT.md",
+      "sha256": "1878138caad3f0c8e4f1b58cf392fb7642bd7cf7999a5268a2c791d1d2aad52a"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/browser/H0-1280.png",
+      "sha256": "3bf405c21bfd0ce60688c3d83731e97698832b0542b6367b489d09078c5426a8"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/browser/H0-1920.png",
+      "sha256": "af8305783bdf6ed0fb0c363b1e1b64e07bef4e0004be6426b0d13d12009c6389"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/browser/P1-1280.png",
+      "sha256": "d1759b03944d0e6c1c230d41bbe43f8cdf1a812c034796a82b944ac27a536629"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/browser/P1-1920.png",
+      "sha256": "bdcbaa56232016dafebd88010e21321b59ca521792f718dc89d6b4dc10b451b6"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/browser/P2-1280.png",
+      "sha256": "abd1382c3e80021a05f0c4578925c52d195aca4a1c16fc66342d37189d85dc1a"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/browser/P2-1920.png",
+      "sha256": "db0b700d1181e25fca245be885480e500cbfc47e0a835095b3703dc24fcb5dc6"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/browser/browser-latest-results.json",
+      "sha256": "a03ec50d4d9a7c406c2b507e23a348e20a55686f3573e48aa1b5db6032eda8bc"
+    },
+    {
+      "path": "docs/reports/master-v3-2026-10-19/browser/browser-results.json",
+      "sha256": "9e192f57246bc10618c265270fd3ca732ea9e817d85584f50cb310f976942714"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/sdk-cold-3.json",
+      "sha256": "aabeac733bc7d0a77761ecbeff0ae8a041ee66e2f4a1dd5872287eaaccd1ea47"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/profile-pose-long.mjs",
+      "sha256": "7d424a6a176b446fb1fe3c7838d289f2e0318a0837cebde1f460cfd66d59462d"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/sdk-cold-2.json",
+      "sha256": "99946f06de11dd84105843e56476fccb299f9659773f6a8a364c817a0b0f3f80"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/delayed-pose-failure.json",
+      "sha256": "595285ffe3de8e68ef692f18f07c17af5a15f31b578ec513cc57c38b0c06b3b6"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/endurance.json",
+      "sha256": "4b28b709b91ba08c4ae4c188f634ea3ee2298ff63eb65c7e30bbbadfa1d3b9d0"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/sdk-cold-1.json",
+      "sha256": "f61aaea4ce5acee4044b338770e2adbdbcd19b935cb9ad8cac37e9f8b8ae5fda"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/index.json",
+      "sha256": "1233d993e9cae6c5c125b56e1eb696ce1993f092684cf1c790684633bc9e3289"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/followup-suites.json",
+      "sha256": "e54fa932ca7cccfe6efa785f8ee87c2de90d22e27a253cf62dc84598398628b6"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/closeout-checks.json",
+      "sha256": "ef3551754bbc1987514619681343d4bb17266f01ba923ba546babd3a80386153"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/pose-profile-long.json",
+      "sha256": "5804710098c8ac5c69c933711db64dd440db72438c24183714d80ab1caae795e"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/native-permission.json",
+      "sha256": "00fc30f5003375d78565fc717878e86d9442d2d4ca3404f0d39877db7df43cce"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/preservation-audit.json",
+      "sha256": "19eede5fc9a595b939275a586635f43e342fce14ef62f0e8780919302427b9f8"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/build.log",
+      "sha256": "5e11d517d75f76e79d07ccf377a2e0531775e2c110ea4a6c299d6057ccad378b"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/lifecycle.json",
+      "sha256": "4b68b81c1aea8744f21bfc7b2de80f7ecfec500973b34fac62feae139b7510c7"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/node-tests.log",
+      "sha256": "84409063113945667ab80cb242c0418fecea99c80b7c4973c591791fa840764e"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/pose-recovery.json",
+      "sha256": "ff3abb405baaeff2a2f520c287b358c5378d65ba4e73d598d9d30c08e2b42246"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/hand-movement.json",
+      "sha256": "a79519701e4f2fe04cc3ddac77f186e562801251a2af1a6d5e066cf6d3b477bd"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/current-checkout-baseline.json",
+      "sha256": "aa7353c4496cd3922699c5312f35510356dc5cf49901c8754c8b345ba984df0d"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/field-readiness.json",
+      "sha256": "7ed216bc7349e9968fce734b9cb6b16582892073f7d261d4cbd6b0ccffb3c02a"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/archive.json",
+      "sha256": "d1835739a9550c91e0d59c01873c06cd4c83ec6cbd8dbac48f3516f6c3379f82"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/preview-old-fixture-failure.json",
+      "sha256": "9b13a103c4704cdb92a97a666e2091ffc0e2319cf42823bdde5d780478c2666c"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/pose-coop.cpuprofile",
+      "sha256": "17c569a41b34cad1c0b75775996f0ab4d977906d7bd1baa762b8db81f9385fd4"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/production-suites.json",
+      "sha256": "55c922936866a799d4598cfceac3e7ada44dc1ec022d148a06044ea9a20e16d8"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/camera-matrix.json",
+      "sha256": "35824d1e76701cbf85f7e9827dc34fb626094e45c69e72698630e1a89e7cbf9f"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/pose-profile-short.json",
+      "sha256": "d84f7b77a77f776766c17cd6f4404c4595bbe30dd08eaa16f65ac1967adcdf19"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/pointer-targets.json",
+      "sha256": "bb4769c353fb0bded024634c594b94629cb198aa27af28777233286b3b71b3fb"
+    },
+    {
+      "path": "docs/reports/cloud-completion-2026-10-20/evidence/baseline-before.json",
+      "sha256": "4cf676953d8128d64ecf782231cf3687915c32619f61410962c9a2dba04dfcc6"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-17-reactor-rush-wp-01-implementation-plan.md",
+      "sha256": "6d7bf3e55a6eb503c9adf1da7110a92134d015cf3a8684b1aa9bf2b7e2e2db3a"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-18-reactor-rush-cv-02-implementation-plan.md",
+      "sha256": "9d49712d23898ac55dffa43a019e354437352531cd3a80faf07a3bfa427506c1"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-19-master-v3-stab-01.md",
+      "sha256": "7462626544fd6e5c1464418cf7d30564143cda881711d3c866b7e252022f5375"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-20-wp02-handoff-proposal.md",
+      "sha256": "40784525ba03509c6efd16762d4e4514939faa2aacf37b3ccc3821cc5d02175d"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-17-reactor-rush-design-skills-design.md",
+      "sha256": "cdec9c44bf93e39f2cdd69e6843195fa7e4015ba68ff7908df3d88888977c59a"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-17-reactor-rush-wp-02-stitch-visual-production.md",
+      "sha256": "40ae0545cf54dae4c95799d59463b95d8bbcb82b9f771ed75a7b9986a151c269"
+    },
+    {
+      "path": "public/mediapipe/NOTICE.md",
+      "sha256": "842b9bd5b761bd80753e6d49f33b5df74ee9f10f454556ab93a57075f9bd3fbf"
+    },
+    {
+      "path": "public/mediapipe/hand_landmarker.task",
+      "sha256": "fbc2a30080c3c557093b5ddfc334698132eb341044ccee322ccf8bcf3607cde1"
+    },
+    {
+      "path": "public/mediapipe/pose_landmarker_lite.task",
+      "sha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a"
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_internal.js",
+      "sha256": "6522286aa32dd93eff17c3da002b0649516f87abfec7a80b5bfe5c9625caa5f8"
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_internal.wasm",
+      "sha256": "0e101a010e262ef8e78f22e3c95b60a9705fd06962753c9acd6356d9fb56b7bd"
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_module_internal.js",
+      "sha256": "539a4386fd12d0723d6e900ec80467d168ba7290dda2f79e77a2181b8e906115"
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_module_internal.wasm",
+      "sha256": "3b57e4b55ac6346bf940212e3e11250b308a6a474077385e2f527b119cf74525"
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_nosimd_internal.js",
+      "sha256": "942654dbdcebce08ea039af23d18e58bebf23c8607d74023d2df7071c8a7b638"
+    },
+    {
+      "path": "public/mediapipe/wasm/vision_wasm_nosimd_internal.wasm",
+      "sha256": "c9b1b69bb87baf9e529254d8559dcbcf4c5a9c0eda84f56a12f17d675335ec9c"
+    },
+    {
+      "path": "src/adapters/hand-input-mapper.ts",
+      "sha256": "99f2852f64fb4eb5cd7b2dbbb1b6ea960689d6e93fff2f55b8f88cf0f3890010"
+    },
+    {
+      "path": "src/adapters/hand-landmarks-renderer.ts",
+      "sha256": "ddc1fe0429ca425e31da49d7eb4f52d940c7ebdf27f09c95b493239ee69dfc28"
+    },
+    {
+      "path": "src/adapters/keyboard-input-adapter.ts",
+      "sha256": "388f5bc6b4a4e43418d13709fffab8078f24ab5c17391844e517708d9965fbb1"
+    },
+    {
+      "path": "src/adapters/mediapipe-hand-input-adapter.ts",
+      "sha256": "7db716f00990702b0c19acdb90173a2283178a8991447e07d19c9552174b930c"
+    },
+    {
+      "path": "src/adapters/mediapipe-pose-input-adapter.ts",
+      "sha256": "404d9d9753e02c0c6f6f0672d1698d43ce178ab45f221ba8cc6f17affea86bb6"
+    },
+    {
+      "path": "src/adapters/pose-input-mapper.ts",
+      "sha256": "9118542559baf16bee11f42483e1f8ddad2ee8e68c5dad13a828d73a73e6ae3c"
+    },
+    {
+      "path": "src/adapters/pose-landmarks-renderer.ts",
+      "sha256": "251d9940f3d3f3f2b675da539bd3c3a79ffdad9d8601e280dfacef5d964d68cc"
+    },
+    {
+      "path": "src/gameplay/accessibility-cues.ts",
+      "sha256": "c24f4c5a46267dae4f65059c6a64ef74121da336fae30818b4a417cc28c5261b"
+    },
+    {
+      "path": "src/gameplay/core.ts",
+      "sha256": "662f95acdecacdfb1fb98fdba55c403a6e2cb3bc875e364d99e1f3821173896f"
+    },
+    {
+      "path": "src/workers/hand-landmarker.worker.ts",
+      "sha256": "019cf3073982b6f7dcf02f483e906aaa16e6cd82d2ff48a0aa0633fe70497500"
+    },
+    {
+      "path": "src/workers/pose-landmarker.worker.ts",
+      "sha256": "03213f015239444b6f41e18504d2cf750d783580610d9be682a2c6418c3e9cf4"
+    },
+    {
+      "path": "tests/browser/camera-smoke.mjs",
+      "sha256": "5fbfa52c88549c846be911e29eea99311feb73465bd4cf487387e75cb49b26b0"
+    },
+    {
+      "path": "tests/browser/hand-movement-smoke.mjs",
+      "sha256": "b5dc31a8db4e51148dde5b8641c5603f7915d685c1679b4df3debaac0e5d5c87"
+    },
+    {
+      "path": "tests/browser/pose-calibration-smoke.mjs",
+      "sha256": "ba7ed639561841233528d6a777cb533e9b795cc7d087062f1b49d5d93eb1e72d"
+    },
+    {
+      "path": "tests/browser/pose-recovery-smoke.mjs",
+      "sha256": "2905a1596adbbd1521c42f1ac61e794bfc074f90f3e03be2f143497c83f38151"
+    },
+    {
+      "path": "tests/browser/pose-sdk-smoke.mjs",
+      "sha256": "35209c6d1adff9ff9efebecf8bae96021dbeb3e600891e32959c7395284f48bd"
+    },
+    {
+      "path": "tests/browser/fixtures.mjs",
+      "sha256": "712a8cc8318c7573196e56bd22f0ea43e0f7c6bb5cb5c1d34b2e57cafeb96946"
+    },
+    {
+      "path": "tests/browser/launch.mjs",
+      "sha256": "1ae8459f5733cc7b8ffe99c109f9e91fadee5ec9ecb7ddfbe365efdce6675fc8"
+    },
+    {
+      "path": "tests/browser/endurance-smoke.mjs",
+      "sha256": "730d762f4226aec547a617a6d09bc74cbd54b008e037c8afaf44cd9ef73955c9"
+    },
+    {
+      "path": "tests/browser/native-permission-smoke.mjs",
+      "sha256": "492d66088f25807d37adcda775b41b79ac362261cf104a433c1c940e7cc5f661"
+    },
+    {
+      "path": "tests/browser/camera-lifecycle-smoke.mjs",
+      "sha256": "9be6fa63c09003b60b3d6cfd1aab565f8a96288fa88cf1113c24cefe0e64b4a7"
+    },
+    {
+      "path": "tests/browser/results-controls-smoke.mjs",
+      "sha256": "fea45870a871ea5125525fd82a89ed1a52a09054fbc4861f858699c0683c9292"
+    }
+  ]
+}

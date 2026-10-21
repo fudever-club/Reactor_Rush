@@ -1,0 +1,184 @@
+{
+  "status": "PASS",
+  "method": "real SDK/model/WASM; synthetic video, remote origins blocked; no people or real webcam",
+  "browser": "154.0.8037.57",
+  "state": {
+    "status": "ready",
+    "message": "Searching for a body. Face the camera with both shoulders visible; keep your upper body in frame.",
+    "metrics": {
+      "poseCalibration": {
+        "state": "idle",
+        "cameraReady": true,
+        "expectedPlayers": 2,
+        "detectedPlayers": 0,
+        "playersReady": false,
+        "shouldersReady": false,
+        "positionReady": false,
+        "fresh": false,
+        "stableSamples": 0,
+        "requiredSamples": 3
+      },
+      "delegate": "CPU",
+      "inferenceMs": 269,
+      "fps": 12,
+      "playerStates": {
+        "p1": "WAITING",
+        "p2": "WAITING"
+      },
+      "recalibrationRequired": true,
+      "readinessReason": "NO_POSE",
+      "sampleAgeMs": 76,
+      "poseCount": 0,
+      "posePreviewCount": 0,
+      "freshnessMs": 122.5
+    }
+  },
+  "trace": [
+    {
+      "type": "init",
+      "at": 1339.2999999998137,
+      "delegate": "GPU"
+    },
+    {
+      "type": "ready",
+      "at": 1891.5999999996275,
+      "delegate": "GPU"
+    },
+    {
+      "type": "init",
+      "at": 5283.200000000186,
+      "delegate": "CPU"
+    },
+    {
+      "type": "ready",
+      "at": 7647.5999999996275,
+      "delegate": "CPU"
+    },
+    {
+      "type": "result",
+      "at": 7991.200000000186,
+      "delegate": "CPU",
+      "inferenceMs": 322.6000000005588,
+      "captureAgeMs": 337.20000000018626
+    },
+    {
+      "type": "result",
+      "at": 8072.899999999441,
+      "delegate": "CPU",
+      "inferenceMs": 55.5,
+      "captureAgeMs": 76
+    },
+    {
+      "type": "result",
+      "at": 8159.700000000186,
+      "delegate": "CPU",
+      "inferenceMs": 66.20000000018626,
+      "captureAgeMs": 77.1000000005588
+    },
+    {
+      "type": "result",
+      "at": 8249.399999999441,
+      "delegate": "CPU",
+      "inferenceMs": 59.5,
+      "captureAgeMs": 76.3999999994412
+    },
+    {
+      "type": "result",
+      "at": 8297,
+      "delegate": "CPU",
+      "inferenceMs": 41.299999999813735,
+      "captureAgeMs": 42.700000000186265
+    },
+    {
+      "type": "result",
+      "at": 8404.799999999814,
+      "delegate": "CPU",
+      "inferenceMs": 54.200000000186265,
+      "captureAgeMs": 62.5
+    },
+    {
+      "type": "result",
+      "at": 8498.299999999814,
+      "delegate": "CPU",
+      "inferenceMs": 51.799999999813735,
+      "captureAgeMs": 84.59999999962747
+    },
+    {
+      "type": "result",
+      "at": 8541.5,
+      "delegate": "CPU",
+      "inferenceMs": 36,
+      "captureAgeMs": 37.40000000037253
+    }
+  ],
+  "requests": [
+    {
+      "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.wasm",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4173/mediapipe/pose_landmarker_lite.task",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4173/mediapipe/wasm/vision_wasm_module_internal.wasm",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4173/mediapipe/pose_landmarker_lite.task",
+      "status": 200
+    }
+  ],
+  "remoteBlocked": [],
+  "logs": [
+    {
+      "level": "warning",
+      "message": "[.WebGL-0x1c74001b7200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "level": "warning",
+      "message": "[.WebGL-0x1c74001b7200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "level": "warning",
+      "message": "[.WebGL-0x1c74001b7200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels"
+    },
+    {
+      "level": "warning",
+      "message": "[.WebGL-0x1c74001b7200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    },
+    {
+      "level": "warning",
+      "message": "W1020 16:57:28.110000 2191552 gl_context.cc:1135] OpenGL error checking is disabled"
+    },
+    {
+      "level": "warning",
+      "message": "W1020 16:57:33.864999 2191552 gl_context.cc:1135] OpenGL error checking is disabled"
+    },
+    {
+      "level": "error",
+      "message": "INFO: Created TensorFlow Lite XNNPACK delegate for CPU."
+    },
+    {
+      "level": "warning",
+      "message": "W1020 16:57:34.103000 2191552 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors."
+    },
+    {
+      "level": "warning",
+      "message": "W1020 16:57:34.140999 2191552 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors."
+    }
+  ],
+  "limitations": [
+    "not target hardware",
+    "not actual disconnected Wi-Fi test",
+    "no tracking accuracy/latency certification"
+  ]
+}

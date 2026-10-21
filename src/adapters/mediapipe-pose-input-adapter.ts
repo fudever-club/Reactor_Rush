@@ -130,6 +130,7 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
   private recoveryNeedsCalibration = false;
   private status: CameraInputStatus = 'idle';
   private startPromise?: Promise<void>;
+  private sessionGeneration = 0;
   private pendingAction?: { kind: 'calibrate' | 'start'; promise: Promise<boolean>; resolve: (ready: boolean) => void; timer: ReturnType<typeof setTimeout> };
   private calibrationState: PoseCalibrationProgress['state'] = 'idle';
   private stableSamples = 0;
@@ -235,15 +236,18 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
 
   async start(): Promise<void> {
     if (this.startPromise) return this.startPromise;
+    if (!this.disposed && (this.status === 'ready' || this.status === 'loading-model')) return;
+    const generation = ++this.sessionGeneration;
     this.disposed = false;
     this.cpuFallbackAttempted = false;
     this.recoveryNeedsCalibration = false;
     this.setStatus('requesting-camera');
-    this.startPromise = this.startResources();
+    const starting = this.startResources(generation);
+    this.startPromise = starting;
     try {
-      await this.startPromise;
+      await starting;
     } finally {
-      this.startPromise = undefined;
+      if (this.startPromise === starting) this.startPromise = undefined;
     }
   }
 
@@ -366,6 +370,8 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
   stop(): void {
     if (this.disposed && !this.stream && !this.worker) return;
     this.disposed = true;
+    this.sessionGeneration += 1;
+    this.startPromise = undefined;
     this.finishPendingAction(false, 'cancelled');
     if (this.frameHandle !== undefined) this.cancelFrame(this.frameHandle);
     this.frameHandle = undefined;
@@ -381,7 +387,7 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
     this.notifyDetection();
   }
 
-  private async startResources(): Promise<void> {
+  private async startResources(generation: number): Promise<void> {
     try {
       const stream = await this.getUserMedia({
         audio: false,
@@ -392,67 +398,77 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
           frameRate: { ideal: 20, max: 24 }
         }
       });
-      if (this.disposed) {
+      if (this.disposed || generation !== this.sessionGeneration) {
         stopStream(stream);
         return;
       }
       this.stream = stream;
+      if (stream.getVideoTracks().some(track => track.readyState === 'ended')) {
+        throw new Error('The camera stopped before the pose model finished loading.');
+      }
       for (const track of stream.getTracks()) {
         track.addEventListener('ended', this.handleTrackEnded);
       }
       this.video.srcObject = stream;
       this.video.dataset.active = 'true';
       await this.video.play();
-      if (this.disposed) return;
+      if (this.disposed || generation !== this.sessionGeneration) return;
       this.setStatus('loading-model', 'Camera connected. Loading the pose model…');
       await this.initWorker();
-      if (this.disposed) return;
+      if (this.disposed || generation !== this.sessionGeneration) return;
+      if (stream.getVideoTracks().some(track => track.readyState === 'ended')) {
+        throw new Error('The camera disconnected while the pose model was loading.');
+      }
       this.setStatus('ready');
       this.notifyDetection();
       this.startLoop();
     } catch (error) {
+      if (generation !== this.sessionGeneration || this.status === 'stopped') return;
       this.fail(normalizeErrorMessage(error));
-      throw error;
+      throw new Error(normalizeErrorMessage(error), { cause: error });
     }
   }
 
   private initWorker(delegate: 'GPU' | 'CPU' = 'GPU'): Promise<void> {
+    const generation = this.sessionGeneration;
     return new Promise((resolve, reject) => {
-      this.readyReject = reject;
       const worker = this.createWorker();
       this.worker = worker;
-      const timer = this.modelReadyTimer = setTimeout(() => {
-        if (this.status !== 'ready' && !this.disposed) {
-          this.fail('The pose model took too long to load. Using keyboard controls.');
-        }
-      }, MODEL_READY_TIMEOUT_MS);
-
+      const active = () => !this.disposed && generation === this.sessionGeneration && this.worker === worker;
+      const cleanup = () => {
+        clearTimeout(timer);
+        if (this.modelReadyTimer === timer) this.modelReadyTimer = undefined;
+        if (this.readyReject === onReject) this.readyReject = undefined;
+        worker.removeEventListener('message', onInitMessage);
+        worker.removeEventListener('error', onError);
+      };
+      const onReject = (error: Error) => { cleanup(); reject(error); };
+      const onError = (event: ErrorEvent) => {
+        if (active()) onReject(new Error(event.message || 'The pose model worker failed to start.'));
+      };
       const onInitMessage = (event: MessageEvent<WorkerResponse>) => {
-        if (this.disposed) return;
+        if (!active()) return;
         if (event.data.type === 'ready') {
-          clearTimeout(timer);
-          this.readyReject = undefined;
+          cleanup();
           this.activeDelegate = event.data.delegate ?? 'CPU';
-          worker.removeEventListener('message', onInitMessage);
           worker.addEventListener('message', this.handleWorkerMessage);
           worker.addEventListener('error', this.handleWorkerError);
           resolve();
         } else if (event.data.type === 'error') {
-          clearTimeout(timer);
-          this.readyReject = undefined;
-          this.fail(event.data.message);
-          reject(new Error(event.data.message));
+          onReject(new Error(event.data.message));
         }
       };
-
+      const timer = this.modelReadyTimer = setTimeout(() => {
+        onReject(new Error('The pose model took too long to load. Using keyboard controls.'));
+      }, MODEL_READY_TIMEOUT_MS);
+      this.readyReject = onReject;
       worker.addEventListener('message', onInitMessage);
-      worker.postMessage({
-        type: 'init',
-        wasmRoot: this.wasmRoot,
-        modelPath: this.modelPath,
-        numPoses: 3,
-        delegate
-      });
+      worker.addEventListener('error', onError);
+      try {
+        worker.postMessage({ type: 'init', wasmRoot: this.wasmRoot, modelPath: this.modelPath, numPoses: 3, delegate });
+      } catch (error) {
+        onReject(error instanceof Error ? error : new Error(String(error)));
+      }
     });
   }
 
@@ -486,8 +502,10 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
     this.inFlightSince = now;
 
     const capturedWorker = this.worker;
-    this.createBitmap(this.video)
-      .then((bitmap) => {
+    let capture: Promise<ImageBitmap>;
+    try { capture = this.createBitmap(this.video); }
+    catch (error) { capture = Promise.reject(error); }
+    capture.then((bitmap) => {
         if (this.disposed || this.worker !== capturedWorker || this.now() - now >= POSE_TRACKING_STALE_MS) {
           bitmap.close();
           if (this.worker === capturedWorker) {
@@ -496,8 +514,13 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
           }
           return;
         }
-        this.frameCaptureFailures = 0;
-        capturedWorker.postMessage({ type: 'frame', bitmap, timestamp: now }, [bitmap]);
+        try {
+          capturedWorker.postMessage({ type: 'frame', bitmap, timestamp: now }, [bitmap]);
+          this.frameCaptureFailures = 0;
+        } catch (error) {
+          bitmap.close();
+          throw error;
+        }
       })
       .catch(() => {
         if (this.disposed || this.worker !== capturedWorker) return;
@@ -513,6 +536,7 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
   private async retryWithCpu(): Promise<void> {
     if (this.disposed || this.cpuFallbackAttempted) return;
     this.finishPendingAction(false, 'cancelled');
+    const generation = this.sessionGeneration;
     this.cpuFallbackAttempted = true;
     this.worker?.removeEventListener('message', this.handleWorkerMessage);
     this.worker?.removeEventListener('error', this.handleWorkerError);
@@ -535,11 +559,11 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
     this.notifyDetection();
     try {
       await this.initWorker('CPU');
-      if (this.disposed) return;
+      if (this.disposed || generation !== this.sessionGeneration) return;
       this.setStatus('ready', 'Pose CPU fallback ready. Calibrate again; if tracking is too slow, use keyboard controls.');
       this.notifyDetection();
     } catch (error) {
-      this.fail(normalizeErrorMessage(error));
+      if (generation === this.sessionGeneration && !this.disposed) this.fail(normalizeErrorMessage(error));
     }
   }
 
@@ -643,6 +667,8 @@ export class MediaPipePoseInputAdapter implements InputAdapter {
     this.inFlight = false;
     this.inFlightSince = Number.NEGATIVE_INFINITY;
     this.frameCaptureFailures = 0;
+    this.lastVideoTime = -1;
+    this.lastFrameSentAt = Number.NEGATIVE_INFINITY;
     this.lastResultAt = 0;
     this.smoothedFps = 0;
     this.smoothedInferenceMs = 0;

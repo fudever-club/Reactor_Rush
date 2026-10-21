@@ -64,3 +64,8 @@ H0 calibration/start clicks now retain explicit user intent for up to3seconds wh
 - Reproduce synthetic browser checks with node tests/browser/camera-smoke.mjs EVIDENCE_DIR BASE_URL PLAYWRIGHT_NODE_MODULES. Playwright is supplied externally; it was not added to project dependencies. The script overrides camera I/O and workers: it does not validate actual inference or people.
 - Physical testing: one actual Edge/Solo/GPU Hand flow was operated and observed by the agent; user confirmed movement and Catch, and a round completed. Co-op and controlled physical benchmarks remain NOT RUN. Follow [FIELD-01 runbook](../reports/master-v3-2026-10-19/FIELD-01.md); no field PASS until observations and measurements are recorded.
 - Final booth scheme, vertical slice, art acceptance and release remain human decisions. Historical CV-02 plan approval discrepancy is preserved in the report; present execution is not retroactive approval.
+
+
+## Cloud reliability follow-up — started20October2026
+
+The [Cloud engineering report](../reports/cloud-completion-2026-10-20/REPORT.md) records adapter session-generation/idempotent-START fixes, bounded capture/initialization cleanup and results STOP pointer correction. No freshness/watchdog or gameplay-rule relaxation was made. The separately labeled production browser runs use synthetic inputs except for no-person SDK probes; they do not replace FIELD-01 or resolve historical physical failures by inference. [Local package and evidence commands](../operations/booth-local.md) are available for reproducible handoff.

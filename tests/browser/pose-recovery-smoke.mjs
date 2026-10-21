@@ -1,3 +1,4 @@
+import { launchBrowser } from './launch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -6,7 +7,7 @@ const [output,base='http://127.0.0.1:5173',modules]=process.argv.slice(2);
 if(!output)throw Error('Usage: node tests/browser/pose-recovery-smoke.mjs OUTPUT [BASE_URL] [PLAYWRIGHT_NODE_MODULES]');
 const require=createRequire(modules?path.join(modules,'package.json'):import.meta.url);
 const {chromium}=require('playwright');
-await fs.mkdir(output,{recursive:true});const browser=await chromium.launch({headless:true});const results=[];let active;
+await fs.mkdir(output,{recursive:true});const browser=await launchBrowser(chromium);const results=[];let active;
 function fixture(){
  // The worker is fake; skip browser bitmap capture cost to isolate preview/scene recovery.
  window.createImageBitmap=async()=>({close(){}});
@@ -18,7 +19,7 @@ function fixture(){
 async function amber(page,selector){return page.evaluate(selector=>{const c=document.querySelector(selector);const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i]>235&&d[i+1]>185&&d[i+1]<225&&d[i+2]>75&&d[i+2]<130&&d[i+3]>100)n++;return n;},selector);}
 try{for(const [width,height] of [[1280,720],[1920,1080]])for(const solo of [true,false])for(const scheme of ['P1','P2']){
  const id=scheme+'-'+(solo?'Solo':'Coop')+'-'+width;const page=active=await browser.newPage({viewport:{width,height}});const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.addInitScript(fixture);await page.goto(base);await page.waitForFunction(()=>window.__RR_GAME_TEST__?.ready);await page.evaluate(({solo,scheme})=>Object.assign(window.__POSE_RECOVERY__,{solo,scheme}),{solo,scheme});
- await page.locator('#choose-camera').click();await page.locator(solo?'#camera-mode-solo':'#camera-mode-coop').click();await page.locator(scheme==='P1'?'#scheme-pose-both':'#scheme-pose-one').click();await page.locator('#camera-consent').check();await page.locator('#enable-camera').click();await page.waitForFunction(()=>!document.querySelector('#calibrate-camera').disabled);assert.ok(await amber(page,'#camera-preview-canvas')>50,'amber skeleton visible before calibration');
+ await page.locator('#choose-camera').click();await page.locator(solo?'#camera-mode-solo':'#camera-mode-coop').click();await page.locator(scheme==='P1'?'#scheme-pose-both':'#scheme-pose-one').click();await page.locator('#camera-consent').check();await page.locator('#enable-camera').click();await page.waitForFunction(()=>!document.querySelector('#calibrate-camera').disabled);await page.waitForFunction(()=>{const c=document.querySelector('#camera-preview-canvas');const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i]>235&&d[i+1]>185&&d[i+1]<225&&d[i+2]>75&&d[i+2]<130&&d[i+3]>100)n++;return n>50;}); // CALIBRATE is requestable before detection; wait for actual pixels.
  await page.locator('#calibrate-camera').click();await page.waitForFunction(()=>!document.querySelector('#start-camera-round').disabled);await page.locator('#start-camera-round').click();await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
  await page.evaluate(()=>{window.__POSE_RECOVERY__.raised=true});await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().input.p1.catch);
  await page.evaluate(()=>{window.__POSE_RECOVERY__.visible=false});await page.waitForFunction(()=>document.querySelector('#hud-camera-cue').textContent.includes('SEARCHING'));const frames=await page.evaluate(()=>window.__POSE_RECOVERY__.frames);await page.waitForFunction(n=>window.__POSE_RECOVERY__.frames>n+2,frames);assert.equal(await amber(page,'#hud-skeleton-overlay'),0);

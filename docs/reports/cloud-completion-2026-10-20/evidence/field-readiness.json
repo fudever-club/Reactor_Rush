@@ -1,0 +1,17 @@
+{
+  "status": "INCOMPLETE",
+  "physicalAcceptance": "PENDING_HUMAN",
+  "issues": [
+    "No physical observation rows",
+    "No physical metric rows"
+  ],
+  "failures": [],
+  "observations": [],
+  "metrics": [],
+  "limitations": [
+    "Validates supplied numbers and provenance fields, not authenticity of measurements.",
+    "Does not certify complete distance/lighting/participant matrix, TV readability, offline hardware or endurance.",
+    "Threshold equality does not incorporate measurement uncertainty; retain timing resolution and method.",
+    "Historical CV-02 protocol is distinct from MASTER-V3. No automatic G3/G4 approval."
+  ]
+}

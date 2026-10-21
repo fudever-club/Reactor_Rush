@@ -1,0 +1,30 @@
+
+> reactor-rush-animation-poc@0.1.0 build
+> tsc --noEmit && vite build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 68 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/animation-test.html                            2.58 kB │ gzip:   1.04 kB
+dist/assets/sensor-left-Dc3_VQqr.png                4.25 kB
+dist/assets/torso-Bl0LQ6I1.png                      5.63 kB
+dist/assets/torso-DAK-U_0e.png                      6.89 kB
+dist/assets/head-shell-COQkz4dG.png                 6.96 kB
+dist/assets/head-shell-LPq64VPU.png                11.00 kB
+dist/index.html                                    13.06 kB │ gzip:   3.31 kB
+dist/assets/hand-landmarker.worker-BdGEZ8Ha.js    155.41 kB
+dist/assets/pose-landmarker.worker-DEPvwhiA.js    155.55 kB
+dist/assets/animationTest-BmfYM2PC.css              2.29 kB │ gzip:   0.98 kB
+dist/assets/main-crL26-gx.css                      19.58 kB │ gzip:   4.91 kB
+dist/assets/animationTest-CfKcTD3_.js               4.72 kB │ gzip:   1.96 kB
+dist/assets/main-Tx6I9QXz.js                       90.23 kB │ gzip:  22.98 kB
+dist/assets/rig-wKbGeSd7.js                     1,523.03 kB │ gzip: 451.97 kB
+
+✓ built in 856ms
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

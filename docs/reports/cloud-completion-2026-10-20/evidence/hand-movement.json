@@ -1,0 +1,46 @@
+{
+  "browser": "154.0.8037.57",
+  "method": "synthetic video and fake worker; no real model or field certification",
+  "results": [
+    {
+      "id": "Hand-1280",
+      "distance": 3,
+      "status": "PASS",
+      "checks": [
+        "edge calibration rejected",
+        "Solo two hands rejected",
+        "slider applied",
+        "actual robot moved right and left",
+        "STOP",
+        "live recenter then both directions",
+        "dock geometry",
+        "camera teardown"
+      ],
+      "geometry": {
+        "left": 576,
+        "right": 704,
+        "bottom": 294.75687399426295
+      }
+    },
+    {
+      "id": "Hand-1920",
+      "distance": 15,
+      "status": "PASS",
+      "checks": [
+        "edge calibration rejected",
+        "Solo two hands rejected",
+        "slider applied",
+        "actual robot moved right and left",
+        "STOP",
+        "live recenter then both directions",
+        "dock geometry",
+        "camera teardown"
+      ],
+      "geometry": {
+        "left": 576.001564945227,
+        "right": 703.998435054773,
+        "bottom": 293.65947075208913
+      }
+    }
+  ]
+}

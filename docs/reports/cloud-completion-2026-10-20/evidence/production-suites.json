@@ -1,0 +1,72 @@
+[
+  {
+    "suite": "results-controls",
+    "exit_code": 0,
+    "wall_seconds": 2.4311604459999216,
+    "output": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-results-controls",
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-results-controls.log"
+  },
+  {
+    "suite": "pose-calibration",
+    "exit_code": 1,
+    "wall_seconds": 46.70114446200023,
+    "output": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-pose-calibration",
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-pose-calibration.log"
+  },
+  {
+    "suite": "pose-recovery",
+    "exit_code": 1,
+    "wall_seconds": 2.323977923999337,
+    "output": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-pose-recovery",
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-pose-recovery.log"
+  },
+  {
+    "suite": "hand-movement",
+    "exit_code": 0,
+    "wall_seconds": 10.79517844900056,
+    "output": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-hand-movement",
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-hand-movement.log"
+  },
+  {
+    "suite": "lifecycle",
+    "exit_code": 0,
+    "wall_seconds": 26.92840523399991,
+    "output": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-lifecycle",
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-lifecycle.log"
+  },
+  {
+    "suite": "sdk-cold-1",
+    "exit_code": 0,
+    "wall_seconds": 10.430215307999788,
+    "output": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-sdk-cold-1",
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-sdk-cold-1.log"
+  },
+  {
+    "suite": "sdk-cold-2",
+    "exit_code": 0,
+    "wall_seconds": 9.415405224000096,
+    "output": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-sdk-cold-2",
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-sdk-cold-2.log"
+  },
+  {
+    "suite": "sdk-cold-3",
+    "exit_code": 0,
+    "wall_seconds": 10.123375121999743,
+    "output": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-sdk-cold-3",
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-sdk-cold-3.log"
+  },
+  {
+    "suite": "camera-matrix",
+    "exit_code": 0,
+    "wall_seconds": 41.443429521000326,
+    "output": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-camera-matrix",
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-camera-matrix.log"
+  },
+  {
+    "suite": "endurance",
+    "exit_code": 0,
+    "wall_seconds": 668.190334547,
+    "output": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-endurance",
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/production-endurance.log"
+  }
+]

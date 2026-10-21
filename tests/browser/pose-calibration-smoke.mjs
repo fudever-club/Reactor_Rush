@@ -1,8 +1,9 @@
+import { launchBrowser } from './launch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';import path from 'node:path';import {createRequire} from 'node:module';
 const [output,base='http://127.0.0.1:5173',modules]=process.argv.slice(2);if(!output)throw Error('OUTPUT required');
 const require=createRequire(modules?path.join(modules,'package.json'):import.meta.url);const {chromium}=require('playwright');
-await fs.mkdir(output,{recursive:true});const browser=await chromium.launch({headless:true});const results=[];let active;const uiOnly=process.argv.includes('--ui-only');
+await fs.mkdir(output,{recursive:true});const browser=await launchBrowser(chromium);const results=[];let active;const uiOnly=process.argv.includes('--ui-only');
 function fixture(){
  // The worker is fake; skip browser bitmap capture cost to isolate preview/scene recovery.
  window.createImageBitmap=async()=>({close(){}});

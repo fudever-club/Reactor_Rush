@@ -146,7 +146,7 @@ kbd { display: inline-grid; min-width: 2em; height: 2em; padding: 0 .4em; place-
 .camera-preview-label { position: absolute; z-index: 2; right: 3%; bottom: 3%; left: 3%; padding: .6em .8em; border: 1px solid #505a7b88; border-radius: 999px; background: #11172fe8; color: #dce3f8; font-size: clamp(8px, .75cqw, 10px); font-weight: 850; letter-spacing: .12em; text-align: center; pointer-events: none; }
 .camera-stop-button { position: absolute; top: 19%; left: 50%; padding: .5em .8em; border: 1px solid #ff8b83; border-radius: 7px; background: #321c30e8; color: #ffd6d2; font: inherit; font-size: clamp(8px, .75cqw, 10px); font-weight: 800; letter-spacing: .08em; cursor: pointer; pointer-events: auto; transform: translateX(-50%); }
 .camera-stop-button:hover { background: #572637; }
-.result-camera-stop { display: block; margin: .7em auto 0; color: #aeb7d2; font-size: clamp(9px, .78cqw, 11px); }
+.result-camera-stop { pointer-events: auto; min-height: 44px; display: block; margin: .7em auto 0; color: #aeb7d2; font-size: clamp(9px, .78cqw, 11px); }
 
 .hud-camera-dock { position: absolute; top: 16%; left: 50%; transform: translateX(-50%); width: 10cqw; display: flex; flex-direction: column; align-items: center; gap: 5px; z-index: 10; pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
 .hud-camera-dock[hidden] { display: none !important; }

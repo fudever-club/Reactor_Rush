@@ -1,0 +1,20 @@
+[
+  {
+    "suite": "native-permission",
+    "exit_code": 0,
+    "wall_seconds": 8.637913296000079,
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/native-permission.log"
+  },
+  {
+    "suite": "pose-profile",
+    "exit_code": 0,
+    "wall_seconds": 28.897204479999345,
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/pose-profile.log"
+  },
+  {
+    "suite": "pose-recovery-recheck",
+    "exit_code": 0,
+    "wall_seconds": 31.13880523500029,
+    "log": "/var/tmp/reactor-rush-completion-20261020T163138Z/pose-recovery-recheck.log"
+  }
+]

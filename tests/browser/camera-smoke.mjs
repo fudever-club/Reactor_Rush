@@ -1,3 +1,4 @@
+import { launchBrowser } from './launch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -9,8 +10,8 @@ const modules = process.argv[4] || process.env.RR_BROWSER_NODE_MODULES;
 const require = createRequire(modules ? path.join(modules,'package.json') : import.meta.url);
 const { chromium } = require('playwright');
 await fs.mkdir(output,{recursive:true});
-const browser=await chromium.launch({headless:true});
-const results=[];
+const browser=await launchBrowser(chromium);
+const results=[];let active;let caseId;
 function fixture(){
   const state=window.__RR_FIXTURE__={cameraCalls:0,workers:[],streams:[],scenario:'normal',catching:false};
   navigator.mediaDevices.getUserMedia=async()=>{
@@ -36,7 +37,7 @@ function fixture(){
 }
 const schemeSelector={H0:'#scheme-hand',P1:'#scheme-pose-both',P2:'#scheme-pose-one'};
 async function open(width,height){
-  const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});
+  const page=active=await browser.newPage({viewport:{width,height},reducedMotion:'reduce'});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   await page.addInitScript(fixture);await page.goto(base);await page.waitForFunction(()=>window.__RR_GAME_TEST__?.ready);
   assert.equal(await page.evaluate(()=>window.__RR_FIXTURE__.cameraCalls),0);
@@ -52,12 +53,12 @@ async function startCamera(page,scheme,coop){
 try{
   for(const [width,height] of [[1280,720],[1920,1080]]){
     for(const scheme of ['H0','P1','P2']){
-      const {page,errors}=await open(width,height);await startCamera(page,scheme,true);
+      caseId=scheme+'-'+width;const {page,errors}=await open(width,height);await startCamera(page,scheme,true);
       const want=scheme==='H0'?'PINCH':scheme==='P1'?'BOTH ARMS':'ONE ARM';assert.match(await page.locator('#hud-controls-hint').textContent(),new RegExp(want));
       const geometry=await page.evaluate(()=>{const c=document.querySelector('#game-container').getBoundingClientRect();const rect=id=>{const r=document.querySelector(id).getBoundingClientRect();return {left:(r.left-c.left)*1280/c.width,right:(r.right-c.left)*1280/c.width,top:(r.top-c.top)*720/c.height,bottom:(r.bottom-c.top)*720/c.height};};return {dock:rect('#hud-camera-dock'),clock:rect('.hud-clock'),stop:rect('#stop-camera'),cue:rect('#hud-camera-cue'),video:rect('#hud-camera-preview'),overlay:rect('#hud-skeleton-overlay')};});
       assert.ok(geometry.dock.left>=571&&geometry.dock.right<=709,JSON.stringify(geometry));assert.ok(geometry.dock.top>geometry.clock.bottom);assert.ok(geometry.dock.bottom<515);
       assert.deepEqual(geometry.video,geometry.overlay);assert.ok(geometry.stop.left>=geometry.dock.left&&geometry.stop.right<=geometry.dock.right);
-      await page.screenshot({path:path.join(output,scheme+'-'+width+'.png')});
+      // Capture artifacts after control assertions: screenshots can pause software-rendered hosts beyond250ms.
       await page.keyboard.press('v');assert.equal(await page.locator('.hud-camera-preview-frame').isVisible(),false);assert.equal(await page.locator('#hud-camera-cue').isVisible(),true);await page.keyboard.press('v');
       if(scheme!=='H0'){
         // Screenshots can pause this host longer than the safety timeout; explicitly recalibrate if so.
@@ -68,17 +69,24 @@ try{
         await page.evaluate(()=>{window.__RR_FIXTURE__.scenario='normal';window.__RR_FIXTURE__.catching=false;});
         await page.waitForFunction(()=>!document.querySelector('#hud-camera-recalibrate').disabled);await page.locator('#hud-camera-recalibrate').click();
         await page.waitForFunction(()=>document.querySelector('#hud-camera-cue').textContent.includes('ACCEPTED IDLE'));
-        await page.evaluate(()=>{window.__RR_FIXTURE__.scenario='stall';});await page.waitForFunction(()=>document.querySelector('#hud-camera-cue').textContent.includes('RECALIBRATE'));
+        await page.evaluate(()=>{window.__RR_FIXTURE__.scenario='stall';});
+        // No delivered result is not proof of a missing person: pause input at250ms,
+        // then the bounded CPU watchdog stops the camera and restores keyboard.
+        await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().cameraAdapter.getMetrics().readinessReason==='WAITING_FOR_FRAME');
         assert.equal(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().input.p1.catch),false);
+        assert.equal(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().input.p1.moveAxis),0);
+        await page.waitForFunction(()=>!window.__RR_GAME_TEST__.getState().cameraMode);
+        assert.equal(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().cameraAdapter.currentStatus),'error');
       }
-      await page.locator('#stop-camera').click();assert.equal(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().cameraMode),false);
+      if(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().cameraMode))await page.locator('#stop-camera').click();assert.equal(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().cameraMode),false);
       const x=await page.evaluate(()=>window.__RR_GAME_TEST__.getState().playerX.p1);await page.keyboard.down('a');await page.waitForTimeout(130);await page.keyboard.up('a');assert.ok(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().playerX.p1)<x);
       assert.equal(await page.evaluate(()=>window.__RR_FIXTURE__.workers.filter(w=>w.active).length),0);assert.deepEqual(errors,[]);
+      await page.screenshot({path:path.join(output,scheme+'-'+width+'-keyboard-fallback.png')});
       results.push({id:scheme+'-'+width,status:'PASS',geometry,fixture:'synthetic stream + fake worker; no actual inference or field evidence',errors});await page.close();
     }
   }
   for(const scheme of ['H0','P1','P2']){const {page,errors}=await open(1280,720);await startCamera(page,scheme,false);assert.equal(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().cameraMode),true);await page.locator('#stop-camera').click();assert.deepEqual(errors,[]);results.push({id:scheme+'-solo',status:'PASS'});await page.close();}
   const {page,errors}=await open(1280,720);await page.locator('#choose-camera').click();await page.evaluate(()=>{window.__RR_FIXTURE__.scenario='denied';});await page.locator('#camera-consent').check();await page.locator('#enable-camera').click();await page.waitForFunction(()=>document.querySelector('#camera-status').textContent.includes('denied'));await page.locator('#camera-to-keyboard').click();await page.locator('#start-round').click();assert.deepEqual(errors,[]);results.push({id:'permission-denied-keyboard',status:'PASS'});await page.close();
-} catch(error){results.push({status:'FAIL',message:error.stack});throw error;}
+} catch(error){results.push({id:caseId,status:'FAIL',message:error.stack,state:await active?.evaluate(()=>({phase:window.__RR_GAME_TEST__?.getState().phase,metrics:window.__RR_GAME_TEST__?.getState().cameraAdapter?.getMetrics(),status:document.querySelector('#camera-status')?.textContent,cue:document.querySelector('#hud-camera-cue')?.textContent})).catch(()=>null)});throw error;}
 finally{await fs.writeFile(path.join(output,'browser-results.json'),JSON.stringify({browser:browser.version(),results},null,2));await browser.close();}
 console.log(JSON.stringify(results.map(({id,status})=>({id,status})),null,2));
