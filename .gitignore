@@ -6,3 +6,6 @@ coverage/
 *.log
 .DS_Store
 Thumbs.db
+
+# Duplicate delivery archive; editable audio sources are tracked separately.
+/reactor_rush_audio.zip

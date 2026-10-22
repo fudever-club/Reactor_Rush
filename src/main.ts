@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { getPlayfieldLabel, presentChallengeEvents, presentCatch, type FeedbackMessage } from './gameplay/feedback';
 import { GameAudio } from './gameplay/game-audio';
+import { GAME_AUDIO_ASSETS } from './gameplay/audio-assets';
 import p1Rig from '../assets/characters/p1-cyan/rig.json';
 import p1Animations from '../assets/characters/p1-cyan/animations.json';
 import p2Rig from '../assets/characters/p2-pink/rig.json';
@@ -200,8 +201,9 @@ class EnergyCatchScene extends Phaser.Scene {
     this.game.canvas.focus({ preventScroll: true });
     this.drawStage();
     this.ui = this.createHud();
-    this.audio = new GameAudio(undefined, this.updateSoundUi);
+    this.audio = new GameAudio(undefined, this.updateSoundUi, GAME_AUDIO_ASSETS);
     this.ui.soundButton.addEventListener('click', this.handleSoundRequested);
+    this.ui.root.addEventListener('click', this.handleUiSound);
     this.ui.menuButton.addEventListener('click', this.handleMissionMenuRequested);
     document.addEventListener('visibilitychange', this.handleVisibilityChanged);
     this.updateSoundUi();
@@ -324,6 +326,7 @@ class EnergyCatchScene extends Phaser.Scene {
       window.removeEventListener('keydown', onWindowKeyDown);
       document.removeEventListener('visibilitychange', this.handleVisibilityChanged);
       this.ui?.soundButton.removeEventListener('click', this.handleSoundRequested);
+      this.ui?.root.removeEventListener('click', this.handleUiSound);
       this.ui?.menuButton.removeEventListener('click', this.handleMissionMenuRequested);
       this.audio?.dispose();
       this.reducedMotionQuery?.removeEventListener('change', applyMotionPreference);
@@ -431,6 +434,11 @@ class EnergyCatchScene extends Phaser.Scene {
     this.audio?.present(cue.cue);
   }
 
+  private handleUiSound = (event: Event): void => {
+    const button=(event.target as HTMLElement)?.closest?.('button');
+    if(!button||button===this.ui?.soundButton||button.disabled)return;
+    this.audio?.present(/^(mode-|camera-mode-|scheme-)/.test(button.id)?'select':'confirm');
+  };
   private handleSoundRequested = (): void => { void this.audio?.toggle(); };
   private handleVisibilityChanged = (): void => { if (document.hidden) this.audio?.mute(); };
   private updateSoundUi = (): void => {
@@ -578,6 +586,7 @@ class EnergyCatchScene extends Phaser.Scene {
       this.ui.cameraStatus.textContent = 'Calibration not saved. ' + this.poseCalibrationHint(adapter.getMetrics().poseCalibration) + ' Press CALIBRATE to retry.';
     }
     if (calibrated && this.ui) {
+      this.audio?.present('cameraReady');
       const metrics = this.cameraAdapter?.getMetrics();
       const delegateTag = metrics?.delegate ? ` (${metrics.delegate} active)` : '';
       const isHand = this.trackingScheme === 'H0';
@@ -863,6 +872,8 @@ class EnergyCatchScene extends Phaser.Scene {
     metrics?: CameraMetrics
   ): void {
     if (!this.ui) return;
+    if(this.cameraMode && this.state.phase==='playing')this.audio?.updateTracking?.(this.cameraAdapter?.canStart?.()??false);
+    else this.audio?.resetTracking?.();
     const hasP1 = players.includes('p1');
     const hasP2 = players.includes('p2');
     const ambiguity = metrics?.ambiguityReason;
@@ -1406,6 +1417,7 @@ class EnergyCatchScene extends Phaser.Scene {
     const soundHost=showCameraDialog?this.ui.cameraSetup:this.ui.root;
     if(this.ui.soundButton.parentElement!==soundHost)soundHost.appendChild?.(this.ui.soundButton);
     this.ui.root.dataset.phase = this.campaign.phase;
+    this.audio?.setScene?.(this.campaign.phase,getCampaignRound(this.campaign).id);
     this.campaignUi?.show(this.campaign, this.state.phase === 'restart', this.cameraMode, this.trackingScheme, this.challenge);
     this.ui.menu.hidden = this.campaign.phase !== 'menu' || this.cameraSetupVisible;
     this.ui.cameraSetup.hidden = phase !== 'menu' || !this.cameraSetupVisible;
@@ -1461,6 +1473,7 @@ class EnergyCatchScene extends Phaser.Scene {
 
 export const game = new Phaser.Game({
   type: Phaser.AUTO,
+  audio: { noAudio: true },
   parent: 'game-container',
   width: WIDTH,
   height: HEIGHT,

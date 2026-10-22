@@ -12,11 +12,11 @@ import vm from 'node:vm';
 // Run the real scene methods; replace only Phaser startup, DOM handles and camera I/O.
 const source = stripTypeScriptTypes(await readFile(new URL('../src/main.ts', import.meta.url),'utf8'))
   .replace(/^import[\s\S]*?;\r?\n/gm,'').replace(/export const game = new Phaser.Game[\s\S]*/, 'globalThis.Scene = EnergyCatchScene;');
-function element(){return {textContent:'',disabled:false,hidden:false,checked:true,className:'',classList:{toggle(){}},setAttribute(){},focus(){},pause(){},play(){return Promise.resolve();},srcObject:null};}
+function element(){return {dataset:{},textContent:'',disabled:false,hidden:false,checked:true,className:'',classList:{toggle(){}},setAttribute(){},focus(){},pause(){},play(){return Promise.resolve();},srcObject:null};}
 function setup(){
   const adapters=[];
   class Adapter { constructor(video, options){this.options=options;adapters.push(this);this.currentStatus='loading-model';this.pending=new Promise((res,rej)=>{this.resolve=res;this.reject=rej;});} start(){return this.pending;}stop(){this.stopped=true;this.options.onStatus('stopped');}getMetrics(){return {delegate:'CPU',fps:0,inferenceMs:0};} }
-  const context={...feedbackPresentation,...releaseObservation,...coreEngine,...challengeEngine,...campaignEngine,document:{querySelector(){return null}},Phaser:{Scene:class{}},p1Rig:{},p2Rig:{},p1Animations:{},p2Animations:{},createGameState:()=>({phase:'menu',players:{}}),MediaPipeHandInputAdapter:Adapter,MediaPipePoseInputAdapter:Adapter};
+  const context={...feedbackPresentation,...releaseObservation,...coreEngine,...challengeEngine,...campaignEngine,document:{querySelector(){return null},getElementById(){return null}},Phaser:{Scene:class{}},p1Rig:{},p2Rig:{},p1Animations:{},p2Animations:{},createGameState:()=>({phase:'menu',players:{}}),MediaPipeHandInputAdapter:Adapter,MediaPipePoseInputAdapter:Adapter};
   vm.runInNewContext(source,context);const scene=new context.Scene();
   scene.ui=new Proxy({}, {get(target,key){return target[key]??=element();}});
   scene.ui.cameraCanvas=null;scene.ui.hudCameraCanvas=null;
@@ -274,3 +274,7 @@ test('Co-op keyboard hint explicitly separates both players bindings in every ro
   const hint=scene.ui.controlsHint.textContent;assert.match(hint,/P1.*A.*D.*HOLD S.*P2.*←.*→.*HOLD ↓/);assert.match(hint,roundIndex===0?/CATCH/:/ACTIVATE/);
  }
 });
+
+test('scene audio follows all campaign rounds and distinguishes final completion',()=>{const {scene}=setup();const scenes=[];scene.audio={setScene:(...args)=>scenes.push(args)};scene.rigs={p2:{root:{setVisible(){}}}};scene.game={canvas:{focus(){},setAttribute(){}}};scene.updateHud=()=>{};for(const [roundIndex,id] of [[0,'energy-catch'],[1,'duo-circuit'],[2,'cool-the-core']]){scene.campaign={...campaignEngine.createCampaign('solo'),phase:'intro',roundIndex};scene.state.phase='menu';scene.showPhase('menu');assert.equal(scenes.at(-1)?.[0],'intro');assert.equal(scenes.at(-1)?.[1],id);}scene.campaign.phase='complete';scene.state.phase='results';scene.showPhase('results');assert.equal(scenes.at(-1)[0],'complete');});
+
+test('tracking sounds consume current adapter readiness only during camera gameplay',()=>{const {scene}=setup();let ready=true;const accepted=[];let resets=0;scene.audio={updateTracking:value=>accepted.push(value),resetTracking:()=>resets++};scene.cameraMode=true;scene.cameraAdapter={canStart:()=>ready,currentStatus:'ready',getMetrics:()=>({})};scene.updateCameraDetection(['p1'],true,true,{delegate:'CPU',fps:10,inferenceMs:20});ready=false;scene.updateCameraDetection([],true,false,{delegate:'CPU',fps:10,inferenceMs:20});assert.deepEqual(accepted,[true,false]);scene.cameraMode=false;scene.updateCameraDetection([],false,false);assert.ok(resets>0);});
