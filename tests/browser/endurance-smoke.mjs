@@ -1,3 +1,4 @@
+import {beginRoundIntro} from './campaign-helpers.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -23,7 +24,7 @@ async function open(scheme,coop){
 }
 async function startRound(page){
  await page.locator('#calibrate-camera').click();await page.waitForFunction(()=>!document.querySelector('#start-camera-round').disabled);
- await page.waitForFunction(()=>{const button=document.querySelector('#start-camera-round');if(button.disabled)return false;button.click();return true;});await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
+ await page.waitForFunction(()=>{const button=document.querySelector('#start-camera-round');if(button.disabled)return false;button.click();return true;});await beginRoundIntro(page);await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
 }
 async function released(page){
  return page.evaluate(()=>window.__RR_FIXTURE__.workers.every(w=>!w.active)&&window.__RR_FIXTURE__.streams.every(s=>s.getTracks().every(t=>t.readyState==='ended')));
@@ -47,10 +48,10 @@ try{
    assert.equal(after.time,0);assert.equal(after.cameraMode,true);assert.equal(after.workers,1);
    assert.equal(after.team,after.players.p1.score+after.players.p2.score);
    assert.deepEqual(errors,[]);
-   const id='round-'+(pair*2+round+1);results.push({id,scheme,coop,status:'PASS',wallSeconds:(performance.now()-started)/1000,before,after});console.log(id,'PASS');
-   if(round===0){await page.locator('#restart-round').click();await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');}
+   const id='campaign-'+(pair+1)+'-round-'+(round+1);results.push({id,scheme,coop,status:'PASS',wallSeconds:(performance.now()-started)/1000,before,after});console.log(id,'PASS');
+   if(round===0){await page.locator('#restart-round').click();await beginRoundIntro(page,1);await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');}
   }
   await page.locator('#stop-camera-results').click();assert.equal(await released(page),true);await page.close();active=undefined;
  }
 }catch(error){results.push({status:'FAIL',error:error.stack,state:await active?.evaluate(()=>({phase:window.__RR_GAME_TEST__?.getState().phase,metrics:window.__RR_GAME_TEST__?.getState().cameraAdapter?.getMetrics()})).catch(()=>null)});throw error;}
-finally{await fs.writeFile(path.join(output,'endurance-results.json'),JSON.stringify({browser:browser.version(),method:'Synthetic camera, fake worker and bitmap; actual production60s timer, results/replay and resource lifecycle. Not physical endurance, SDK inference, render FPS or body latency.',results},null,2));await browser.close();}
+finally{await fs.writeFile(path.join(output,'endurance-results.json'),JSON.stringify({browser:browser.version(),method:'Synthetic camera, fake worker and bitmap; actual production60s timer, round results/Next Round and resource lifecycle. Not physical endurance, SDK inference, render FPS or body latency.',results},null,2));await browser.close();}

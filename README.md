@@ -6,7 +6,7 @@
   </a>
 </p>
 
-# ⚡ REACTOR RUSH — ENERGY CATCH ⚡
+# ⚡ REACTOR RUSH — THREE-ROUND MISSION ⚡
 
 [![FU-DEVER Club](https://img.shields.io/badge/DEVELOPED%20BY-FU--DEVER%20CLUB-FF5722?style=for-the-badge&logo=github&logoColor=white)](https://github.com/fudever-club)
 [![Phaser Engine](https://img.shields.io/badge/GAME%20ENGINE-PHASER%204.2-brightgreen?style=for-the-badge&logo=javascript)](https://phaser.io/)
@@ -27,12 +27,24 @@
 
 ---
 
+
+## Campaign ba ải — cập nhật 21/10/2026
+
+**Energy Catch → Duo Circuit → Cool the Core**, mỗi ải 60 giây. Có hướng dẫn và kết quả từng ải, bảng tổng kết toàn game và chơi lại từ đầu. Solo chỉ tính P1; Co-op cộng hai người.
+
+- **Energy Catch:** luật bắt năng lượng/hazard và combo hiện có giữ nguyên.
+- **Duo Circuit:** đứng ở vùng nút đang sáng, giữ kích hoạt 1 giây để nối; thả rồi mới nối tiếp. +100 mỗi nút, +200 cho một mạch ba nút.
+- **Cool the Core:** đến van đang hoạt động, giữ kích hoạt khi an toàn để làm mát; thả khi báo quá tải. Nhiệt còn lại hiển thị ở tổng kết.
+- **Pose Both Arms [P1]:** nghiêng thân để đi, giơ cả hai tay để Catch/Activate; thả tay một lần khi vào ải mới. H0/P2 và bàn phím vẫn có sẵn. Camera được giữ xuyên chuyển ải khi đã opt-in; STOP CAMERA dừng camera và chọn bàn phím.
+
+[Đặc tả gameplay](docs/gameplay/three-round-campaign.md) · [Luồng màn hình](docs/design/screen-flow-and-round-map.md) · [Báo cáo kiểm thử và giới hạn](docs/reports/three-round-campaign-2026-10-21.md). Đây là bản kỹ thuật cục bộ; kiểm thử webcam vật lý đủ ba ải, TV và cold-start ngắt mạng thật vẫn cần bằng chứng riêng.
+
 ## 📖 Giới thiệu tổng quan
 
-**Reactor Rush — Energy Catch** là dự án game web tương tác tốc độ cao, được phát triển nhằm thử nghiệm và tối ưu hóa việc kết hợp giữa **Game Engine 2D (Phaser)** và **Mô hình thị giác máy tính (Google MediaPipe Hand Landmarker)** chạy trực tiếp trên trình duyệt.
+**Reactor Rush** là game web arcade gồm ba ải liên tiếp, được phát triển nhằm thử nghiệm và tối ưu hóa việc kết hợp giữa **Game Engine 2D (Phaser)** và **Mô hình thị giác máy tính (MediaPipe Pose/Hand Landmarker)** chạy trực tiếp trên trình duyệt.
 
 Game mang đến trải nghiệm điều khiển đa phương thức đột phá:
-- **Motion Control (Cử chỉ bàn tay)**: Ba scheme webcam thử nghiệm: Hand Pinch H0, Pose Both Arms P1 và Pose One Arm P2. Có GPU delegate và CPU fallback; độ trễ, FPS và khoảng cách sử dụng trên laptop booth chưa được đo.
+- **Motion Control (Cử chỉ thân người/bàn tay)**: Ba scheme webcam thử nghiệm: Hand Pinch H0, Pose Both Arms P1 và Pose One Arm P2. Có GPU delegate và CPU fallback; độ trễ, FPS và khoảng cách sử dụng trên laptop booth chưa được đo.
 - **Keyboard Control (Bàn phím truyền thống)**: Mượt mà, nhạy bén và là phương án dự phòng chuẩn chỉ.
 
 ---
@@ -42,7 +54,7 @@ Game mang đến trải nghiệm điều khiển đa phương thức đột phá
 - 🕹️ **2 Chế độ chơi linh hoạt**:
   - **1 Player (Solo)**: Thử thách phản xạ cá nhân với nhân vật P1 (Cyan).
   - **2 Players (Co-op)**: Hai người chơi cùng đứng trước camera hoặc cùng bàn phím phối hợp bắt năng lượng chia làn đối xứng.
-- 🖐️ **AI Hand Tracking tối ưu hóa sâu**:
+- 🖐️ **Camera tracking qua Web Worker**:
   - Inference chạy trong **Web Worker**; chi phí CPU/GPU và ảnh hưởng tới vòng game vẫn cần đo trên thiết bị đích.
   - **GPU Acceleration (WebGL)** và CPU fallback một lần khi inference GPU quá hạn. Cần hiệu chuẩn lại sau khôi phục; hiệu năng thực tế chưa được nghiệm thu.
   - **Visual Landmark Skeleton Overlay**: Hiển thị khung xương và 21 khớp bàn tay thời gian thực với mã màu trực quan (Cyan cho P1, Pink cho P2).
@@ -66,26 +78,27 @@ Game mang đến trải nghiệm điều khiển đa phương thức đột phá
 | **Player 1 (Cyan)** | <kbd>A</kbd> / <kbd>D</kbd> | Giữ <kbd>S</kbd> khi năng lượng chạm tới robot |
 | **Player 2 (Pink)** | <kbd>←</kbd> / <kbd>→</kbd> | Giữ <kbd>↓</kbd> khi năng lượng chạm tới robot |
 
-- <kbd>Enter</kbd>: Bắt đầu trận đấu từ Menu chính.
-- <kbd>R</kbd> hoặc <kbd>Enter</kbd>: Chơi lại vòng mới tại màn hình kết quả.
+- <kbd>Enter</kbd>: Mở hướng dẫn ải; chọn **START ROUND** hoặc Enter lần nữa để bắt đầu sau nhịp chuẩn bị.
+- Sau ải 1/2: **NEXT ROUND** hoặc Enter mở hướng dẫn ải tiếp theo.
+- Sau ải 3: **PLAY AGAIN**, R hoặc Enter bắt đầu lượt mới từ hướng dẫn ải 1 và xóa tổng điểm cũ.
 
 ---
 
 ### 2. Cử chỉ Webcam (Motion Control với MediaPipe)
 
-1. Từ Menu chính, chọn **SET UP WEBCAM CONTROLS**.
-2. Chọn chế độ mong muốn: **1 PLAYER (SOLO)** hoặc **2 PLAYERS (CO-OP)**.
-3. Tích chọn đồng ý quyền camera (xử lý hoàn toàn tại local trên thiết bị) $\rightarrow$ nhấn **ENABLE CAMERA & LOAD MODEL**.
-4. Đưa tay vào khung hình:
-   - Hệ thống sẽ nhận diện và vẽ khung xương bàn tay trực tiếp trên camera preview.
-   - Di chuyển tay vào vùng chỉ định rồi nhấn **CALIBRATE HAND** (hoặc **CALIBRATE BOTH HANDS**) để khóa điểm trung tính.
-5. Nhấn **START WITH CAMERA** để bắt đầu:
-   - **Di chuyển**: Đưa bàn tay sang trái hoặc phải so với vị trí đã calibrate.
-   - **Bắt (Catch)**: Chụm đầu ngón cái và ngón trỏ lại (Pinch gesture).
+1. Chọn **SET UP WEBCAM CONTROLS**, rồi Solo hoặc Co-op.
+2. **POSE BOTH ARMS [P1]** là scheme mặc định của prototype: camera cần thấy vai và hai tay. Khung hình xử lý trên máy; đọc phần thông báo camera/MediaPipe metrics trước khi đồng ý và chọn **ENABLE CAMERA & LOAD MODEL**.
+3. Thả lỏng hai tay, đứng đúng vùng và chọn **CALIBRATE POSE**; giữ vai ổn định đến khi đủ 3 mẫu và ứng dụng báo sẵn sàng.
+4. Chọn **START WITH CAMERA** để mở hướng dẫn ải đầu; chọn **START ROUND** để chơi. Nghiêng thân trái/phải để di chuyển, giơ cả hai tay để Catch/Activate. Thả tay một lần khi ải bắt đầu và sau mỗi nút mạch điện.
+5. Camera được giữ xuyên các ải khi còn hoạt động. **STOP CAMERA** dừng stream/model và chuyển sang bàn phím.
+
+Các scheme thử nghiệm khác vẫn có sẵn: **HAND PINCH [H0]** dùng tay di chuyển và chụm ngón cái/trỏ để kích hoạt; **POSE ONE ARM [P2]** dùng một tay giơ lên để kích hoạt. Cần hiệu chỉnh theo hướng dẫn của scheme đã chọn. [Chi tiết camera và giới hạn](docs/gameplay/camera-input-integration.md).
 
 ---
 
-## ⚡ Luật chơi & Cách tính điểm
+## ⚡ Luật Energy Catch & Cách tính điểm
+
+Các luật dưới đây áp dụng riêng ải 1. Luật ải 2/3 và tổng điểm được mô tả trong [đặc tả campaign](docs/gameplay/three-round-campaign.md).
 
 - **Thời gian**: Vòng đấu đếm ngược **60 giây**.
 - **Quả cầu năng lượng Cyan (Energy Orb)**:
@@ -107,7 +120,7 @@ Game mang đến trải nghiệm điều khiển đa phương thức đột phá
 - **Bundler & Tooling**: Vite 8.3, Sharp 0.35
 - **Unit Testing**: Node.js Native Test Runner (`node:test`, `node:assert/strict`)
 
-### Sơ đồ luồng xử lý Motion Input (Camera Pipeline)
+### Sơ đồ luồng xử lý Hand Pinch H0 (một trong ba scheme camera)
 
 ```mermaid
 flowchart LR

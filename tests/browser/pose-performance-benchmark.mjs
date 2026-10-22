@@ -1,3 +1,4 @@
+import {beginRoundIntro} from './campaign-helpers.mjs';
 /** Bounded component ablation, not physical-camera/model performance certification.
  * Usage: CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium node tests/browser/pose-performance-benchmark.mjs OUTPUT BASE PLAYWRIGHT_MODULES
  * Env: RR_BENCH_SECONDS=8 RR_BENCH_VARIANTS=baseline,no-overlays,no-ui,no-raster
@@ -54,7 +55,7 @@ try {
   await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().cameraAdapter?.currentStatus==='ready');
   await page.locator('#calibrate-camera').click();
   await page.waitForFunction(()=>{const b=document.querySelector('#start-camera-round');if(b.disabled)return false;b.click();return true;});
-  await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
+  await beginRoundIntro(page);await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
   await page.evaluate(variant=>{
    const a=window.__RR_GAME_TEST__.getState().cameraAdapter;
    if(variant==='timer-pump')window.__BENCH_TIMER__=setInterval(()=>a.pumpFrame(),8);

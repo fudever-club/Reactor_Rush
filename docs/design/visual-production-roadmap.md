@@ -1,13 +1,39 @@
 # Reactor Rush — Visual Production Roadmap
 
-**Status date:** 2026-10-17  
+**Status date:** Current upgrade 2026-10-22; campaign update 2026-10-21; historical art/audit record 2026-10-17
+
 **Purpose:** Separate assets already running in the MVP from UI concepts, art references, and future-round proposals.
 
 **WP-01 Stitch audit A01:** `BLOCKED` on 2026-10-17. The current Edge session showed Stitch's Sign In control and “Sorry, we hit a snag”; no project screens or dimensions were visible. This work package made no Stitch edits or exports. The audit evidence is kept with the external WP-01 evidence package. Do not treat earlier local observations below as freshly verified by A01.
 
 **Work-package boundary:** WP-01 covers documentation, project skills, and this read-only Stitch audit. WP-02 covers visual production in Stitch and requires separate explicit approval before any canvas edit, export, or publish. WP-01 authorizes none of those writes.
 
-## Current source of truth
+## Current upgrade — 22 October 2026
+
+Mission Patch Lab local implementation adds original Reactor Rush identity/round diagrams, supplied FU-DEVER logo and final-only Buggy, distinct connector/valve apparatus, live coaching and event feedback, optional local audio and final Mission Menu. Gameplay/input/rig contracts remain unchanged. [Design and limits](../superpowers/specs/2026-10-22-arcade-identity-feedback-design.md) · [Execution and acceptance report](../reports/arcade-upgrade-2026-10-22.md). New assets remain In review. No Stitch production/publication or release is implied.
+
+### Prioritized potential directions — proposed, not implemented
+
+| Priority | Experiment | Decision criterion / dependency |
+|---|---|---|
+| 1 | Local personal records, separated Solo/Co-op | No identity collection; storage-denied/reset paths; observe whether players choose to retry. |
+| 2 | Optional single-round practice | Reuse mechanic modules, label practice separately from the fixed 60-second campaign; preserve release safety. |
+| 3 | Vietnamese/English presentation | Confirm actual visitor language needs; share one copy dictionary and input-aware terminology. |
+| 4 | Cosmetic mission patches or robot accessories | Preserve silhouettes/anchors; provide editable sources/exports and final-scale artist review. |
+| 5 | A shared Co-op task | New rules need a separate spec/candidate and actual balance playtest; current independent boards must not be described as shared mechanics. |
+| 6 | Booth fullscreen/pause/attract/operator reset | Define real browser Escape/rejection, timer resume, freshness and camera teardown behavior; execute on target setup. |
+
+These opportunities came from three read-only discovery agents. They are hypotheses, not measured gains in fun, engagement, accessibility or physical performance. The official logo/Buggy dependency has been resolved by the user; no API key is needed for the current local wave.
+
+## Campaign runtime update — 21 October 2026
+
+The user confirmed the three-round direction. The local game now connects **Energy Catch → Duo Circuit → Cool the Core** with explicit intros, ready beats, round results, final breakdown and replay. Rules live in the [new campaign spec](../gameplay/three-round-campaign.md); execution evidence and limitations live in the [current report](../reports/three-round-campaign-2026-10-21.md).
+
+New circuit/cooling arenas and progress UI are procedural Phaser/DOM presentation. They do not add production exports or change the manifest, existing robot rigs or animation definitions. Final Boss remains future-only. The source-level camera pipeline stays separate from the previous Downloads diagnostic build; physical three-round and TV acceptance are still open. No Stitch canvas/export/publish operation was performed.
+
+The sections below preserve the earlier WP-01 art-production record. Their conditional-round labels describe that earlier date and are superseded for local campaign availability by this update; art approval and Stitch discrepancies are not silently closed.
+
+## Historical WP-01 source of truth (17 October 2026)
 
 - **Art direction:** Direction A / Orbital Buddy, navy science-lab UI, 1280×720 target. Keep approved P1 Cyan and P2 Pink designs unchanged.
 - **Playable mode:** Energy Catch, 2-player keyboard co-op, 60 seconds. Current controls are P1 A/D + hold S and P2 Left/Right + hold Down.
@@ -29,7 +55,7 @@
 
 **Draft hygiene:** prior local documentation reports first Start and Round Complete drafts with unsupported labels/mechanics. A01 could not freshly verify the project contents; until a read-only review is available, do not treat those earlier drafts as approved UI or export them as approved screens.
 
-## Round world board
+## Historical round world board
 
 The round-map design must communicate status without implying that conditional modes are already playable or scheduled:
 
@@ -40,7 +66,7 @@ The round-map design must communicate status without implying that conditional m
 
 The three future locations are art-direction proposals, not game maps or feature commitments. Any player-facing selection/progression screen must be revisited when round order, availability, and mechanics are decided.
 
-## Next production sequence
+## Historical proposed production sequence
 
 1. Review the corrected Start / Attract, Round Complete, and environment mood concepts; keep them labeled as concepts until Phaser integration.
 2. Confirm a real 1280×720 export for the environment board. Prior local records report a 1280×1024 Desktop preview; A01 was unable to recheck the project or establish export dimensions.

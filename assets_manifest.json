@@ -1398,6 +1398,148 @@
       "anchor_y": 0.975,
       "file_size_bytes": 1650,
       "qa_result": "Cutout tween definition; 5 authored keyframes over 760ms. Runtime evidence is recorded in docs/art/animation-production-report.md."
+    },
+    {
+      "asset_id": "BRAND-RR-REACTOR-SYMBOL",
+      "source_uri": "assets/brand/reactor-rush-symbol.svg",
+      "export_uri": "assets/brand/reactor-rush-symbol.svg",
+      "owner": "Reactor Rush project team; final ownership confirmation pending",
+      "status": "In review",
+      "license": "Original local vector artwork authored by Codex for Reactor Rush. No official FU-DEVER logo or third-party artwork. Human release review pending.",
+      "last_reviewed": "2026-10-22",
+      "width": 128,
+      "height": 128,
+      "pixel_ratio": 1,
+      "alpha": true,
+      "state_names": [
+        "game-identity"
+      ],
+      "frame_count": 1,
+      "anchor_x": 0.5,
+      "anchor_y": 0.5,
+      "file_size_bytes": 763,
+      "qa_result": "Editable SVG source and export are the same file. Dimensions/viewBox and byte count verified from local source; visual integration and final art acceptance pending."
+    },
+    {
+      "asset_id": "UI-ROUND-ENERGY",
+      "source_uri": "assets/ui/round-energy.svg",
+      "export_uri": "assets/ui/round-energy.svg",
+      "owner": "Reactor Rush project team; final ownership confirmation pending",
+      "status": "In review",
+      "license": "Original local vector artwork authored by Codex for Reactor Rush. No official FU-DEVER logo or third-party artwork. Human release review pending.",
+      "last_reviewed": "2026-10-22",
+      "width": 320,
+      "height": 240,
+      "pixel_ratio": 1,
+      "alpha": true,
+      "state_names": [
+        "round-energy"
+      ],
+      "frame_count": 1,
+      "anchor_x": 0.5,
+      "anchor_y": 0.5,
+      "file_size_bytes": 907,
+      "qa_result": "Editable SVG source and export are the same file. Dimensions/viewBox and byte count verified from local source; visual integration and final art acceptance pending."
+    },
+    {
+      "asset_id": "UI-ROUND-CIRCUIT",
+      "source_uri": "assets/ui/round-circuit.svg",
+      "export_uri": "assets/ui/round-circuit.svg",
+      "owner": "Reactor Rush project team; final ownership confirmation pending",
+      "status": "In review",
+      "license": "Original local vector artwork authored by Codex for Reactor Rush. No official FU-DEVER logo or third-party artwork. Human release review pending.",
+      "last_reviewed": "2026-10-22",
+      "width": 320,
+      "height": 240,
+      "pixel_ratio": 1,
+      "alpha": true,
+      "state_names": [
+        "round-circuit"
+      ],
+      "frame_count": 1,
+      "anchor_x": 0.5,
+      "anchor_y": 0.5,
+      "file_size_bytes": 949,
+      "qa_result": "Editable SVG source and export are the same file. Dimensions/viewBox and byte count verified from local source; visual integration and final art acceptance pending."
+    },
+    {
+      "asset_id": "UI-ROUND-COOLING",
+      "source_uri": "assets/ui/round-cooling.svg",
+      "export_uri": "assets/ui/round-cooling.svg",
+      "owner": "Reactor Rush project team; final ownership confirmation pending",
+      "status": "In review",
+      "license": "Original local vector artwork authored by Codex for Reactor Rush. No official FU-DEVER logo or third-party artwork. Human release review pending.",
+      "last_reviewed": "2026-10-22",
+      "width": 320,
+      "height": 240,
+      "pixel_ratio": 1,
+      "alpha": true,
+      "state_names": [
+        "round-cooling"
+      ],
+      "frame_count": 1,
+      "anchor_x": 0.5,
+      "anchor_y": 0.5,
+      "file_size_bytes": 834,
+      "qa_result": "Editable SVG source and export are the same file. Dimensions/viewBox and byte count verified from local source; visual integration and final art acceptance pending."
+    },
+    {
+      "asset_id": "BRAND-FU-DEVER-DARK-LOGO",
+      "source_uri": "assets/brand/source/fu-dever-dark-original.png",
+      "export_uri": "assets/brand/fu-dever-dark.png",
+      "owner": "FU-DEVER; user supplied and authorized source use on2026-10-22",
+      "status": "In review",
+      "license": "User-provided FU-DEVER brand/Buggy asset, local game use explicitly authorized. No AI redraw, recolor or stretching. Final project art acceptance pending.",
+      "last_reviewed": "2026-10-22",
+      "width": 512,
+      "height": 512,
+      "pixel_ratio": 1,
+      "alpha": true,
+      "state_names": [
+        "club-credit-dark"
+      ],
+      "frame_count": 1,
+      "anchor_x": 0.5,
+      "anchor_y": 0.5,
+      "file_size_bytes": 35684,
+      "source_sha256": "8eb822f59815be99de107774ee97376ffdc28f47094a83ef62d93426a0d17ec2",
+      "export_sha256": "ecc3b436779b81870547a0a252d94e0584147d3adbe46adcbb4ad222f8f5954b",
+      "source_crop": {
+        "left": 876,
+        "top": 545,
+        "width": 2473,
+        "height": 3072
+      },
+      "qa_result": "alpha-only bounds; proportional fit with16px minimum transparent pad; logo512sq, Buggy480sq; lossless PNG compression; no recolor/redraw. Original source copy SHA-256 equals supplied file. Actual integration visual review pending."
+    },
+    {
+      "asset_id": "MASCOT-BUGGY-CELEBRATE",
+      "source_uri": "assets/mascot/source/buggy-celebrate-original.png",
+      "export_uri": "assets/mascot/buggy-celebrate.png",
+      "owner": "FU-DEVER; user supplied and authorized source use on2026-10-22",
+      "status": "In review",
+      "license": "User-provided FU-DEVER brand/Buggy asset, local game use explicitly authorized. No AI redraw, recolor or stretching. Final project art acceptance pending.",
+      "last_reviewed": "2026-10-22",
+      "width": 480,
+      "height": 480,
+      "pixel_ratio": 1,
+      "alpha": true,
+      "state_names": [
+        "final-complete-celebration"
+      ],
+      "frame_count": 1,
+      "anchor_x": 0.5,
+      "anchor_y": 0.5,
+      "file_size_bytes": 231956,
+      "source_sha256": "866cd3733df26e1a1d5ba52711aaded0c887c761ffdf140e42777cb59a229b53",
+      "export_sha256": "f317a1b46c93844815b937d20109d5d40fed046a28994fa5ceba33e69e052a57",
+      "source_crop": {
+        "left": 109,
+        "top": 96,
+        "width": 1824,
+        "height": 1799
+      },
+      "qa_result": "alpha-only bounds; proportional fit with16px minimum transparent pad; logo512sq, Buggy480sq; lossless PNG compression; no recolor/redraw. Original source copy SHA-256 equals supplied file. Actual integration visual review pending."
     }
   ],
   "production_batch": {

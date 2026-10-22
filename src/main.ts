@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { getPlayfieldLabel, presentChallengeEvents, presentCatch, type FeedbackMessage } from './gameplay/feedback';
+import { GameAudio } from './gameplay/game-audio';
 import p1Rig from '../assets/characters/p1-cyan/rig.json';
 import p1Animations from '../assets/characters/p1-cyan/animations.json';
 import p2Rig from '../assets/characters/p2-pink/rig.json';
@@ -18,12 +20,16 @@ import {
   hasTimeAfterStep,
   isCurrentInputStep,
   requestRestart,
-  startGame,
   type GameState,
   type InputAdapter,
   type InputFrame,
   type PlayerId
 } from './gameplay/core';
+import { createCampaign, startCampaign, beginCampaignRound, completeCampaignRound, continueCampaign, campaignTotals, getCampaignRound, type CampaignState } from './gameplay/campaign';
+import { createChallenge, stepChallenge, getChallengeView, type ChallengeState, type Zone } from './gameplay/challenges';
+import { ChallengeRenderer } from './gameplay/challenge-renderer';
+import { CampaignUi } from './gameplay/campaign-ui';
+import { hasObservedCameraRelease } from './gameplay/observed-release';
 import { getFallingItemCue } from './gameplay/accessibility-cues';
 import { CutoutRig, preloadRig, type AnimationSet, type RigSpec } from './rig';
 import './game-style.css';
@@ -116,6 +122,11 @@ interface RuntimeUi {
   readyTitle: HTMLElement;
   resultsTitle: HTMLElement;
   gameAnnouncer: HTMLElement;
+  actionFeedback: HTMLElement;
+  actionFeedbackP1: HTMLElement;
+  actionFeedbackP2: HTMLElement;
+  soundButton: HTMLButtonElement;
+  menuButton: HTMLButtonElement;
   modeSoloButton?: HTMLButtonElement;
   modeCoopButton?: HTMLButtonElement;
   cameraModeSoloButton?: HTMLButtonElement;
@@ -138,6 +149,14 @@ interface RuntimeUi {
 
 class EnergyCatchScene extends Phaser.Scene {
   private state: GameState = createGameState();
+  private campaign: CampaignState = createCampaign('solo');
+  private challenge: ChallengeState | null = null;
+  private challengeRenderer?: ChallengeRenderer;
+  private audio?: GameAudio;
+  private lastPlayfieldLabel = '';
+  private campaignUi?: CampaignUi;
+  // Only actual/current release observations can arm a round or the next socket.
+  private releaseSeen: Record<PlayerId, boolean> = { p1: false, p2: false };
   private keyboardAdapter?: KeyboardInputAdapter;
   private inputAdapter?: InputAdapter;
   private cameraAdapter?: MediaPipeHandInputAdapter | MediaPipePoseInputAdapter;
@@ -177,10 +196,18 @@ class EnergyCatchScene extends Phaser.Scene {
   create(): void {
     this.game.canvas.tabIndex = 0;
     this.game.canvas.setAttribute('role', 'application');
-    this.game.canvas.setAttribute('aria-label', 'Energy Catch playfield. Player 1 uses A and D to move and holds S to catch. Player 2 uses Left and Right to move and holds Down to catch.');
+    this.game.canvas.setAttribute('aria-label', 'Reactor Rush three-round playfield.');
     this.game.canvas.focus({ preventScroll: true });
     this.drawStage();
     this.ui = this.createHud();
+    this.audio = new GameAudio(undefined, this.updateSoundUi);
+    this.ui.soundButton.addEventListener('click', this.handleSoundRequested);
+    this.ui.menuButton.addEventListener('click', this.handleMissionMenuRequested);
+    document.addEventListener('visibilitychange', this.handleVisibilityChanged);
+    this.updateSoundUi();
+    this.challengeRenderer = new ChallengeRenderer(this);
+    this.campaignUi = new CampaignUi(this.handleBeginRoundRequested);
+    this.campaignUi.stopButton.addEventListener('click', this.handleCameraStopRequested);
     this.ui.startButton.addEventListener('click', this.handleStartRequested);
     this.ui.restartButton.addEventListener('click', this.handleRestartRequested);
     this.keyboardAdapter = new KeyboardInputAdapter();
@@ -238,10 +265,13 @@ class EnergyCatchScene extends Phaser.Scene {
         event.preventDefault();
         this.toggleHudCameraDock();
       }
-      if (!targetUsesNativeKeyboard && event.code === 'Enter' && (this.state.phase === 'menu' || this.state.phase === 'results')) {
-        this.handleStartRequested();
+      if (!targetUsesNativeKeyboard && event.code === 'Enter') {
+        event.preventDefault();
+        if (this.campaign.phase === 'intro') this.handleBeginRoundRequested();
+        else if (this.campaign.phase === 'menu') this.handleStartRequested();
+        else this.handleRestartRequested();
       }
-      if (event.code === 'KeyR') this.handleRestartRequested();
+      if (!targetUsesNativeKeyboard && event.code === 'KeyR' && this.campaign.phase === 'complete') this.handleRestartRequested();
     };
     window.addEventListener('keydown', onWindowKeyDown);
 
@@ -271,6 +301,11 @@ class EnergyCatchScene extends Phaser.Scene {
       ready: true,
       getState: () => ({
         phase: this.state.phase,
+        campaign: structuredClone(this.campaign),
+        totals: campaignTotals(this.campaign),
+        challenge: this.challenge ? structuredClone(this.challenge) : null,
+        challengeView: this.challenge ? { p1: getChallengeView(this.challenge, 'p1'), p2: getChallengeView(this.challenge, 'p2') } : null,
+        releaseSeen: { ...this.releaseSeen },
         timeRemainingMs: this.state.timeRemainingMs,
         players: this.state.players,
         playerX: { ...this.playerX },
@@ -287,6 +322,10 @@ class EnergyCatchScene extends Phaser.Scene {
     (window as typeof window & { __RR_GAME_TEST__?: typeof harness }).__RR_GAME_TEST__ = harness;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       window.removeEventListener('keydown', onWindowKeyDown);
+      document.removeEventListener('visibilitychange', this.handleVisibilityChanged);
+      this.ui?.soundButton.removeEventListener('click', this.handleSoundRequested);
+      this.ui?.menuButton.removeEventListener('click', this.handleMissionMenuRequested);
+      this.audio?.dispose();
       this.reducedMotionQuery?.removeEventListener('change', applyMotionPreference);
       this.ui?.startButton.removeEventListener('click', this.handleStartRequested);
       this.ui?.restartButton.removeEventListener('click', this.handleRestartRequested);
@@ -318,26 +357,107 @@ class EnergyCatchScene extends Phaser.Scene {
     const phaseBeforeFrame = this.state.phase;
     this.state = advanceGameFrame(this.state, frameDeltaMs, (state, stepMs, elapsedMs) => {
       this.state = state;
-      this.lastInput = isCurrentInputStep(elapsedMs, stepMs, frameDeltaMs) ? currentInput : previousInput;
+      if (this.campaign.phase === 'intro') this.campaign = beginCampaignRound(this.campaign);
+      const current = isCurrentInputStep(elapsedMs, stepMs, frameDeltaMs);
+      if (current) for (const player of ['p1', 'p2'] as const) {
+        if (!currentInput[player].catch && this.hasObservedRelease(player)) this.releaseSeen[player] = true;
+      }
+      const observed = current ? currentInput : previousInput;
+      this.lastInput = {
+        p1: { ...observed.p1, catch: current && this.releaseSeen.p1 && observed.p1.catch },
+        p2: { ...observed.p2, catch: current && this.releaseSeen.p2 && observed.p2.catch }
+      };
       const playerXAtStepStart = { ...this.playerX };
       this.movePlayers(stepMs);
-      this.updateFallingItems(stepMs, playerXAtStepStart);
-      if (hasTimeAfterStep(state, stepMs)) {
-        this.spawnAfterMs -= stepMs;
-        if (this.spawnAfterMs <= 0) this.spawnItem();
+      if (this.challenge) {
+        const zones = this.getPlayerZones();
+        const neutral: InputFrame = {p1:{moveAxis:0,catch:false},p2:{moveAxis:0,catch:false}};
+        const next = stepChallenge(this.challenge, this.state.players, current ? this.lastInput : neutral, zones, stepMs);
+        this.challenge = next.state;
+        this.state = {...this.state, players:next.players};
+        for (const event of next.events) {
+          if (event.kind === 'connect') this.releaseSeen[event.player] = false;
+          this.showCatchFeedback(event.player, 480, event.points, event.kind === 'overload' ? 'hazard' : 'energy');
+          this.rigs[event.player].play(event.kind === 'overload' ? 'catch' : 'activate');
+        }
+        this.presentFeedback(presentChallengeEvents(next.events));
+      } else {
+        this.updateFallingItems(stepMs, playerXAtStepStart);
+        if (hasTimeAfterStep(state, stepMs)) {
+          this.spawnAfterMs -= stepMs;
+          if (this.spawnAfterMs <= 0) this.spawnItem();
+        }
       }
       return this.state;
     });
+    if (this.state.phase === 'playing' && this.campaign.phase === 'intro') this.campaign = beginCampaignRound(this.campaign);
     this.lastInput = currentInput;
     if (this.state.phase !== phaseBeforeFrame) {
-      if (this.state.phase === 'results') this.clearItems();
+      if (this.state.phase === 'results') {
+        this.campaign = completeCampaignRound(this.campaign, this.state.players);
+        this.clearItems();
+        this.audio?.present('complete');
+      }
       this.showPhase(this.state.phase);
     }
     this.updateHud();
+    this.campaignUi?.updateStatus(this.campaign, this.challenge, this.releaseSeen, this.getPlayerZones());
+    this.challengeRenderer?.render(this.challenge, this.isSoloMode);
     this.announceActiveItems();
   }
 
+  private clearActionFeedback(): void {
+    if(!this.ui)return;this.ui.actionFeedbackP1.textContent='';this.ui.actionFeedbackP2.textContent='';
+  }
+
+  private getPlayerZones(): Record<PlayerId, Zone> {
+    return Object.fromEntries((['p1','p2'] as const).map(player => {
+      const limits = PLAYER_LIMITS[player];
+      return [player, Math.min(2, Math.max(0, Math.floor((this.playerX[player]-limits.min)/(limits.max-limits.min)*3))) as Zone];
+    })) as Record<PlayerId, Zone>;
+  }
+
+  private presentFeedback(messages: FeedbackMessage[], announce=true): void {
+    if (!messages.length) return;
+    if (this.ui) {
+      for(const message of messages){
+        const target=message.player==='p1'?this.ui.actionFeedbackP1:this.ui.actionFeedbackP2;
+        target.textContent=message.text;
+        target.setAttribute('data-tone',message.points<0||message.cue==='overload'||message.cue==='hazard'?'warning':'success');
+      }
+      if (announce) this.ui.gameAnnouncer.textContent = messages.map(message=>message.text).join('. ');
+    }
+    const cue = messages.find(message=>message.cue==='circuit'||message.cue==='overload')??messages[0];
+    this.audio?.present(cue.cue);
+  }
+
+  private handleSoundRequested = (): void => { void this.audio?.toggle(); };
+  private handleVisibilityChanged = (): void => { if (document.hidden) this.audio?.mute(); };
+  private updateSoundUi = (): void => {
+    if (!this.ui || !this.audio) return;
+    this.ui.soundButton.textContent = this.audio.available ? (this.audio.enabled?'SOUND ON':'SOUND OFF') : 'SOUND UNAVAILABLE';
+    this.ui.soundButton.setAttribute('aria-pressed',String(this.audio.enabled));
+    this.ui.soundButton.disabled = !this.audio.available;
+  };
+  private updatePlayfieldLabel(): void {
+    const label=getPlayfieldLabel(getCampaignRound(this.campaign).name,this.isSoloMode,this.cameraMode,this.trackingScheme);
+    if (label===this.lastPlayfieldLabel) return;
+    this.lastPlayfieldLabel=label;
+    this.game?.canvas?.setAttribute('aria-label',label);
+  }
+
+  private hasObservedRelease(player: PlayerId): boolean {
+    if (!this.cameraMode) return true;
+    const adapter = this.cameraAdapter;
+    if (!adapter || adapter.currentStatus !== 'ready') return false;
+    if (this.trackingScheme === 'H0' && !(adapter as MediaPipeHandInputAdapter).isCalibrated) return false;
+    return hasObservedCameraRelease({player,scheme:this.trackingScheme,solo:this.isSoloMode,metrics:adapter.getMetrics(),
+      poses:this.trackingScheme === 'H0' ? undefined : (adapter as MediaPipePoseInputAdapter).getLatestPoses(),
+      hands:this.trackingScheme === 'H0' ? (adapter as MediaPipeHandInputAdapter).getLatestHands() : undefined});
+  }
+
   private handleStartRequested = (): void => {
+    if (this.state.phase === 'menu' && window.matchMedia?.('(max-width: 959px)').matches) return;
     if (this.state.phase === 'menu' && !this.cameraSetupVisible) {
       if (this.ui?.hudCameraVideo) {
         this.ui.hudCameraVideo.pause();
@@ -351,7 +471,7 @@ class EnergyCatchScene extends Phaser.Scene {
       this.beginRun();
       this.updateInputModeUi();
     }
-    else if (this.state.phase === 'results') this.beginRestart();
+    else if (this.state.phase === 'results') this.handleRestartRequested();
   };
 
   private handleCameraSetupRequested = (): void => {
@@ -475,7 +595,7 @@ class EnergyCatchScene extends Phaser.Scene {
     const adapter = this.cameraAdapter;
     const session = this.cameraSessionId;
     const actionVersion = this.cameraActionVersion;
-    if (!adapter) return;
+    if (!adapter || !this.cameraSetupVisible || this.campaign.phase !== 'menu') return;
     if (!adapter.canStart() && (adapter instanceof MediaPipeHandInputAdapter || adapter instanceof MediaPipePoseInputAdapter)) {
       if (this.ui) this.ui.cameraStatus.textContent = 'Waiting for a fresh calibrated sample before starting…';
       const ready = await adapter.requestStartReadiness();
@@ -485,7 +605,7 @@ class EnergyCatchScene extends Phaser.Scene {
         return;
       }
     }
-    if (!adapter.canStart()) return;
+    if (!adapter.canStart() || !this.cameraSetupVisible || this.campaign.phase !== 'menu') return;
     this.cameraMode = true;
     this.inputAdapter = this.cameraAdapter;
     this.cameraSetupVisible = false;
@@ -538,19 +658,21 @@ class EnergyCatchScene extends Phaser.Scene {
   private setSoloMode(solo: boolean): void {
     if (this.isSoloMode !== solo) ++this.cameraActionVersion;
     this.isSoloMode = solo;
+    if (this.campaign.phase === 'menu') this.campaign = createCampaign(solo ? 'solo' : 'co-op');
     this.ui?.modeSoloButton?.classList.toggle('active', solo);
     this.ui?.modeCoopButton?.classList.toggle('active', !solo);
     this.ui?.cameraModeSoloButton?.classList.toggle('active', solo);
     this.ui?.cameraModeCoopButton?.classList.toggle('active', !solo);
     if (this.ui?.menuSubtitle) {
       this.ui.menuSubtitle.innerHTML = solo
-        ? 'Single player <span aria-hidden="true">·</span> 60 seconds'
-        : 'Two-player co-op <span aria-hidden="true">·</span> 60 seconds';
+        ? 'Solo mission · 3 rounds · 60 seconds each'
+        : 'Co-op mission · 3 rounds · 60 seconds each';
     }
     document.querySelector('.player-card-p2')?.classList.toggle('solo-inactive', solo);
     this.updateInstructionsForScheme();
     this.cameraAdapter?.setSoloMode(solo);
     this.rigs.p2?.root.setVisible(!solo);
+    (this.children?.getByName('p2-stage-label') as Phaser.GameObjects.Text | undefined)?.setVisible(!solo);
     this.updateHud();
     this.setCameraHandsStatus(solo ? 'P1: waiting' : 'P1: waiting · P2: waiting');
   }
@@ -638,7 +760,10 @@ class EnergyCatchScene extends Phaser.Scene {
   private updateControlsHintText(): void {
     if (!this.ui) return;
     if (!this.cameraMode) {
-      this.ui.controlsHint.textContent = 'HOLD S / ↓ TO CATCH';
+      const action=getCampaignRound(this.campaign).id==='energy-catch'?'CATCH':'ACTIVATE';
+      this.ui.controlsHint.textContent=this.isSoloMode
+        ? 'A / D MOVE · HOLD S TO '+action
+        : 'P1 A / D MOVE · HOLD S TO '+action+' · P2 ← / → MOVE · HOLD ↓ TO '+action;
       return;
     }
     if (this.cameraAdapter?.getMetrics().recalibrationRequired) {
@@ -652,6 +777,7 @@ class EnergyCatchScene extends Phaser.Scene {
     } else {
       this.ui.controlsHint.textContent = 'LEAN LEFT/RIGHT · RAISE ONE ARM TO CATCH';
     }
+    if (getCampaignRound(this.campaign).id !== 'energy-catch') this.ui.controlsHint.textContent = this.ui.controlsHint.textContent!.replace('TO CATCH','TO ACTIVATE');
   }
 
   private updateCameraStatus(status: CameraInputStatus, message?: string): void {
@@ -927,6 +1053,7 @@ class EnergyCatchScene extends Phaser.Scene {
   }
 
   private updateInputModeUi(): void {
+    this.updatePlayfieldLabel();
     if (!this.ui) return;
     const isPlaying = this.state.phase === 'playing';
     this.updateControlsHintText();
@@ -935,27 +1062,52 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui.hudCameraDock.hidden = !this.cameraMode || !isPlaying;
   }
 
+  private handleMissionMenuRequested = (): void => {
+    if (this.campaign.phase !== 'complete') return;
+    this.audio?.mute();
+    this.handleCameraStopRequested();
+    this.campaign=createCampaign(this.isSoloMode?'solo':'co-op');
+    this.state=createGameState();this.challenge=null;this.releaseSeen={p1:false,p2:false};
+    this.lastInput={p1:{moveAxis:0,catch:false},p2:{moveAxis:0,catch:false}};
+    this.resetPositions();this.clearItems();this.challengeRenderer?.render(null,this.isSoloMode);
+    this.clearActionFeedback();
+    this.showPhase('menu');this.ui?.startButton.focus({preventScroll:true});
+  };
+
   private handleRestartRequested = (): void => {
-    if (this.state.phase === 'results') this.beginRestart();
+    if (this.campaign.phase === 'round-results') {
+      this.campaign = continueCampaign(this.campaign);
+      this.prepareIntro();
+    } else if (this.campaign.phase === 'complete') {
+      this.campaign = startCampaign(this.campaign);
+      this.prepareIntro();
+    }
   };
 
   private beginRun(): void {
-    this.state = startGame(this.state);
+    this.campaign = startCampaign(createCampaign(this.isSoloMode ? 'solo' : 'co-op'));
+    this.prepareIntro();
+  }
+
+  private prepareIntro(): void {
+    this.state = createGameState();
+    this.challenge = createChallenge(getCampaignRound(this.campaign).id, this.campaign.mode);
+    this.releaseSeen = {p1:false,p2:false};
+    this.clearActionFeedback();
     this.resetPositions();
     this.clearItems();
     this.spawnPlayer = 'p1';
     this.spawnAfterMs = 250;
+    this.challengeRenderer?.render(this.challenge, this.isSoloMode);
     this.showPhase(this.state.phase);
   }
 
-  private beginRestart(): void {
-    this.state = requestRestart(this.state);
-    this.resetPositions();
-    this.clearItems();
-    this.spawnPlayer = 'p1';
-    this.spawnAfterMs = 450;
+  private handleBeginRoundRequested = (): void => {
+    if (this.campaign.phase !== 'intro' || this.state.phase === 'restart') return;
+    this.releaseSeen = {p1:false,p2:false};
+    this.state = requestRestart({...createGameState(),phase:'results'});
     this.showPhase(this.state.phase);
-  }
+  };
 
   private movePlayers(deltaMs: number): void {
     const activePlayers = this.isSoloMode ? (['p1'] as const) : (['p1', 'p2'] as const);
@@ -1000,6 +1152,7 @@ class EnergyCatchScene extends Phaser.Scene {
         const playerState = this.state.players[item.player];
         const scoreDelta = playerState.score - previousScore;
         this.announceCatch(item.player, item.kind, scoreDelta, playerState.score, playerState.combo);
+        this.presentFeedback([presentCatch(item.player, item.kind, scoreDelta)], false);
         this.showCatchFeedback(item.player, item.y, scoreDelta, item.kind);
         this.rigs[item.player].play('catch');
         this.removeItem(i);
@@ -1184,6 +1337,11 @@ class EnergyCatchScene extends Phaser.Scene {
       readyTitle: get('ready-title'),
       resultsTitle: get('results-title'),
       gameAnnouncer: get('game-announcer'),
+      actionFeedback: get('action-feedback'),
+      actionFeedbackP1: get('action-feedback-p1'),
+      actionFeedbackP2: get('action-feedback-p2'),
+      soundButton: get<HTMLButtonElement>('sound-toggle'),
+      menuButton: get<HTMLButtonElement>('mission-menu'),
       modeSoloButton: (document.getElementById('mode-solo') as HTMLButtonElement) || undefined,
       modeCoopButton: (document.getElementById('mode-coop') as HTMLButtonElement) || undefined,
       cameraModeSoloButton: (document.getElementById('camera-mode-solo') as HTMLButtonElement) || undefined,
@@ -1207,16 +1365,20 @@ class EnergyCatchScene extends Phaser.Scene {
 
   private updateHud(): void {
     if (!this.ui) return;
-    const p1 = this.state.players.p1;
-    const p2 = this.state.players.p2;
+    const final = this.campaign.phase === 'complete';
+    const totals = campaignTotals(this.campaign);
+    const p1 = final ? {score:totals.p1,combo:0,bestCombo:Math.max(...this.campaign.results.map(r=>r.players.p1.bestCombo))} : this.state.players.p1;
+    const p2 = final ? {score:totals.p2,combo:0,bestCombo:Math.max(...this.campaign.results.map(r=>r.players.p2.bestCombo))} : this.state.players.p2;
     const time = String(Math.ceil(this.state.timeRemainingMs / 1000)).padStart(2, '0');
 
     if (this.isSoloMode) {
       this.ui.p2Score.parentElement?.classList.add('solo-inactive');
       this.ui.resultP2Score.parentElement?.classList.add('solo-inactive');
+      this.ui.p2Score.closest<HTMLElement>('.hud-player')!.hidden = true;
     } else {
       this.ui.p2Score.parentElement?.classList.remove('solo-inactive');
       this.ui.resultP2Score.parentElement?.classList.remove('solo-inactive');
+      this.ui.p2Score.closest<HTMLElement>('.hud-player')!.hidden = false;
     }
 
     const values: Array<[HTMLElement, string]> = [
@@ -1241,8 +1403,11 @@ class EnergyCatchScene extends Phaser.Scene {
   private showPhase(phase: GameState['phase']): void {
     if (!this.ui) return;
     const showCameraDialog = phase === 'menu' && this.cameraSetupVisible;
-    this.ui.root.dataset.phase = phase;
-    this.ui.menu.hidden = phase !== 'menu' || this.cameraSetupVisible;
+    const soundHost=showCameraDialog?this.ui.cameraSetup:this.ui.root;
+    if(this.ui.soundButton.parentElement!==soundHost)soundHost.appendChild?.(this.ui.soundButton);
+    this.ui.root.dataset.phase = this.campaign.phase;
+    this.campaignUi?.show(this.campaign, this.state.phase === 'restart', this.cameraMode, this.trackingScheme, this.challenge);
+    this.ui.menu.hidden = this.campaign.phase !== 'menu' || this.cameraSetupVisible;
     this.ui.cameraSetup.hidden = phase !== 'menu' || !this.cameraSetupVisible;
     this.ui.ready.hidden = phase !== 'restart';
     this.ui.hud.hidden = phase !== 'playing';
@@ -1255,6 +1420,7 @@ class EnergyCatchScene extends Phaser.Scene {
     else if (phase === 'restart') this.ui.readyTitle.focus({ preventScroll: true });
     else if (phase === 'playing') this.game.canvas.focus({ preventScroll: true });
     else if (phase === 'results') this.ui.resultsTitle.focus({ preventScroll: true });
+    else if (this.campaign.phase === 'intro') document.getElementById('intro-title')?.focus({ preventScroll:true });
     this.cameraSetupWasVisible = showCameraDialog;
   }
 
@@ -1284,12 +1450,12 @@ class EnergyCatchScene extends Phaser.Scene {
     graphics.fillRect(38, FLOOR_Y, 578, 3);
     graphics.fillStyle(0xff70b2, 0.45);
     graphics.fillRect(664, FLOOR_Y, 578, 3);
-    this.add.text(50, 132, 'PLAYER 1  ·  CYAN', {
+    this.add.text(76, 142, 'PLAYER 1  ·  CYAN', {
       fontFamily: 'Segoe UI, system-ui, sans-serif', fontSize: '12px', fontStyle: 'bold', color: '#55DFFF', letterSpacing: 1.5
     });
-    this.add.text(1230, 132, 'PLAYER 2  ·  PINK', {
+    this.add.text(1204, 142, 'PLAYER 2  ·  PINK', {
       fontFamily: 'Segoe UI, system-ui, sans-serif', fontSize: '12px', fontStyle: 'bold', color: '#FF70B2', letterSpacing: 1.5
-    }).setOrigin(1, 0);
+    }).setOrigin(1, 0).setName('p2-stage-label');
   }
 }
 

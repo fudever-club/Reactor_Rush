@@ -1,3 +1,4 @@
+import {beginRoundIntro} from './campaign-helpers.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -20,7 +21,7 @@ try{for(const scheme of ['H0','P1','P2']){
  }`});
  await page.goto(base);await page.waitForFunction(()=>window.__RR_GAME_TEST__?.ready);
  await page.locator('#choose-camera').click();await page.locator({H0:'#scheme-hand',P1:'#scheme-pose-both',P2:'#scheme-pose-one'}[scheme]).click();await page.locator('#camera-consent').check();await page.locator('#enable-camera').click();await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().cameraAdapter?.currentStatus==='ready');
- await page.locator('#calibrate-camera').click();await page.waitForFunction(()=>{const button=document.querySelector('#start-camera-round');if(button.disabled)return false;button.click();return true;});await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
+ await page.locator('#calibrate-camera').click();await page.waitForFunction(()=>{const button=document.querySelector('#start-camera-round');if(button.disabled)return false;button.click();return true;});await beginRoundIntro(page);await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
  const before=await page.evaluate(async()=>({permission:(await navigator.permissions.query({name:'camera'})).state,tracks:window.__RR_FIXTURE__.streams.flatMap(s=>s.getTracks().map(t=>({label:t.label,state:t.readyState})))}));
  assert.equal(before.permission,'granted');assert.ok(before.tracks.every(t=>t.state==='live'));
  const cdp=await context.newCDPSession(page);const {targetInfo}=await cdp.send('Target.getTargetInfo');

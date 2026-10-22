@@ -2,16 +2,16 @@
 
 ## Current implementation
 
-Energy Catch is the default local app at `/`. The previous cutout rig preview remains at `/animation-test.html`. Both pages load the same P1 Cyan and P2 Pink rig definitions and the existing Idle, Move, and Catch animations. Character artwork and animation keyframes are not regenerated or modified.
+Energy Catch is the first round of the [three-round campaign](three-round-campaign.md), the default local app at `/`. The previous cutout rig preview remains at `/animation-test.html`. Both pages load the same P1 Cyan and P2 Pink rig definitions and the existing Idle, Move, and Catch animations. Character artwork and animation keyframes are not regenerated or modified.
 
-The round is a 60-second cooperative session. The playfield is split into one lane per player. Falling cyan energy is worth 100 points; each fifth consecutive energy catch raises the multiplier by 0.5×, capped at 3×. A red hazard caught by the player subtracts 50 points (score cannot go below zero) and clears that player's active combo. Missing an item has no score penalty. Each player's score, active combo, and best combo are tracked separately.
+The round lasts 60 seconds and supports the campaign’s Solo or Co-op mode. The playfield is split into one lane per player. Falling cyan energy is worth 100 points; each fifth consecutive energy catch raises the multiplier by 0.5×, capped at 3×. A red hazard caught by the player subtracts 50 points (score cannot go below zero) and clears that player's active combo. Missing an item has no score penalty. Each player's score, active combo, and best combo are tracked separately.
 
 | Player | Move | Catch |
 |---|---|---|
 | P1 Cyan | A / D | Hold S as an item reaches the robot |
 | P2 Pink | ← / → | Hold ↓ as an item reaches the robot |
 
-Enter starts from the menu. At the end of the round, R or Enter resets both scorecards and starts a new round after a short ready beat.
+The campaign menu opens a round intro. Start Round / Enter starts its 900 ms ready beat. At the end of Energy Catch, Next Round / Enter opens the Duo Circuit intro; its scores have already been snapshotted for final totals. Replay is offered after the third round and clears the complete campaign. See [campaign authority](three-round-campaign.md) for session rules.
 
 Webcam motion input is an optional beta path. Keyboard remains the default and fallback. See [Camera Input Integration](camera-input-integration.md) for opt-in, calibration, mapping, runtime assets, privacy details, and current verification limits. Scoring, catch windows, timer, and restart rules remain unchanged.
 
@@ -19,7 +19,7 @@ Webcam motion input is an optional beta path. Keyboard remains the default and f
 
 - `src/gameplay/core.ts` contains Phaser independent types and deterministic scoring, timer, phase, restart, and keyboard mapping logic.
 - `src/adapters/keyboard-input-adapter.ts` tracks window `keydown`/`keyup` state and translates it to the `InputAdapter` frame contract. It clears held keys when the window loses focus and removes its listeners when the scene shuts down. A future MediaPipe adapter can implement the same contract without changing scoring or scene rules.
-- `src/main.ts` owns the 1280 × 720 Phaser scene, two existing `CutoutRig` instances, item spawning, catch windows, HUD, and phase overlays.
+- `src/main.ts` owns the 1280 × 720 Phaser scene, input lifecycle and unchanged Energy Catch simulation; `campaign.ts`, `challenges.ts`, `campaign-ui.ts` and `challenge-renderer.ts` separate campaign state, new mechanics, screens and arena rendering.
 - `src/animation-test.ts` preserves the existing animation production preview.
 - Energy and hazard items are drawn from basic Phaser shapes; no gameplay dependency or particle system is added.
 

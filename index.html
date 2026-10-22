@@ -2,21 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="data:," />
+    <link rel="icon" href="./assets/brand/reactor-rush-symbol.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#10142C" />
-    <meta name="description" content="A keyboard-first two-player cooperative energy-catching arcade game." />
-    <title>Reactor Rush — Energy Catch</title>
+    <meta name="description" content="Three arcade experiments. Catch energy, connect circuits and cool the core with keyboard or optional webcam controls." />
+    <title>Reactor Rush — Three-Round Mission</title>
   </head>
   <body>
     <main class="shell">
-      <section class="game-frame" aria-label="Energy Catch game">
+      <section class="game-frame" aria-label="Reactor Rush three-round arcade game">
         <div id="game-container">
           <div id="runtime-ui" aria-label="Game interface">
+            <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="false" aria-label="Toggle game sound">SOUND OFF</button>
             <section id="menu-screen" class="ui-screen menu-screen" aria-labelledby="menu-title">
               <header class="menu-title">
-                <p class="menu-eyebrow"><span class="status-dot" aria-hidden="true"></span> REACTOR RUSH</p>
-                <h1 id="menu-title">Energy Catch</h1>
+                <div class="brand-lockup"><img class="brand-symbol" src="./assets/brand/reactor-rush-symbol.svg" alt="" /><div><h1 id="menu-title">REACTOR <span>RUSH</span></h1><p class="brand-promise">Power the lab. One mission, three experiments.</p></div></div>
+
                 <p id="menu-subtitle" class="menu-subtitle">Single player <span aria-hidden="true">·</span> 60 seconds</p>
                 <div class="mode-select-row" role="group" aria-label="Game Mode">
                   <button id="mode-solo" class="mode-btn active" type="button">1 PLAYER (SOLO)</button>
@@ -24,6 +25,7 @@
                 </div>
               </header>
 
+              <ol class="campaign-route" aria-label="Three-round campaign route"><li><img src="./assets/ui/round-energy.svg" alt="" /><b>01</b><span>Energy Catch<small>Collect the power</small></span></li><li><img src="./assets/ui/round-circuit.svg" alt="" /><b>02</b><span>Duo Circuit<small>Connect the lab</small></span></li><li><img src="./assets/ui/round-cooling.svg" alt="" /><b>03</b><span>Cool the Core<small>Keep it stable</small></span></li></ol>
               <div class="player-cards">
                 <article class="player-card player-card-p1" aria-label="Player 1 Cyan controls">
                   <div class="player-card-heading">
@@ -35,7 +37,7 @@
                   </div>
                   <div class="control-lines">
                     <p class="control-line"><span class="key-group"><kbd>A</kbd><b>/</b><kbd>D</kbd></span><span>Move</span></p>
-                    <p class="control-line"><span class="key-group"><span class="hold-label">HOLD</span><kbd>S</kbd></span><span>Catch</span></p>
+                    <p class="control-line"><span class="key-group"><span class="hold-label">HOLD</span><kbd>S</kbd></span><span>Catch / Activate</span></p>
                   </div>
                 </article>
 
@@ -49,17 +51,22 @@
                   </div>
                   <div class="control-lines">
                     <p class="control-line"><span class="key-group"><kbd>←</kbd><b>/</b><kbd>→</kbd></span><span>Move</span></p>
-                    <p class="control-line"><span class="key-group"><span class="hold-label">HOLD</span><kbd>↓</kbd></span><span>Catch</span></p>
+                    <p class="control-line"><span class="key-group"><span class="hold-label">HOLD</span><kbd>↓</kbd></span><span>Catch / Activate</span></p>
                   </div>
                 </article>
               </div>
 
               <div class="menu-action">
-                <button id="start-round" class="game-action" type="button">PRESS ENTER TO START</button>
+                <button id="start-round" class="game-action" type="button">START MISSION · ENTER</button>
             <button id="choose-camera" class="game-action secondary-action" type="button">SET UP WEBCAM CONTROLS</button>
-                <p>Catch cyan energy <span aria-hidden="true">·</span> Avoid red hazards</p>
+                <p>Three rounds. One shared mission.</p>
               </div>
+              <div class="club-credit"><img src="./assets/brand/fu-dever-dark.png" alt="FU-DEVER" /><span>A <strong>FU-DEVER</strong><br />PROJECT</span></div>
             </section>
+            <aside id="menu-window-guard" class="menu-window-guard" role="status" aria-live="polite">
+              <h2>Widen your game window</h2>
+              <p>Use a landscape window at least 960 px wide to start the mission.</p>
+            </aside>
 
         <section id="camera-setup-screen" class="ui-screen camera-setup-screen" role="dialog" aria-modal="true" aria-labelledby="camera-title" aria-describedby="camera-instructions" tabindex="-1" hidden>
           <div class="camera-setup-card">
@@ -113,15 +120,24 @@
           </div>
         </section>
 
+            <section id="round-intro" class="ui-screen round-intro" aria-labelledby="intro-title" hidden>
+              <div class="intro-layout"><div class="intro-visual"><div id="intro-art" class="intro-art" aria-hidden="true"></div><div class="intro-number" id="intro-number" aria-hidden="true">01</div></div><div class="intro-copy">
+                <p id="intro-mode">SOLO · ROUND 1 OF 3 · 60 SECONDS</p><h2 id="intro-title" tabindex="-1">Energy Catch</h2><p id="intro-objective"></p>
+                <ol id="intro-steps"></ol><p id="intro-controls"></p>
+                <button id="begin-campaign-round" class="game-action" type="button">START ROUND · ENTER</button>
+                <button id="stop-camera-intro" class="camera-back-action" type="button" hidden>STOP CAMERA &amp; USE KEYBOARD</button>
+              </div></div>
+            </section>
             <section id="ready-screen" class="ui-screen transition-screen" aria-labelledby="ready-title" hidden>
               <div class="transition-card ready-card">
                 <p class="transition-kicker">NEW ROUND</p>
                 <h2 id="ready-title" tabindex="-1">GET READY</h2>
-                <p>New round <span aria-hidden="true">·</span> scores and combos reset</p>
+                <p>Release activation. Your round begins in a moment.</p>
               </div>
             </section>
 
             <section id="active-hud" class="active-hud" aria-label="Round status" hidden>
+              <div id="energy-landmark" class="energy-landmark" aria-hidden="true"><img src="./assets/ui/round-energy.svg" alt="" /><span>ENERGY CHAMBER</span></div>
               <article class="hud-player hud-player-p1">
                 <div class="hud-player-heading"><span class="hud-mark" aria-hidden="true">01</span><span>P1 CYAN</span></div>
                 <strong id="hud-p1-score" class="hud-score">0</strong>
@@ -129,7 +145,7 @@
               </article>
 
               <div class="hud-clock" aria-live="off">
-                <span class="hud-clock-label">TIME</span>
+                <span class="hud-clock-label" id="hud-round-label">1/3 · ENERGY CATCH</span>
                 <strong id="hud-timer" class="hud-timer">60</strong>
                 <span class="hud-clock-unit">SECONDS</span>
               </div>
@@ -140,7 +156,7 @@
                 <span id="hud-p2-combo" class="hud-combo">COMBO 0 <b>·</b> BEST 0</span>
               </article>
 
-          <div class="play-hint"><span class="hint-orb" aria-hidden="true"></span> ENERGY <b>+100</b><span class="hint-divider" aria-hidden="true"></span><span class="hint-hazard" aria-hidden="true">!</span> HAZARD <b>−50</b><span class="hint-divider" aria-hidden="true"></span> EVERY 5 ENERGY <b>+0.5×</b> <span>MAX 3×</span><span class="hint-divider" aria-hidden="true"></span><span id="hud-controls-hint">HOLD S / ↓ TO CATCH</span></div>
+          <div id="action-feedback" class="action-feedback" aria-live="off"><span id="action-feedback-p1"></span><span id="action-feedback-p2" hidden></span></div><div class="play-hint"><span id="energy-rules"><span class="hint-orb" aria-hidden="true"></span> ENERGY <b>+100</b><span class="hint-divider" aria-hidden="true"></span><span class="hint-hazard" aria-hidden="true">!</span> HAZARD <b>−50</b><span class="hint-divider" aria-hidden="true"></span> EVERY 5 ENERGY <b>+0.5×</b> <span>MAX 3×</span><span class="hint-divider" aria-hidden="true"></span></span><span id="task-status" hidden></span><span id="hud-controls-hint">HOLD S / ↓ TO CATCH</span></div>
           <div id="hud-camera-dock" class="hud-camera-dock" hidden>
             <div class="hud-camera-preview-frame">
               <video id="hud-camera-preview" muted playsinline aria-label="Mirrored in-game webcam preview"></video>
@@ -158,9 +174,11 @@
 
             <section id="results-screen" class="ui-screen results-screen" aria-labelledby="results-title" aria-live="polite" hidden>
               <div class="results-card">
-                <p class="results-eyebrow">ENERGY CATCH <span aria-hidden="true">/</span> ROUND SUMMARY</p>
-                <h2 id="results-title" tabindex="-1">ROUND COMPLETE</h2>
-                <p class="results-subtitle">CO-OP SCORECARD</p>
+                <img id="buggy-celebration" class="buggy-celebration" src="./assets/mascot/buggy-celebrate.png" alt="Buggy celebrating the completed mission" hidden />
+                <img id="final-club-logo" class="final-club-logo" src="./assets/brand/fu-dever-dark.png" alt="FU-DEVER" hidden />
+                <p class="results-eyebrow"><span id="results-round-name">Energy Catch</span></p>
+                <div class="results-heading"><img class="completion-symbol" src="./assets/brand/reactor-rush-symbol.svg" alt="" /><h2 id="results-title" tabindex="-1">ROUND COMPLETE</h2></div>
+                <p id="results-mode" class="results-subtitle">SOLO SCORECARD</p>
 
                 <div class="results-players">
                   <article class="result-player result-player-p1">
@@ -175,8 +193,11 @@
                   </article>
                 </div>
 
+                <table id="campaign-breakdown" class="campaign-breakdown" hidden><thead><tr><th scope="col">ROUND</th><th scope="col">P1 CYAN</th><th id="breakdown-p2" scope="col">P2 PINK</th><th scope="col">TEAM</th></tr></thead><tbody id="campaign-rows"></tbody></table>
+                <p id="final-best-combo" hidden></p><p id="result-feedback"></p>
                 <p class="team-total-label">TEAM TOTAL <strong id="result-team-total">0</strong></p>
                 <button id="restart-round" class="game-action replay-action" type="button">PLAY AGAIN <span>R / ENTER</span></button>
+                <button id="mission-menu" class="camera-back-action mission-menu-action" type="button" hidden>MISSION MENU</button>
                 <button id="stop-camera-results" class="camera-back-action result-camera-stop" type="button" hidden>STOP CAMERA &amp; RETURN TO KEYBOARD</button>
               </div>
             </section>

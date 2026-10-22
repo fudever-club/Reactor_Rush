@@ -1,3 +1,4 @@
+import {beginRoundIntro} from './campaign-helpers.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -35,7 +36,7 @@ try{
   }else{
    await page.locator('#calibrate-camera').click();
    await page.waitForFunction(()=>{const b=document.querySelector('#start-camera-round');if(b.disabled)return false;b.click();return true;});
-   await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
+   await beginRoundIntro(page);await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
    await page.evaluate(action=>{
     const f=window.__RR_FIXTURE__;
     if(action==='disconnect'){const track=f.streams.at(-1).getVideoTracks()[0];track.stop();track.dispatchEvent(new Event('ended'));}
@@ -48,7 +49,7 @@ try{
   }
   assert.deepEqual(errors,[]);results.push({id,status:'PASS'});console.log(id,'PASS');await page.close();active=undefined;
  }
- id='keyboard-focus-loss';const page=active=await browser.newPage();await page.goto(base);await page.waitForFunction(()=>window.__RR_GAME_TEST__?.ready);await page.locator('#start-round').click();
+ id='keyboard-focus-loss';const page=active=await browser.newPage();await page.goto(base);await page.waitForFunction(()=>window.__RR_GAME_TEST__?.ready);await page.locator('#start-round').click();await beginRoundIntro(page);
  await page.keyboard.down('s');await page.keyboard.down('a');await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().input.p1.catch);
  await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await page.waitForFunction(()=>!window.__RR_GAME_TEST__.getState().input.p1.catch&&window.__RR_GAME_TEST__.getState().input.p1.moveAxis===0);
  await page.keyboard.up('s');await page.keyboard.up('a');results.push({id,status:'PASS'});await page.close();active=undefined;

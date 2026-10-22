@@ -1,3 +1,4 @@
+import {beginRoundIntro} from './campaign-helpers.mjs';
 import { launchBrowser } from './launch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -48,7 +49,7 @@ async function startCamera(page,scheme,coop){
   await page.locator(schemeSelector[scheme]).click();await page.locator('#camera-consent').check();await page.locator('#enable-camera').click();
   await page.waitForFunction(()=>!document.querySelector('#calibrate-camera').disabled);await page.locator('#calibrate-camera').click();
   await page.waitForFunction(()=>!document.querySelector('#start-camera-round').disabled);await page.locator('#start-camera-round').click();
-  await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
+  await beginRoundIntro(page);await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
 }
 try{
   for(const [width,height] of [[1280,720],[1920,1080]]){
@@ -86,7 +87,7 @@ try{
     }
   }
   for(const scheme of ['H0','P1','P2']){const {page,errors}=await open(1280,720);await startCamera(page,scheme,false);assert.equal(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().cameraMode),true);await page.locator('#stop-camera').click();assert.deepEqual(errors,[]);results.push({id:scheme+'-solo',status:'PASS'});await page.close();}
-  const {page,errors}=await open(1280,720);await page.locator('#choose-camera').click();await page.evaluate(()=>{window.__RR_FIXTURE__.scenario='denied';});await page.locator('#camera-consent').check();await page.locator('#enable-camera').click();await page.waitForFunction(()=>document.querySelector('#camera-status').textContent.includes('denied'));await page.locator('#camera-to-keyboard').click();await page.locator('#start-round').click();assert.deepEqual(errors,[]);results.push({id:'permission-denied-keyboard',status:'PASS'});await page.close();
+  const {page,errors}=await open(1280,720);await page.locator('#choose-camera').click();await page.evaluate(()=>{window.__RR_FIXTURE__.scenario='denied';});await page.locator('#camera-consent').check();await page.locator('#enable-camera').click();await page.waitForFunction(()=>document.querySelector('#camera-status').textContent.includes('denied'));await page.locator('#camera-to-keyboard').click();await page.locator('#start-round').click();await beginRoundIntro(page);assert.deepEqual(errors,[]);results.push({id:'permission-denied-keyboard',status:'PASS'});await page.close();
 } catch(error){results.push({id:caseId,status:'FAIL',message:error.stack,state:await active?.evaluate(()=>({phase:window.__RR_GAME_TEST__?.getState().phase,metrics:window.__RR_GAME_TEST__?.getState().cameraAdapter?.getMetrics(),status:document.querySelector('#camera-status')?.textContent,cue:document.querySelector('#hud-camera-cue')?.textContent})).catch(()=>null)});throw error;}
 finally{await fs.writeFile(path.join(output,'browser-results.json'),JSON.stringify({browser:browser.version(),results},null,2));await browser.close();}
 console.log(JSON.stringify(results.map(({id,status})=>({id,status})),null,2));

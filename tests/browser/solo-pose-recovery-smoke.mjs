@@ -1,3 +1,4 @@
+import {beginRoundIntro} from './campaign-helpers.mjs';
 /** Actual production page/UI/input with synthetic video, fake bitmap/worker.
  * No physical camera/model acceptance. Same CLI as other browser checks.
  */
@@ -26,7 +27,7 @@ try{
   await page.waitForTimeout(1400);assert.equal(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().phase),'menu','no automatic initial START');
   assert.equal(await page.locator('#start-camera-round').isEnabled(),false,'initial calibration remains manual');
   await page.locator('#calibrate-camera').click();await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().cameraAdapter.canStart());
-  await page.locator('#start-camera-round').click();await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
+  await page.locator('#start-camera-round').click();await beginRoundIntro(page);await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().phase==='playing');
   await page.evaluate(()=>{window.__POSE_RECOVERY__.raised=true;});await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().input.p1.catch);
   await page.evaluate(()=>{window.__POSE_RECOVERY__.visible=false;});await page.waitForFunction(()=>window.__RR_GAME_TEST__.getState().cameraAdapter.getMetrics().recalibrationRequired);
   assert.equal(await page.evaluate(()=>window.__RR_GAME_TEST__.getState().input.p1.catch),false);

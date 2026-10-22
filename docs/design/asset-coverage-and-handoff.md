@@ -1,6 +1,7 @@
 # Asset Coverage and Handoff
 
-**Status:** Documentation inventory based on the local manifest and production reports; no assets are changed by WP-01.  
+**Status:** Current presentation assets added 22 October 2026; the retained WP-01 inventory below is historical.
+
 **Inventory authority:** [`assets_manifest.json`](../../assets_manifest.json).  
 **Runtime handoff:** [`Phaser animation integration`](../art/phaser-animation-integration.md) and [`animation production report`](../art/animation-production-report.md).
 
@@ -12,7 +13,20 @@
 - **Runtime-integrated:** a local runtime path uses the asset, with evidence recorded in the integration report. This remains a separate status from final art approval.
 - **Planned / missing:** not present as a verified production export; a plan is not evidence of delivery.
 
-## Current asset coverage
+## Current additions — 22 October 2026
+
+The manifest now has **64 records** (3 Draft, 61 In review). The original 58 records are unchanged; root and public manifests remain synchronized. New local presentation files are:
+
+| Family | Source / runtime export | Status and evidence |
+|---|---|---|
+| Reactor Rush game symbol | assets/brand/reactor-rush-symbol.svg | Original editable vector, also used as game favicon; distinct from the club logo. |
+| Round apparatus diagrams | assets/ui/round-energy.svg; round-circuit.svg; round-cooling.svg | Original editable SVGs representing actual collect/connect/cool tasks; 3,453 bytes together with the symbol. |
+| Official FU-DEVER dark-context logo | assets/brand/source/fu-dever-dark-original.png → assets/brand/fu-dever-dark.png | User-supplied source retained byte-for-byte; transparent-only trim, proportional fit and padding; original shape/colors preserved. |
+| Buggy celebration | assets/mascot/source/buggy-celebrate-original.png → assets/mascot/buggy-celebrate.png | User-supplied sticker 9; final campaign-complete screen only; original white outline preserved. |
+
+All six exports are In review. Actual dimensions, source/export hashes and measured bytes belong in the manifest and [upgrade report](../reports/arcade-upgrade-2026-10-22.md). The two runtime PNGs total 267,640 bytes; originals are source masters and are not imported into the live asset graph. No rig, silhouette or animation was changed. Automated metadata/alpha checks, visual inspection and runtime evidence remain separate from human final-art acceptance.
+
+## Historical WP-01 asset coverage
 
 The manifest has **58 asset records**: 3 marked `Draft` and 55 marked `In review`. At the WP-01 baseline, all 58 manifest export paths resolved to local files. This inventory records that evidence; it does not re-run image, runtime, or visual QA.
 
@@ -34,7 +48,7 @@ The `assets_manifest.json` record is the per-file authority for IDs, exact dimen
 - **Environment:** no dedicated production lab-background or environment-prop export is verified in the manifest. Existing in-game treatment remains the current implementation state.
 - **Gameplay items:** energy and hazard shapes are functional Phaser placeholders, not final art exports.
 - **Win and Confused:** static reference poses exist, but no runtime animation is recorded as produced.
-- **Later rounds:** Duo Circuit and Cool the Core remain conditional visual proposals; Final Boss remains a future placeholder. No production maps or approved gameplay specifications exist.
+- **Later rounds at WP-01:** Duo Circuit and Cool the Core were conditional proposals. The 21 October [campaign specification](../gameplay/three-round-campaign.md) now defines and implements them; Final Boss remains a future placeholder. Historical concept status is not current availability.
 - **Readability and performance:** TV contrast/legibility and target-laptop performance remain unverified. The animation report notes that its automated-browser FPS samples are not a target-device benchmark.
 - **Ownership/licensing:** manifest entries ask the team to confirm individual ownership/release terms before public distribution; WP-01 does not adjudicate rights.
 
@@ -58,4 +72,4 @@ For a future approved asset batch, return:
 - Screen-scale visual review and any unverified target hardware/readability claims.
 - Automated checks, self-review, and any distinct independent evaluation as separate evidence classes.
 
-No such asset batch is authorized by this document. WP-01 changes documentation only.
+The historical WP-01 document authorized documentation only. The user separately authorized the 22 October local asset upgrade and supplied the official sources; its scope/evidence are recorded above and in the upgrade specification/report.

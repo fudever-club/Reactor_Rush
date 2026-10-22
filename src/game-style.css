@@ -344,3 +344,140 @@ kbd { display: inline-grid; min-width: 2em; height: 2em; padding: 0 .4em; place-
 .camera-actions .pose-calibration-action:not(:disabled) { background: #173d50; border-color: #55dfff; color: #e0faff; }
 .camera-actions .pose-calibration-action:focus-visible { outline: 3px solid #f6d55c; outline-offset: 3px; }
 .camera-actions .pose-calibration-action[aria-busy="true"] { border-color: #f6d55c; color: #fff1af; }
+
+/* Three-round mission: extend Direction A with quiet, legible campaign surfaces. */
+[hidden], .solo-inactive { display:none !important; }
+::selection { background:#55dfff; color:#10142c; }
+button:focus-visible, input:focus-visible { outline:3px solid #f6d55c; outline-offset:3px; }
+button { touch-action:manipulation; }
+.menu-title { top:5%; }
+.menu-title h1 { letter-spacing:-.03em; font-size:5cqw; }
+.menu-subtitle { font-size:1.5cqw; color:#c0c9e1; }
+.campaign-route { position:absolute; top:27%; left:6%; width:88%; display:flex; list-style:none; padding:0; margin:0; gap:3cqw; text-align:left; }
+.campaign-route li { display:flex; flex:1; gap:1cqw; align-items:center; border-bottom:1px solid #505a7b; padding:1cqw 0; }
+.campaign-route b { color:#55dfff; font-size:2.7cqw; font-variant-numeric:tabular-nums; }
+.campaign-route span { font-size:1.65cqw; font-weight:750; }
+.campaign-route small { display:block; margin-top:.3em; font-size:1.15cqw; font-weight:500; color:#c0c9e1; }
+.player-cards { top:46%; gap:3%; }
+.player-card { min-height:0; padding:1.1cqw 1.6cqw; background:#111831; box-shadow:none; }
+.player-role { display:none; }
+.control-lines { padding-top:.7cqw; }
+.menu-action { top:74%; gap:.55cqw; width:85%; }
+.menu-action .game-action { min-height:2.8em; padding:.65em 2em; }
+.menu-action p { font-size:1.1cqw; }
+.round-intro { padding:6%; background:#10142cf5; }
+.intro-layout { display:grid; grid-template-columns:26% 1fr; gap:5%; align-items:center; height:100%; }
+.intro-number { align-self:start; margin-top:4%; font-size:18cqw; line-height:1; color:#55dfff; font-weight:850; letter-spacing:-.04em; font-variant-numeric:tabular-nums; }
+.intro-copy h2 { margin:.5cqw 0 1.3cqw; font-size:4.6cqw; line-height:1.1; letter-spacing:-.03em; }
+#intro-mode { font-size:1.3cqw; color:#b7c6e7; margin:0; font-weight:700; }
+#intro-objective { font-size:1.8cqw; line-height:1.4; margin:0; max-width:44ch; }
+#intro-steps { margin:1.8cqw 0; padding-left:1.5em; font-size:1.5cqw; line-height:1.8; }
+#intro-steps li::marker { color:#55dfff; font-weight:800; }
+#intro-controls { color:#c0c9e1; font-size:1.25cqw; line-height:1.5; margin:0 0 1.6cqw; max-width:60ch; }
+#stop-camera-intro { display:block; margin-top:.8cqw; pointer-events:auto; }
+.hud-player { top:5%; box-shadow:none; border-width:1px; }
+.hud-player-p1 { left:5%; }.hud-player-p2 { right:5%; }
+.hud-clock { top:5%; }.hud-clock-label { font-size:1cqw; letter-spacing:.05em; color:#c0c9e1; white-space:nowrap; }
+.play-hint { bottom:5%; width:90%; max-width:90%; font-size:.95cqw; padding:.6em; border:0; border-radius:0; }
+#energy-rules { display:contents; }
+#task-status { display:block; flex-basis:100%; color:#f4f3ee; font-size:1.15cqw; letter-spacing:0; }
+#hud-controls-hint { color:#c0c9e1; }
+.hud-camera-dock { top:24%; }
+.results-card { width:84%; padding:2cqw 3cqw; background:#151d35; box-shadow:0 16px 48px #05081788; border:0; }
+.results-card h2 { margin:0 0 .6cqw; font-size:3.1cqw; letter-spacing:-.02em; }
+.results-eyebrow { display:none; }
+.results-subtitle { margin:.7cqw 0 1cqw; color:#c0c9e1; font-size:1.1cqw; }
+.results-players { display:flex; justify-content:center; gap:2cqw; }
+.result-player { flex:1; background:none; border:0; border-bottom:1px solid #505a7b; border-radius:0; padding:.6cqw; }
+.result-score { font-size:3cqw; }.result-combo { font-size:1cqw; }
+.result-player-label { font-size:1.05cqw; }
+.campaign-breakdown { width:100%; margin:1.1cqw 0; border-collapse:collapse; text-align:right; font-size:1.25cqw; font-variant-numeric:tabular-nums; }
+.campaign-breakdown th,.campaign-breakdown td { padding:.65cqw .8cqw; border-bottom:1px solid #39405e; }
+.campaign-breakdown th { color:#c0c9e1; font-size:1cqw; }
+.campaign-breakdown th:first-child,.campaign-breakdown td:first-child { text-align:left; }
+#final-best-combo,#result-feedback { font-size:1.15cqw; color:#c0c9e1; margin:.65cqw 0; }
+.team-total-label { margin:.8cqw 0; }.replay-action { min-height:2.7em; padding:.6em 2em; }
+.result-camera-stop[hidden] { display:none !important; }
+#runtime-ui[data-phase="complete"] .results-card { padding:1.5cqw 3cqw; }
+@media (max-height:600px) { .shell { padding:8px; }.game-frame { width:min(100%,1280px,calc((100svh - 16px)*1.7777778)); } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; animation:none !important; scroll-behavior:auto !important; } }
+
+/* Mission Patch Lab: original game identity, quiet local apparatus diagrams. */
+.brand-lockup { display:flex; align-items:center; justify-content:center; gap:1.4cqw; text-align:left; }
+.brand-symbol { width:7.8cqw; height:7.8cqw; flex:none; }
+.menu-title { top:6%; }
+.menu-title h1 { margin:0; font-size:4.9cqw; line-height:.98; letter-spacing:-.025em; font-weight:900; }
+.menu-title h1 span { color:#55dfff; }
+.brand-promise { margin:.7cqw 0 0; color:#d3ddf2; font-size:1.35cqw; font-weight:500; }
+.menu-subtitle { margin:.9cqw 0 .2cqw; font-size:1.25cqw; }
+.mode-select-row { margin-top:.65cqw; }
+.campaign-route { top:31%; gap:2cqw; }
+.campaign-route li { position:relative; gap:.6cqw; min-width:0; padding:.9cqw 0 1.2cqw; }
+.campaign-route img { width:6.1cqw; height:4.6cqw; object-fit:contain; flex:none; }
+.campaign-route b { font-size:1cqw; color:#c0c9e1; align-self:flex-start; margin-top:.5cqw; }
+.campaign-route span { font-size:1.6cqw; line-height:1.2; }
+.campaign-route small { font-size:1.05cqw; }
+.player-cards { top:49%; }
+.player-card { border-radius:12px; }
+.menu-action { top:76%; }
+.menu-action p { margin:.35cqw 0; }
+.sound-toggle { position:absolute; z-index:8; top:2.1%; right:5.3%; min-height:2.1em; padding:.35em .65em; border:1px solid #66789c; border-radius:5px; background:#10142c; color:#d3ddf2; font:750 .9cqw/1.2 'Segoe UI',system-ui,sans-serif; letter-spacing:.05em; pointer-events:auto; cursor:pointer; }
+.sound-toggle:hover { background:#252b47; color:#fff; }
+.sound-toggle[aria-pressed="true"] { border-color:#66e5ad; color:#b4f6d3; }
+.sound-toggle:disabled { opacity:.7; cursor:default; }
+.intro-layout { grid-template-columns:29% 1fr; gap:5%; }
+.intro-visual { position:relative; align-self:center; }
+.intro-art { width:100%; aspect-ratio:4/3; background:url('../assets/ui/round-energy.svg') center/contain no-repeat; }
+.intro-art[data-round="duo-circuit"] { background-image:url('../assets/ui/round-circuit.svg'); }
+.intro-art[data-round="cool-the-core"] { background-image:url('../assets/ui/round-cooling.svg'); }
+.intro-number { font-size:5cqw; text-align:center; margin:1cqw 0 0; letter-spacing:-.02em; }
+#intro-mode { font-size:1.15cqw; }
+#intro-steps { list-style:none; padding:0; counter-reset:instruction; margin:1.3cqw 0; display:grid; gap:.6cqw; font-size:1.45cqw; line-height:1.45; }
+#intro-steps li { display:flex; align-items:baseline; gap:.8cqw; counter-increment:instruction; }
+#intro-steps li::before { content:counter(instruction); color:#55dfff; border-bottom:2px solid #55dfff; padding:0 .35em .1em; font-weight:800; flex:none; }
+#intro-controls { font-size:1.15cqw; }
+.action-feedback { position:absolute; left:5%; bottom:14%; width:90%; margin:0; color:#b4f6d3; text-align:center; font-size:1.35cqw; font-weight:800; letter-spacing:.015em; text-shadow:0 2px 6px #050817; }
+.action-feedback[data-tone="warning"] { color:#ffb0b8; }
+#task-status { font-size:1.12cqw; line-height:1.45; }
+.results-heading { display:flex; justify-content:center; align-items:center; gap:1cqw; margin:0 0 .5cqw; }
+.results-heading h2 { margin:0; }
+.completion-symbol { width:3.5cqw; height:3.5cqw; }
+.mission-menu-action { display:inline-block; margin-left:1.5cqw; padding:.7em 1em; min-height:2.7em; }
+.result-camera-stop { margin-top:.6cqw; }
+#runtime-ui[data-phase="complete"] .results-card { padding:1.2cqw 3cqw; }
+#runtime-ui[data-phase="complete"] .results-subtitle { margin:.4cqw 0; }
+#runtime-ui[data-phase="complete"] .result-score { font-size:2.5cqw; }
+#runtime-ui[data-phase="complete"] .campaign-breakdown { margin:.65cqw 0; }
+#runtime-ui[data-phase="complete"] .campaign-breakdown th,#runtime-ui[data-phase="complete"] .campaign-breakdown td { padding:.5cqw .8cqw; }
+@container game (max-width:800px) { .sound-toggle { font-size:1.15cqw; }.brand-promise { font-size:1.45cqw; } }
+
+.sound-toggle { top:6%; right:6%; }
+#runtime-ui[data-phase="playing"] .sound-toggle { top:20%; left:50%; right:auto; transform:translateX(-50%); }
+
+.club-credit { position:absolute; left:2%; bottom:2%; display:flex; align-items:center; gap:.7cqw; color:#c0c9e1; font-size:.7cqw; font-weight:700; letter-spacing:.06em; }
+.club-credit img { width:5.3cqw; height:5.3cqw; object-fit:contain; }
+.club-credit span { max-width:9ch; line-height:1.6; }
+.results-card { position:relative; }
+.buggy-celebration { position:absolute; top:1.2cqw; left:1.3cqw; width:8.4cqw; height:8.4cqw; object-fit:contain; pointer-events:none; }
+.final-club-logo { position:absolute; top:1.2cqw; right:1.6cqw; width:5.4cqw; height:5.4cqw; object-fit:contain; }
+
+.energy-landmark { position:absolute; top:29%; right:8%; width:29%; text-align:center; pointer-events:none; }
+.energy-landmark img { display:block; width:100%; height:auto; opacity:.72; }
+.energy-landmark span { color:#c0c9e1; font-size:1.3cqw; font-weight:800; letter-spacing:.05em; }
+
+/* Review batch: pointer access, atomic club spelling and clear per-player event lanes. */
+.mission-menu-action { pointer-events:auto; cursor:pointer; }
+.club-credit span { max-width:none; font-size:.8cqw; white-space:nowrap; line-height:1.5; }
+.club-credit strong { font-weight:800; }
+.action-feedback { top:23%; bottom:auto; display:grid; grid-template-columns:44% 44%; column-gap:12%; font-size:1.08cqw; line-height:1.3; text-shadow:none; }
+.action-feedback span { text-align:center; color:#b4f6d3; min-width:0; }
+.action-feedback span[data-tone="warning"] { color:#ffb0b8; }
+
+/* Guard only the menu below the supported landscape window width. */
+.menu-window-guard { display:none; position:absolute; inset:0; align-items:center; justify-content:center; flex-direction:column; gap:8px; padding:38px 20px 12px; background:#10142cf5; text-align:center; }
+.menu-window-guard h2 { margin:0; font-size:18px; line-height:1.2; color:#f4f3ee; }
+.menu-window-guard p { max-width:400px; margin:0; font-size:13px; line-height:1.45; color:#c0c9e1; }
+@media (max-width:959px) {
+  #menu-screen { display:none; }
+  #menu-screen:not([hidden]) + .menu-window-guard { display:flex; }
+}
