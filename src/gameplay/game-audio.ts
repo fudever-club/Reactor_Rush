@@ -1,3 +1,4 @@
+import { sanitizeVolumes, type Volumes } from './game-settings.ts';
 import type {SoundCue} from './feedback.ts';
 type ContextFactory=()=>AudioContext|undefined;
 export type AudioCue=SoundCue|'select'|'confirm'|'start'|'cameraReady'|'trackingLost'|'trackingRestored';
@@ -14,6 +15,9 @@ export class GameAudio {
  enabled=false;
  available=true;
  private context?:AudioContext;
+ private volumes:Volumes={master:100,music:100,sfx:100};
+ private paused=false;
+ private envelopes=new Map<AudioScheduledSourceNode,GainNode>();
  private voices=new Map<AudioScheduledSourceNode,GainNode>();
  private buffers=new Map<AudioCue,AudioBuffer>();
  private loading=new Map<AudioCue,Promise<void>>();
@@ -52,8 +56,20 @@ export class GameAudio {
   if(ready!==this.tracking){this.tracking=ready;this.present(ready?'trackingRestored':'trackingLost');}
  }
  resetTracking():void{this.tracking=undefined;}
- present(cue:AudioCue):void{
-  const context=this.context;if(!this.enabled||!context||context.currentTime-this.lastAt<.1)return;
+ setVolumes(values:Volumes):void{
+  this.volumes=sanitizeVolumes(values);
+  if(this.media)this.media.volume=(this.desired==='victory'?.28:.18)*this.volumes.master*this.volumes.music/10000;
+  for(const gain of this.voices.values())gain.gain.setValueAtTime(this.volumes.master*this.volumes.sfx/10000,this.context!.currentTime);
+ }
+ setPaused(paused:boolean):void{
+  if(this.paused===paused)return;this.paused=paused;
+  if(paused){for(const voice of [...this.voices.keys()])this.stopVoice(voice);this.media?.pause();}
+  else this.syncMusic(true);
+ }
+ preview(cue:AudioCue='energy'):void{this.playCue(cue,true);}
+ present(cue:AudioCue):void{this.playCue(cue,false);}
+ private playCue(cue:AudioCue,preview:boolean):void{
+  const context=this.context;if(!this.enabled||!context||(!preview&&this.paused)||(!preview&&context.currentTime-this.lastAt<.1))return;
   this.lastAt=context.currentTime;
   try{
    while(this.voices.size>=4)this.stopVoice(this.voices.keys().next().value!);
@@ -61,7 +77,8 @@ export class GameAudio {
    let voice:AudioScheduledSourceNode,duration:number;
    if(buffer){const sample=context.createBufferSource();sample.buffer=buffer;voice=sample;duration=Math.min(.45,buffer.duration);gain.gain.setValueAtTime(.45,context.currentTime);}
    else{const oscillator=context.createOscillator(),tone=tones[cue];oscillator.type=cue==='hazard'||cue==='overload'?'triangle':'sine';oscillator.frequency.setValueAtTime(tone[0],context.currentTime);voice=oscillator;duration=tone[1];gain.gain.setValueAtTime(.0001,context.currentTime);gain.gain.exponentialRampToValueAtTime(.055,context.currentTime+.012);gain.gain.exponentialRampToValueAtTime(.0001,context.currentTime+duration);}
-   voice.connect(gain);gain.connect(context.destination);this.voices.set(voice,gain);
+   const volume=context.createGain();volume.gain.setValueAtTime(this.volumes.master*this.volumes.sfx/10000,context.currentTime);
+   voice.connect(gain);gain.connect(volume);volume.connect(context.destination);this.voices.set(voice,volume);this.envelopes.set(voice,gain);
    voice.onended=()=>this.releaseVoice(voice);
    voice.start();voice.stop(context.currentTime+Math.min(.45,duration));
   }catch{this.mute();this.available=false;this.changed();}
@@ -77,19 +94,19 @@ export class GameAudio {
    this.loading.set(cue,pending);
   }
  }
- private syncMusic():void{
-  if(!this.enabled||!this.assets)return;
+ private syncMusic(resuming=false):void{
+  if(!this.enabled||this.paused||!this.assets)return;
   const track=this.desired,url=track?this.assets.music[track]:undefined;
   if(!track||!url){this.stopMusic();return;}
-  if(this.playing===track)return;
+  if(this.playing===track){if(resuming)void this.media?.play().catch(()=>{});return;}
   this.stopMusic();
   try{
    this.media??=this.assets.createMusic?.()??new Audio();
-   this.media.preload='none';this.media.src=url;this.media.loop=track!=='victory';this.media.volume=track==='victory'?.28:.18;
+   this.media.preload='none';this.media.src=url;this.media.loop=track!=='victory';this.media.volume=(track==='victory'?.28:.18)*this.volumes.master*this.volumes.music/10000;
    this.playing=track;void this.media.play().catch(()=>{/* Music rejection must not disable event feedback. */});
   }catch{this.playing=undefined;}
  }
  private stopMusic():void{if(this.media){this.media.pause();try{this.media.currentTime=0;}catch{/* Not loaded yet. */}}this.playing=undefined;}
- private releaseVoice(voice:AudioScheduledSourceNode):void{const gain=this.voices.get(voice);this.voices.delete(voice);try{voice.disconnect();gain?.disconnect();}catch{/* Already disconnected. */}}
+ private releaseVoice(voice:AudioScheduledSourceNode):void{const gain=this.voices.get(voice);this.voices.delete(voice);try{voice.disconnect();gain?.disconnect();this.envelopes.get(voice)?.disconnect();this.envelopes.delete(voice);}catch{/* Already disconnected. */}}
  private stopVoice(voice:AudioScheduledSourceNode):void{try{voice.stop();}catch{/* Already ended. */}this.releaseVoice(voice);}
 }

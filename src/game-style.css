@@ -481,3 +481,35 @@ button { touch-action:manipulation; }
   #menu-screen { display:none; }
   #menu-screen:not([hidden]) + .menu-window-guard { display:flex; }
 }
+
+/* Session controls remain reachable in every phase and at the narrow-window guard. */
+.session-toolbar { position:absolute; top:3%; right:3%; z-index:12; display:flex; gap:6px; pointer-events:auto; }
+.session-toolbar button,.settings-card button { min-height:32px; border:1px solid #66789c; border-radius:5px; background:#10142c; color:#d3ddf2; font:750 11px/1.3 'Segoe UI',system-ui,sans-serif; padding:7px 10px; cursor:pointer; }
+.session-toolbar .sound-toggle,#runtime-ui[data-phase="playing"] .session-toolbar .sound-toggle { position:static; transform:none; font-size:11px; }
+#runtime-ui[data-phase="playing"] > .session-toolbar { top:22%; right:3%; transform:none; }
+.session-toolbar button:hover,.settings-card button:hover { background:#252b47; color:white; }
+.session-toolbar button:focus-visible,.settings-card :focus-visible { outline:3px solid #55dfff; outline-offset:3px; }
+.fullscreen-status { position:absolute; z-index:13; top:9%; right:3%; max-width:42ch; margin:0; padding:3px; color:#ffd1b2; background:#10142c; font-size:12px; }
+.fullscreen-status:empty { display:none; }
+.settings-dialog { position:fixed; z-index:30; inset:0; display:grid; place-items:center; padding:60px 12px 12px; background:#050817da; pointer-events:auto; }
+.settings-dialog[hidden],.settings-dialog [hidden] { display:none!important; }
+.settings-dialog > .session-toolbar { position:fixed; top:12px; right:12px; transform:none!important; }
+.settings-card { width:min(520px,100%); max-height:calc(100svh - 84px); overflow:auto; padding:24px 28px; border:1px solid #66789c; border-radius:14px; background:#151c36; box-shadow:0 24px 80px #05081788; font-size:14px; }
+.settings-kicker { color:#55dfff; letter-spacing:.15em; font-size:11px; font-weight:800; margin:0 0 6px; }
+.settings-card h2 { margin:0; font-size:28px; }
+#settings-pause-status,.settings-note,#settings-confirm-copy { color:#c0c9e1; line-height:1.5; }
+.volume-controls { display:grid; gap:10px; margin:20px 0; }
+.volume-controls label { display:flex; justify-content:space-between; font-weight:750; }
+.volume-controls output { color:#55dfff; font-variant-numeric:tabular-nums; }
+.volume-controls input { width:100%; margin:0 0 8px; accent-color:#55dfff; cursor:pointer; }
+.settings-row { display:flex; flex-wrap:wrap; gap:10px; }
+.settings-note { font-size:12px; }
+.settings-session { display:flex; flex-wrap:wrap; gap:8px; border-top:1px solid #39405e; padding-top:16px; margin:16px 0; }
+.settings-card button:disabled { opacity:.45; cursor:default; }
+.settings-card .settings-primary { background:#55dfff; border-color:#55dfff; color:#10142c; }
+#settings-close { width:100%; margin-top:4px; }
+.game-frame:fullscreen { width:100vw; height:100svh; max-width:none; aspect-ratio:auto; border:0; border-radius:0; display:grid; place-items:center; background:#050817; }
+.game-frame:fullscreen #game-container { width:min(100vw,calc(100svh * 16 / 9)); height:auto; aspect-ratio:16/9; }
+@media(max-width:600px) { .session-toolbar { top:8px; right:8px; gap:4px; }.session-toolbar button { font-size:10px; padding:5px 7px; }.settings-card { padding:20px; }.settings-dialog { padding-top:54px; }.settings-card { max-height:calc(100svh - 70px); } }
+
+.session-toolbar .fullscreen-status { top:calc(100% + 6px); right:0; width:280px; max-width:calc(100vw - 24px); }

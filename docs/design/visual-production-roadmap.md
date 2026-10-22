@@ -8,6 +8,10 @@
 
 **Work-package boundary:** WP-01 covers documentation, project skills, and this read-only Stitch audit. WP-02 covers visual production in Stitch and requires separate explicit approval before any canvas edit, export, or publish. WP-01 authorizes none of those writes.
 
+## Settings and session controls — 22 October 2026
+
+Implemented locally: Settings, persistent Master/Music/SFX preferences, explicit Sound/Test SFX, frozen ready/play with a 900 ms resume gate, confirmed whole-mission restart/menu, paused Camera Stop, visibility pause and explicit fullscreen with failure feedback. Existing mechanics, Direction A rigs and media are unchanged. Final local automated checks: 271 unit tests, typecheck/build and 15 Settings browser groups; full-timer campaign and synthetic camera evidence are versioned in the [report](../reports/settings-controls-2026-10-22.md). Independent final review and portable handoff are recorded there. Physical webcam/TV/audibility remain NOT RUN for this package. Attract mode/operator automation remains proposed.
+
 ## Current upgrade — 22 October 2026
 
 Mission Patch Lab local implementation adds original Reactor Rush identity/round diagrams, supplied FU-DEVER logo and final-only Buggy, distinct connector/valve apparatus, live coaching and event feedback, optional local audio and final Mission Menu. Gameplay/input/rig contracts remain unchanged. [Design and limits](../superpowers/specs/2026-10-22-arcade-identity-feedback-design.md) · [Execution and acceptance report](../reports/arcade-upgrade-2026-10-22.md). New assets remain In review. No Stitch production/publication or release is implied.
@@ -21,7 +25,7 @@ Mission Patch Lab local implementation adds original Reactor Rush identity/round
 | 3 | Vietnamese/English presentation | Confirm actual visitor language needs; share one copy dictionary and input-aware terminology. |
 | 4 | Cosmetic mission patches or robot accessories | Preserve silhouettes/anchors; provide editable sources/exports and final-scale artist review. |
 | 5 | A shared Co-op task | New rules need a separate spec/candidate and actual balance playtest; current independent boards must not be described as shared mechanics. |
-| 6 | Booth fullscreen/pause/attract/operator reset | Define real browser Escape/rejection, timer resume, freshness and camera teardown behavior; execute on target setup. |
+| 6 | Booth attract mode and operator automation | Settings/pause/fullscreen/reset are locally implemented above; attract mode and target-hardware acceptance remain separate work. |
 
 These opportunities came from three read-only discovery agents. They are hypotheses, not measured gains in fun, engagement, accessibility or physical performance. The official logo/Buggy dependency has been resolved by the user; no API key is needed for the current local wave.
 

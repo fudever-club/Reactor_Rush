@@ -46,3 +46,11 @@ Camera mode/calibration is retained across transitions while valid and opted in;
 Preserve Direction A robots and rig definitions, navy lab, safe margins, text/shape alongside color, system typography and reduced motion. New circuit/cooling worlds are runtime vector presentation, not exported Stitch assets or final approved production art. Scores and instructions are live text.
 
 The older WP-01 Stitch audit was blocked on 17 October 2026. Its 1280×1024 preview versus 1280×720 content-label discrepancy remains historical/unresolved; this task did not edit, export or verify Stitch. The older concepts are not evidence that these new runtime screens were externally approved. Automated keyboard and synthetic-camera verification cannot certify physical three-round tracking or TV legibility.
+
+## Settings and session controls — 22 October 2026
+
+The persistent toolbar provides SETTINGS, FULLSCREEN and SOUND OFF/ON. Settings is also usable in a narrow window while the existing mission-start size guard is displayed. It temporarily replaces the camera setup modal; closing returns focus and restores that screen when appropriate. Native sliders support keyboard arrows, and Tab/Escape remain inside the active modal.
+
+During ready/play: SETTINGS → frozen mission → RESUME → 900 ms gate → live play with fresh release required. Hidden-tab pause follows the same explicit resume flow and mutes sound. Settings contains Master/Music/Sound effects, Test SFX, volume defaults, Stop Camera, Restart Mission and Return to Menu. Unfinished-mission restart/menu actions require one inline confirmation; Cancel retains the paused state. Restart leads to round 1 intro; Menu stops resources and focuses Start Mission. Fullscreen failure is visible in text.
+
+[Approved Settings spec](../superpowers/specs/2026-10-22-settings-controls-design.md) · [Verification report](../reports/settings-controls-2026-10-22.md).

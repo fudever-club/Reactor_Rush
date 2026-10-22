@@ -1,3 +1,4 @@
+import { SettingsUi, type SessionAction } from './gameplay/settings-ui';
 import Phaser from 'phaser';
 import { getPlayfieldLabel, presentChallengeEvents, presentCatch, type FeedbackMessage } from './gameplay/feedback';
 import { GameAudio } from './gameplay/game-audio';
@@ -154,6 +155,18 @@ class EnergyCatchScene extends Phaser.Scene {
   private challenge: ChallengeState | null = null;
   private challengeRenderer?: ChallengeRenderer;
   private audio?: GameAudio;
+  private settingsUi?: SettingsUi;
+  private settingsOpen=false;
+  private simulationPaused=false;
+  private resumeRemainingMs=0;
+  private savedTweenScale=1;
+  private savedClockScale=1;
+  private savedClockPaused=false;
+  private physicalActionHeld:Record<PlayerId,boolean>={p1:false,p2:false};
+  private observeActionKey=(event:KeyboardEvent):void=>{
+    const player=event.code==='KeyS'?'p1':event.code==='ArrowDown'?'p2':undefined;
+    if(player)this.physicalActionHeld[player]=event.type==='keydown';
+  };
   private lastPlayfieldLabel = '';
   private campaignUi?: CampaignUi;
   // Only actual/current release observations can arm a round or the next socket.
@@ -206,6 +219,10 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui.root.addEventListener('click', this.handleUiSound);
     this.ui.menuButton.addEventListener('click', this.handleMissionMenuRequested);
     document.addEventListener('visibilitychange', this.handleVisibilityChanged);
+    this.settingsUi=new SettingsUi({close:this.closeSettings,volume:v=>this.audio?.setVolumes(v),preview:()=>this.audio?.preview('energy'),stopCamera:this.handleCameraStopRequested,action:this.runSettingsAction,unfinished:()=>this.campaign.phase!=='menu'&&this.campaign.phase!=='complete',canRestart:()=>this.campaign.phase!=='menu'||!window.matchMedia?.('(max-width: 959px)').matches});
+    document.getElementById('settings-toggle')!.addEventListener('click',this.openSettings);
+    window.addEventListener('keydown',this.observeActionKey,true);
+    window.addEventListener('keyup',this.observeActionKey,true);
     this.updateSoundUi();
     this.challengeRenderer = new ChallengeRenderer(this);
     this.campaignUi = new CampaignUi(this.handleBeginRoundRequested);
@@ -233,6 +250,8 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui.schemePoseBothButton?.addEventListener('click', () => this.setTrackingScheme('P1'));
     this.ui.schemePoseOneButton?.addEventListener('click', () => this.setTrackingScheme('P2'));
     const onWindowKeyDown = (event: KeyboardEvent) => {
+      if (this.settingsOpen) { this.settingsUi?.handleKey(event); return; }
+      if (this.resumeRemainingMs>0) return;
       if (this.cameraSetupVisible) {
         if (event.code === 'Escape') {
           event.preventDefault();
@@ -302,6 +321,11 @@ class EnergyCatchScene extends Phaser.Scene {
     const harness = {
       ready: true,
       getState: () => ({
+        settingsOpen:this.settingsOpen,
+        paused:this.simulationPaused,
+        resumeRemainingMs:this.resumeRemainingMs,
+        volumes:{...this.settingsUi?.volumes},
+        soundEnabled:this.audio?.enabled,
         phase: this.state.phase,
         campaign: structuredClone(this.campaign),
         totals: campaignTotals(this.campaign),
@@ -324,6 +348,10 @@ class EnergyCatchScene extends Phaser.Scene {
     (window as typeof window & { __RR_GAME_TEST__?: typeof harness }).__RR_GAME_TEST__ = harness;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       window.removeEventListener('keydown', onWindowKeyDown);
+      window.removeEventListener('keydown',this.observeActionKey,true);
+      window.removeEventListener('keyup',this.observeActionKey,true);
+      document.getElementById('settings-toggle')?.removeEventListener('click',this.openSettings);
+      this.settingsUi?.dispose();
       document.removeEventListener('visibilitychange', this.handleVisibilityChanged);
       this.ui?.soundButton.removeEventListener('click', this.handleSoundRequested);
       this.ui?.root.removeEventListener('click', this.handleUiSound);
@@ -355,6 +383,17 @@ class EnergyCatchScene extends Phaser.Scene {
 
   update(_time: number, delta: number): void {
     const frameDeltaMs = Math.max(0, Number.isFinite(delta) ? delta : 0);
+    // Return before input reads and every simulation/timing path. The ready gate uses
+    // scene update deltas, independently of the deliberately frozen Phaser Clock.
+    if(this.settingsOpen)return;
+    if(this.simulationPaused){
+      if(this.resumeRemainingMs>0){
+        this.resumeRemainingMs=Math.max(0,this.resumeRemainingMs-frameDeltaMs);
+        if(this.ui){this.ui.ready.hidden=false;this.ui.readyTitle.textContent='RESUME IN '+Math.max(1,Math.ceil(this.resumeRemainingMs/300));}
+        if(this.resumeRemainingMs===0){this.finishPause();this.showPhase(this.state.phase);}
+      }
+      return; // Discard the whole completion frame, including overflow.
+    }
     const previousInput = this.lastInput;
     const currentInput = this.inputAdapter?.read() ?? previousInput;
     const phaseBeforeFrame = this.state.phase;
@@ -440,12 +479,17 @@ class EnergyCatchScene extends Phaser.Scene {
     this.audio?.present(/^(mode-|camera-mode-|scheme-)/.test(button.id)?'select':'confirm');
   };
   private handleSoundRequested = (): void => { void this.audio?.toggle(); };
-  private handleVisibilityChanged = (): void => { if (document.hidden) this.audio?.mute(); };
+  private handleVisibilityChanged = (): void => {
+    if(!document.hidden)return;
+    this.audio?.mute();
+    if(this.state.phase==='playing'||this.state.phase==='restart'||this.resumeRemainingMs>0)this.openSettings();
+  };
   private updateSoundUi = (): void => {
     if (!this.ui || !this.audio) return;
     this.ui.soundButton.textContent = this.audio.available ? (this.audio.enabled?'SOUND ON':'SOUND OFF') : 'SOUND UNAVAILABLE';
     this.ui.soundButton.setAttribute('aria-pressed',String(this.audio.enabled));
     this.ui.soundButton.disabled = !this.audio.available;
+    this.settingsUi?.update(Boolean(this.cameraAdapter),this.audio.enabled);
   };
   private updatePlayfieldLabel(): void {
     const label=getPlayfieldLabel(getCampaignRound(this.campaign).name,this.isSoloMode,this.cameraMode,this.trackingScheme);
@@ -455,7 +499,7 @@ class EnergyCatchScene extends Phaser.Scene {
   }
 
   private hasObservedRelease(player: PlayerId): boolean {
-    if (!this.cameraMode) return true;
+    if (!this.cameraMode) return !this.physicalActionHeld[player];
     const adapter = this.cameraAdapter;
     if (!adapter || adapter.currentStatus !== 'ready') return false;
     if (this.trackingScheme === 'H0' && !(adapter as MediaPipeHandInputAdapter).isCalibrated) return false;
@@ -1073,6 +1117,61 @@ class EnergyCatchScene extends Phaser.Scene {
     this.ui.hudCameraDock.hidden = !this.cameraMode || !isPlaying;
   }
 
+  private freezeSimulation():void{
+    if(this.simulationPaused)return;
+    this.simulationPaused=true;
+    this.savedTweenScale=this.tweens?.timeScale??1;
+    this.savedClockScale=this.time?.timeScale??1;this.savedClockPaused=this.time?.paused??false;
+    if(this.tweens)this.tweens.timeScale=0;
+    if(this.time){this.time.timeScale=0;this.time.paused=true;}
+    this.audio?.setPaused?.(true);
+  }
+  private finishPause():void{
+    this.simulationPaused=false;this.resumeRemainingMs=0;
+    if(this.tweens)this.tweens.timeScale=this.savedTweenScale;
+    if(this.time){this.time.timeScale=this.savedClockScale;this.time.paused=this.savedClockPaused;}
+    this.lastInput={p1:{moveAxis:0,catch:false},p2:{moveAxis:0,catch:false}};this.releaseSeen={p1:false,p2:false};
+    this.audio?.setPaused?.(false);
+  }
+  private openSettings=():void=>{
+    if(this.settingsOpen)return;
+    if(this.state.phase==='playing'||this.state.phase==='restart'||this.simulationPaused)this.freezeSimulation();
+    this.resumeRemainingMs=0;this.settingsOpen=true;
+    // The keyboard adapter listens globally and prevents arrow defaults. Remove it
+    // while native sliders own keys; the capture witness above survives recreation.
+    if(this.keyboardAdapter){const adapter=this.keyboardAdapter;adapter.destroy?.();if(this.inputAdapter===adapter)this.inputAdapter=undefined;this.keyboardAdapter=undefined;}
+    if(this.ui){this.ui.cameraSetup.hidden=true;this.ui.cameraSetup.setAttribute('aria-modal','false');}
+    this.settingsUi?.open(this.simulationPaused,Boolean(this.cameraAdapter));
+    this.settingsUi?.update(Boolean(this.cameraAdapter),this.audio?.enabled??false);
+  };
+  private closeSettings=():void=>{
+    if(!this.settingsOpen)return;
+    this.settingsOpen=false;
+    if(!this.keyboardAdapter)this.keyboardAdapter=new KeyboardInputAdapter();
+    this.inputAdapter=this.cameraMode?this.cameraAdapter:this.keyboardAdapter;
+    if(this.simulationPaused){this.resumeRemainingMs=900;this.releaseSeen={p1:false,p2:false};this.lastInput={p1:{moveAxis:0,catch:false},p2:{moveAxis:0,catch:false}};}
+    this.showPhase(this.state.phase);this.settingsUi?.close();
+    if(this.simulationPaused&&this.ui){this.ui.ready.hidden=false;this.ui.readyTitle.textContent='RESUME IN 3';this.ui.readyTitle.focus({preventScroll:true});}
+  };
+  private runSettingsAction=(action:SessionAction):void=>{
+    if(action==='restart'&&this.campaign.phase==='menu'&&window.matchMedia?.('(max-width: 959px)').matches)return;
+    // Settings has already obtained the explicit inline abandonment confirmation.
+    if(action==='menu')this.audio?.mute();
+    if(this.simulationPaused)this.finishPause();
+    this.settingsOpen=false;
+    if(!this.keyboardAdapter)this.keyboardAdapter=new KeyboardInputAdapter();
+    if(action==='menu'||!this.cameraMode)this.handleCameraStopRequested();
+    this.inputAdapter=this.cameraMode?this.cameraAdapter:this.keyboardAdapter;
+    this.campaign=createCampaign(this.isSoloMode?'solo':'co-op');this.state=createGameState();this.challenge=null;
+    this.lastInput={p1:{moveAxis:0,catch:false},p2:{moveAxis:0,catch:false}};this.releaseSeen={p1:false,p2:false};
+    this.spawnAfterMs=250;this.spawnPlayer='p1';this.resetPositions();this.clearItems();this.clearActionFeedback();
+    if(action==='restart'){this.campaign=startCampaign(this.campaign);this.prepareIntro();}
+    else{this.challengeRenderer?.render(null,this.isSoloMode);this.showPhase('menu');}
+    this.settingsUi?.close();
+    if(action==='menu')this.ui?.startButton.focus({preventScroll:true});
+    else document.getElementById('intro-title')?.focus({preventScroll:true});
+  };
+
   private handleMissionMenuRequested = (): void => {
     if (this.campaign.phase !== 'complete') return;
     this.audio?.mute();
@@ -1413,20 +1512,24 @@ class EnergyCatchScene extends Phaser.Scene {
 
   private showPhase(phase: GameState['phase']): void {
     if (!this.ui) return;
-    const showCameraDialog = phase === 'menu' && this.cameraSetupVisible;
+    const showCameraDialog = !this.settingsOpen && phase === 'menu' && this.cameraSetupVisible;
+    const toolbar=document.getElementById('session-toolbar');
     const soundHost=showCameraDialog?this.ui.cameraSetup:this.ui.root;
-    if(this.ui.soundButton.parentElement!==soundHost)soundHost.appendChild?.(this.ui.soundButton);
+    if(!this.settingsOpen&&toolbar&&toolbar.parentElement!==soundHost)soundHost.appendChild?.(toolbar);
+    this.ui.cameraSetup.setAttribute('aria-modal',String(showCameraDialog));
     this.ui.root.dataset.phase = this.campaign.phase;
     this.audio?.setScene?.(this.campaign.phase,getCampaignRound(this.campaign).id);
     this.campaignUi?.show(this.campaign, this.state.phase === 'restart', this.cameraMode, this.trackingScheme, this.challenge);
     this.ui.menu.hidden = this.campaign.phase !== 'menu' || this.cameraSetupVisible;
-    this.ui.cameraSetup.hidden = phase !== 'menu' || !this.cameraSetupVisible;
+    this.ui.cameraSetup.hidden = !showCameraDialog;
     this.ui.ready.hidden = phase !== 'restart';
+    if(phase==='restart'&&!this.simulationPaused)this.ui.readyTitle.textContent='GET READY';
     this.ui.hud.hidden = phase !== 'playing';
     this.ui.results.hidden = phase !== 'results';
     this.rigs.p2?.root.setVisible(!this.isSoloMode);
     this.updateInputModeUi();
     this.updateHud();
+    if(this.settingsOpen){this.settingsUi?.update(Boolean(this.cameraAdapter),this.audio?.enabled??false);return;}
     if (showCameraDialog) this.ui.cameraTitle.focus({ preventScroll: true });
     else if (this.cameraSetupWasVisible && phase === 'menu') this.ui.chooseCameraButton.focus({ preventScroll: true });
     else if (phase === 'restart') this.ui.readyTitle.focus({ preventScroll: true });

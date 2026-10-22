@@ -53,3 +53,13 @@ Include a menu campaign route (3 rounds), per-round intro, progress indicator 1/
 6. Independent reviewer evaluates spec compliance and code quality. At most three Dev-to-QA correction cycles per task; unresolved P0/P1 stops completion claims. Keep automated verification, self-review and independent evaluation distinct.
 
 The successful Downloads diagnostic test is prior physical evidence for that portable build only. Source-tree changes require fresh build/browser verification and cannot inherit physical performance claims automatically.
+
+## Settings and session controls — approved extension, 22 October 2026
+
+The approved Settings package extends the older session-control boundary above. SETTINGS is available from menu, camera setup, intros, ready, gameplay and results. Opening it during ready/gameplay freezes simulation, movement, items, scores, challenge holds/heat, snapshots and scene animation clocks. RESUME starts an independent 900 ms preparation gate; the completion frame is discarded so paused time cannot catch up. Activation needs a fresh live release after resume; a held S/Down key and stale/obscured camera input cannot unlock it. Losing tab visibility pauses explicitly and switches Sound Off; returning does not auto-resume.
+
+Master, Music and Sound effects sliders range from 0–100%; master multiplies both buses. Only versioned, sanitized volume preferences persist locally. Sound remains explicit opt-in after reload; TEST SFX requires Sound On. RESTORE DEFAULT VOLUMES resets those three values only. Camera remains live while paused and STOP CAMERA remains available.
+
+RESTART MISSION and RETURN TO MENU show inline confirmation for an unfinished campaign. Cancel preserves the frozen session. Restart clears the whole campaign and opens round 1 intro, preserving Solo/Co-op and an actually active opted-in camera; it does not start gameplay or promote a pending setup. Menu clears the mission, stops camera/audio resources, returns to keyboard and focuses Start Mission. FULLSCREEN requests or exits fullscreen only after an explicit action and reports unsupported/rejected requests. Its layout preserves the 16:9 game frame. Existing round rules, Next/Replay actions, camera safety guards and rigs are unchanged.
+
+Implementation contract and acceptance evidence: [Settings spec](../superpowers/specs/2026-10-22-settings-controls-design.md) and [Settings report](../reports/settings-controls-2026-10-22.md). Keyboard/synthetic-browser checks are separate from physical webcam/TV acceptance.

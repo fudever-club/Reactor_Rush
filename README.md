@@ -228,3 +228,12 @@ Phát triển với tinh thần mã nguồn mở và chia sẻ học thuật b�
 ## Cloud engineering checkpoint — started20/10/2026
 
 [Current engineering report](docs/reports/cloud-completion-2026-10-20/REPORT.md) · [Local booth package and field checks](docs/operations/booth-local.md). Camera lifecycle/capture fixes and results STOP hit-target correction are implemented;173/173 Node tests and build passed. Production browser/field gate details are in the report. Physical camera/TV acceptance, art approval and release remain separate.
+
+## Cài đặt và điều khiển phiên chơi — 22/10/2026
+
+- **SETTINGS:** mở cài đặt từ các màn hình; trong lúc chơi game sẽ tạm dừng. Chọn **RESUME** để đếm chuẩn bị 900 ms rồi tiếp tục; thả S/↓ hoặc hạ tay trước khi kích hoạt lại. Chuyển sang tab khác cũng tạm dừng và tắt tiếng.
+- **Master / Music / Sound effects:** chỉnh riêng âm lượng 0–100%, được nhớ trên trình duyệt. **SOUND ON** vẫn cần bật chủ động mỗi lần tải game; **TEST SFX** thử hiệu ứng, **RESTORE DEFAULT VOLUMES** chỉ đặt lại ba mức âm lượng.
+- **RESTART MISSION:** xác nhận rồi chơi lại từ hướng dẫn ải 1, giữ chế độ Solo/Co-op và camera đang hoạt động. **RETURN TO MENU:** xác nhận để xóa lượt hiện tại, dừng camera/âm thanh và về bàn phím. **STOP CAMERA** vẫn dùng được khi tạm dừng.
+- **FULLSCREEN:** bật/tắt toàn màn hình khi trình duyệt hỗ trợ; giao diện báo rõ nếu yêu cầu bị từ chối. Cửa sổ dưới 960 px vẫn mở được Settings, nhưng cần mở rộng để bắt đầu game.
+
+[Đặc tả](docs/superpowers/specs/2026-10-22-settings-controls-design.md) · [Báo cáo kiểm thử](docs/reports/settings-controls-2026-10-22.md).

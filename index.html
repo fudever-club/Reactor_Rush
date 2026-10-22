@@ -13,7 +13,27 @@
       <section class="game-frame" aria-label="Reactor Rush three-round arcade game">
         <div id="game-container">
           <div id="runtime-ui" aria-label="Game interface">
-            <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="false" aria-label="Toggle game sound">SOUND OFF</button>
+            <div id="session-toolbar" class="session-toolbar"><button id="settings-toggle" type="button" aria-haspopup="dialog" aria-controls="settings-dialog">SETTINGS</button><button id="fullscreen-toggle" type="button" aria-pressed="false">FULLSCREEN</button>
+            <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="false" aria-label="Toggle game sound">SOUND OFF</button><p id="fullscreen-status" class="fullscreen-status" role="status"></p></div>
+<section id="settings-dialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-describedby="settings-pause-status" hidden>
+ <div class="settings-card">
+  <p class="settings-kicker">MISSION CONTROL</p><h2 id="settings-title" tabindex="-1">Settings</h2>
+  <p id="settings-pause-status"></p>
+  <div id="settings-content">
+   <div class="volume-controls">
+    <label for="volume-master">Master <output id="volume-master-value" for="volume-master">100%</output></label><input id="volume-master" type="range" min="0" max="100" step="1" value="100" />
+    <label for="volume-music">Music <output id="volume-music-value" for="volume-music">100%</output></label><input id="volume-music" type="range" min="0" max="100" step="1" value="100" />
+    <label for="volume-sfx">Sound effects <output id="volume-sfx-value" for="volume-sfx">100%</output></label><input id="volume-sfx" type="range" min="0" max="100" step="1" value="100" />
+   </div>
+   <div class="settings-row"><button id="settings-test-sfx" type="button" disabled>TEST SFX</button><button id="settings-defaults" type="button">RESTORE DEFAULT VOLUMES</button></div>
+   <p class="settings-note">Volume preferences are saved on this device. Sound starts only when you choose Sound On.</p>
+   <p id="settings-start-guard" class="settings-note" hidden>Widen your window to at least 960 px to start a mission.</p>
+   <div class="settings-session"><button id="settings-restart" type="button">RESTART MISSION</button><button id="settings-menu" type="button">RETURN TO MENU</button><button id="settings-stop-camera" type="button" disabled>STOP CAMERA</button></div>
+   <button id="settings-close" class="settings-primary" type="button">CLOSE SETTINGS</button>
+  </div>
+  <div id="settings-confirmation" hidden><h3 id="settings-confirm-title"></h3><p id="settings-confirm-copy"></p><div class="settings-row"><button id="settings-cancel" type="button">CANCEL</button><button id="settings-confirm" class="settings-primary" type="button">CONFIRM</button></div></div>
+ </div>
+</section>
             <section id="menu-screen" class="ui-screen menu-screen" aria-labelledby="menu-title">
               <header class="menu-title">
                 <div class="brand-lockup"><img class="brand-symbol" src="./assets/brand/reactor-rush-symbol.svg" alt="" /><div><h1 id="menu-title">REACTOR <span>RUSH</span></h1><p class="brand-promise">Power the lab. One mission, three experiments.</p></div></div>
